@@ -53,7 +53,7 @@ export function Navbar() {
           <Logo />
         </a>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-8 lg:flex">
           <ul className="flex items-center" onMouseLeave={() => setHovered(null)}>
             {navLinks.map((l) => (
               <li key={l.href} className="relative">
@@ -61,7 +61,7 @@ export function Navbar() {
                   href={l.href}
                   onMouseEnter={() => setHovered(l.href)}
                   onFocus={() => setHovered(l.href)}
-                  className="relative z-10 block rounded-full px-5 py-2.5 text-[0.97rem] font-medium text-hueso/90 transition-colors duration-300 hover:text-hueso"
+                  className="relative z-10 block rounded-full px-5 py-2.5 whitespace-nowrap text-[0.97rem] font-medium text-hueso/90 transition-colors duration-300 hover:text-hueso"
                 >
                   {l.label}
                 </a>
@@ -84,7 +84,7 @@ export function Navbar() {
 
         <button
           type="button"
-          className="relative z-10 flex size-12 items-center justify-center rounded-full border border-hueso/20 bg-ceniza/40 backdrop-blur-md md:hidden"
+          className="relative z-10 flex size-12 items-center justify-center rounded-full border border-hueso/20 bg-ceniza/40 backdrop-blur-md lg:hidden"
           aria-expanded={open}
           aria-controls="menu-movil"
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
@@ -109,7 +109,7 @@ export function Navbar() {
         {open && (
           <motion.div
             id="menu-movil"
-            className="fixed inset-0 z-0 flex flex-col bg-ceniza px-6 pt-28 pb-10 md:hidden"
+            className="fixed inset-0 z-0 flex flex-col bg-ceniza px-6 pt-28 pb-10 lg:hidden"
             initial={{ clipPath: "circle(0% at calc(100% - 44px) 44px)" }}
             animate={{ clipPath: "circle(150% at calc(100% - 44px) 44px)" }}
             exit={{ clipPath: "circle(0% at calc(100% - 44px) 44px)" }}

@@ -10,7 +10,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
-import { hero, links } from "@/data/nexus";
+import { hero, links, profile } from "@/data/nexus";
 import { Arrow } from "../Arrow";
 import { Embers } from "./Embers";
 import { RotatingTag } from "./RotatingTag";
@@ -333,6 +333,30 @@ export function Hero() {
           </a>
         </div>
       </motion.div>
+
+      {/* 8 · Sellos IAAI en la esquina (Aaron, 10-11). Desde 1024 px, abajo a la izquierda,
+          alineados con el logo. En celular y tablet esa esquina choca con los botones: van arriba, bajo el logo. */}
+      <div className="pointer-events-none absolute inset-x-0 top-[4.9rem] z-20 sm:top-[6.2rem] lg:top-auto lg:bottom-[max(2.4rem,5.5svh)]">
+        <ul
+          aria-label="Afiliaciones y credencial IAAI"
+          className="in-cta mx-auto flex max-w-[1440px] items-center px-5 sm:px-8 lg:px-[8.5vw] xl:px-[min(8.5vw,140px)]"
+          style={{ "--d": "3.6s" } as Vars}
+        >
+          {profile.seals.map((seal, i) => (
+            <li key={seal.name} className={i > 0 ? "-ml-1.5 lg:-ml-2" : ""}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
+              <img
+                src={seal.logo}
+                alt={seal.name}
+                width={320}
+                height={320}
+                decoding="async"
+                className="size-9 rounded-full shadow-[0_6px_18px_-6px_rgba(0,0,0,.85)] ring-2 ring-ceniza sm:size-10 lg:size-11 xl:size-14"
+              />
+            </li>
+          ))}
+        </ul>
+      </div>
     </section>
   );
 }
