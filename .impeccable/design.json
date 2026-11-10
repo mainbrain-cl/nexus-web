@@ -1,0 +1,155 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-10T00:00:00Z",
+  "title": "Design System: NEXUS",
+  "extensions": {
+    "colorMeta": {
+      "ceniza": { "role": "neutral", "displayName": "Ceniza", "canonical": "#120f0d", "tonalRamp": ["#0a0807", "#120f0d", "#1d1815", "#2a231e", "#3a302a", "#5a4d44", "#8a7c70", "#c9bfb4"] },
+      "humo": { "role": "neutral", "displayName": "Humo", "canonical": "#1d1815", "tonalRamp": ["#0e0b0a", "#161210", "#1d1815", "#2a231e", "#3d342d", "#5e5248", "#8f8276", "#cfc5ba"] },
+      "carbon": { "role": "neutral", "displayName": "Carbón", "canonical": "#2a231e", "tonalRamp": ["#120f0d", "#1d1815", "#2a231e", "#3d332c", "#56493f", "#7a6b5f", "#a99b8f", "#ddd4ca"] },
+      "oro": { "role": "primary", "displayName": "Oro Arena", "canonical": "#c9a26b", "tonalRamp": ["#3a2c18", "#5c4627", "#7c5c34", "#9c7a4a", "#c9a26b", "#e0c08f", "#eed8b4", "#f8eedc"] },
+      "oro-claro": { "role": "primary", "displayName": "Oro Claro", "canonical": "#e0c08f", "tonalRamp": ["#3a2c18", "#5c4627", "#7c5c34", "#9c7a4a", "#c9a26b", "#e0c08f", "#eed8b4", "#f8eedc"] },
+      "oro-oscuro": { "role": "primary", "displayName": "Oro Tostado", "canonical": "#9c7a4a", "tonalRamp": ["#3a2c18", "#5c4627", "#7c5c34", "#9c7a4a", "#c9a26b", "#e0c08f", "#eed8b4", "#f8eedc"] },
+      "brasa": { "role": "secondary", "displayName": "Brasa", "canonical": "#ff7a2a", "tonalRamp": ["#4a1c04", "#7a300a", "#b04a12", "#e0621c", "#ff7a2a", "#ffb070", "#ffe2b0", "#fff3d6"] },
+      "hueso": { "role": "neutral", "displayName": "Hueso", "canonical": "#f4eee6", "tonalRamp": ["#2a231e", "#4f453d", "#776c62", "#a39789", "#b3aaa0", "#d6cdc2", "#ebe4da", "#f4eee6"] },
+      "gris": { "role": "neutral", "displayName": "Gris Ceniza", "canonical": "#b3aaa0", "tonalRamp": ["#2a2622", "#433d37", "#5f5750", "#7f766d", "#998f85", "#b3aaa0", "#d0c9c1", "#ece7e1"] },
+      "ambar-revision": { "role": "tertiary", "displayName": "Ámbar de Revisión", "canonical": "#c08419", "tonalRamp": ["#3a2706", "#5c3e0b", "#7f5610", "#a06d15", "#c08419", "#dba54a", "#ecc785", "#f8e7c4"] },
+      "sepia-timbre": { "role": "tertiary", "displayName": "Sepia de Timbre", "canonical": "#6b4f2a", "tonalRamp": ["#21180c", "#3a2b17", "#523d21", "#6b4f2a", "#8a6a40", "#ab8c62", "#cdb48f", "#ebdcc4"] }
+    },
+    "typographyMeta": {
+      "display": { "displayName": "Display carbonizado", "purpose": "Título de la hero y título reencendido de Contacto, con textura de ceniza e ignición." },
+      "headline": { "displayName": "Título de sección", "purpose": "Barlow Condensed cursiva en mayúsculas, una línea en oro claro; también nombres de servicio y pasos del método." },
+      "thesis": { "displayName": "Tesis", "purpose": "Solo el titular de Intersección: la única frase-tesis, en la voz de lectura." },
+      "name": { "displayName": "Nombre", "purpose": "Archivo ancha: el nombre de Domingo, los códigos NFPA y las entradas del registro." },
+      "body": { "displayName": "Lectura", "purpose": "Párrafos en gris, 44 a 60ch." },
+      "label": { "displayName": "Rótulo", "purpose": "Rótulos de canal, lema y firmas; siempre debajo o al lado de su dato." },
+      "button": { "displayName": "Botón", "purpose": "Píldoras en mayúsculas con tracking 0.1em." }
+    },
+    "shadows": [
+      { "name": "caida-hoja", "value": "0 1px 1px rgba(0,0,0,.3), 0 8px 16px -4px rgba(0,0,0,.4), 0 30px 60px -18px rgba(0,0,0,.6), 0 40px 70px -24px rgba(0,0,0,.45)", "purpose": "Solo la hoja del informe sobre el escritorio oscuro." },
+      { "name": "halo-oro", "value": "0 1px 0 rgba(255,240,210,.45) inset, 0 10px 30px -12px rgba(201,162,107,.55)", "purpose": "Botón dorado en reposo." },
+      { "name": "halo-oro-hover", "value": "0 1px 0 rgba(255,240,210,.5) inset, 0 18px 40px -14px rgba(255,140,50,.6), 0 0 0 4px rgba(201,162,107,.16)", "purpose": "Botón dorado al pasar el puntero: el halo se vuelve brasa." },
+      { "name": "resplandor-brasa", "value": "0 0 12px 2px rgba(255,122,42,.55)", "purpose": "Nodos y puntos encendidos." }
+    ],
+    "motion": [
+      { "name": "ease-expo", "value": "cubic-bezier(0.16, 1, 0.3, 1)", "purpose": "Salida exponencial: la curva de toda la página." },
+      { "name": "ease-in-out-expo", "value": "cubic-bezier(0.87, 0, 0.13, 1)", "purpose": "Trazos que se dibujan y vuelven (hilo de la hero, punto de scroll)." },
+      { "name": "reveal", "value": "opacity 0→1, y 22px→0, blur 6px→0, 1s ease-expo", "purpose": "Párrafos y bloques al entrar." },
+      { "name": "mask-rise", "value": "y 105%→0, 1.1s ease-expo, 0.09s por línea", "purpose": "Cada línea de un título sube desde su máscara." },
+      { "name": "thread-draw", "value": "scaleX 0→1, 1.4s ease-expo, desde la izquierda", "purpose": "El hilo dorado se dibuja al entrar." },
+      { "name": "parallax-snap", "value": "Math.round(v * devicePixelRatio) / devicePixelRatio", "purpose": "Todo desplazamiento continuo se redondea al píxel físico." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "640px" },
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" },
+      { "name": "xl", "value": "1280px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Botón oro",
+      "kind": "button",
+      "refersTo": "button-oro",
+      "description": "Acción principal: siempre primero y único dorado de su grupo.",
+      "html": "<a class=\"ds-btn ds-btn-oro\" href=\"#\">Solicitar asesoría <svg class=\"ds-arrow\" viewBox=\"0 0 24 24\" width=\"16\" height=\"16\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M5 12h14M13 6l6 6-6 6\"/></svg></a>",
+      "css": ".ds-btn { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: .7em; overflow: hidden; height: 3.3rem; padding: 0 36px; border-radius: 999px; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; font-size: .92rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; transition: transform .5s cubic-bezier(.16,1,.3,1), box-shadow .5s cubic-bezier(.16,1,.3,1), background-color .4s cubic-bezier(.16,1,.3,1), color .4s cubic-bezier(.16,1,.3,1); } .ds-btn .ds-arrow { transition: transform .5s cubic-bezier(.16,1,.3,1); } .ds-btn:hover .ds-arrow { transform: translateX(4px); } .ds-btn:active { transform: translateY(0) scale(.98); } .ds-btn:focus-visible { outline: 2px solid #e0c08f; outline-offset: 4px; } .ds-btn-oro { background: linear-gradient(180deg, #c9a26b, #a9824d); color: #fff; text-shadow: 0 1px 2px rgba(70,42,12,.45); box-shadow: 0 1px 0 rgba(255,240,210,.45) inset, 0 10px 30px -12px rgba(201,162,107,.55); } .ds-btn-oro::before { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(105deg, transparent 30%, rgba(255,248,230,.38) 48%, transparent 66%); transform: translateX(-120%); transition: transform .9s cubic-bezier(.16,1,.3,1); } .ds-btn-oro:hover { transform: translateY(-2px); box-shadow: 0 1px 0 rgba(255,240,210,.5) inset, 0 18px 40px -14px rgba(255,140,50,.6), 0 0 0 4px rgba(201,162,107,.16); } .ds-btn-oro:hover::before { transform: translateX(120%); }"
+    },
+    {
+      "name": "Botón línea",
+      "kind": "button",
+      "refersTo": "button-linea",
+      "description": "Acción secundaria junto al dorado; se rellena de hueso desde el centro.",
+      "html": "<a class=\"ds-btn-linea\" href=\"#\">Ver servicios</a>",
+      "css": ".ds-btn-linea { position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; overflow: hidden; height: 3.3rem; padding: 0 36px; border-radius: 999px; border: 1.5px solid rgba(244,238,230,.85); background: rgba(18,15,13,.45); color: #f4eee6; font-family: 'Schibsted Grotesk', ui-sans-serif, system-ui, sans-serif; font-size: .92rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; text-decoration: none; transition: transform .5s cubic-bezier(.16,1,.3,1), color .4s cubic-bezier(.16,1,.3,1); } .ds-btn-linea::before { content: ''; position: absolute; inset: 0; z-index: -1; background: #f4eee6; border-radius: inherit; transform: scale(.2); opacity: 0; transition: transform .6s cubic-bezier(.16,1,.3,1), opacity .4s cubic-bezier(.16,1,.3,1); } .ds-btn-linea:hover { color: #120f0d; transform: translateY(-2px); } .ds-btn-linea:hover::before { transform: scale(1); opacity: 1; } .ds-btn-linea:focus-visible { outline: 2px solid #e0c08f; outline-offset: 4px; }"
+    },
+    {
+      "name": "Barra de navegación",
+      "kind": "nav",
+      "refersTo": "nav",
+      "description": "Logo a la izquierda, enlaces con píldora flotante y botón dorado a la derecha; velo ceniza e hilo inferior al bajar.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-logo\">NE<b>X</b>US</span><ul><li><a href=\"#\">Servicios</a></li><li><a href=\"#\">Método</a></li><li><a href=\"#\">Perfil</a></li></ul></nav>",
+      "css": ".ds-nav { position: relative; display: flex; align-items: center; justify-content: space-between; padding: 12px 32px; background: linear-gradient(180deg, rgba(18,15,13,.92), rgba(18,15,13,.72)); backdrop-filter: blur(24px); } .ds-nav::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: linear-gradient(90deg, transparent, rgba(201,162,107,.3), transparent); } .ds-logo { font-family: 'Schibsted Grotesk', sans-serif; font-weight: 600; font-size: 2.1rem; letter-spacing: .06em; color: #f4eee6; } .ds-logo b { color: #c9a26b; font-weight: 600; } .ds-nav ul { display: flex; list-style: none; margin: 0; padding: 0; } .ds-nav a { display: block; padding: 10px 20px; border-radius: 999px; border: 1px solid transparent; font-family: 'Schibsted Grotesk', sans-serif; font-size: .97rem; font-weight: 500; color: rgba(244,238,230,.9); text-decoration: none; transition: color .3s, background-color .3s, border-color .3s; } .ds-nav a:hover { color: #f4eee6; background: rgba(244,238,230,.07); border-color: rgba(244,238,230,.1); } .ds-nav a:focus-visible { outline: 2px solid #e0c08f; outline-offset: 4px; }"
+    },
+    {
+      "name": "Título de sección",
+      "kind": "custom",
+      "refersTo": "headline",
+      "description": "Cursiva condensada en mayúsculas, una línea acentuada en oro claro.",
+      "html": "<h2 class=\"ds-title\"><span>Del dato</span><span class=\"ds-accent\">a la conclusión</span></h2>",
+      "css": ".ds-title { margin: 0; font-family: 'Barlow Condensed', ui-sans-serif, sans-serif; font-weight: 800; font-style: italic; text-transform: uppercase; font-size: clamp(2.3rem, 4.6vw, 4rem); line-height: .9; color: #f4eee6; text-wrap: balance; } .ds-title span { display: block; } .ds-accent { color: #e0c08f; }"
+    },
+    {
+      "name": "Hilo dorado",
+      "kind": "custom",
+      "refersTo": "thread",
+      "description": "El único conector: 1 px que se desvanece hacia la punta, con nodo circular.",
+      "html": "<div class=\"ds-thread\"><span class=\"ds-node\"></span></div>",
+      "css": ".ds-thread { position: relative; width: 240px; height: 1px; background: linear-gradient(90deg, #e0c08f, rgba(201,162,107,.6), transparent); transform-origin: left; transition: transform 1.4s cubic-bezier(.16,1,.3,1); } .ds-thread:hover { transform: scaleX(1.15); } .ds-node { position: absolute; left: 0; top: 50%; width: 7px; height: 7px; border-radius: 999px; background: #e0c08f; transform: translate(-50%, -50%); box-shadow: 0 0 10px rgba(224,192,143,.55); }"
+    },
+    {
+      "name": "Nodo encendido",
+      "kind": "custom",
+      "refersTo": "ember-node",
+      "description": "Marca de selección o paso activo: un punto de brasa, la única luz saturada.",
+      "html": "<span class=\"ds-ember\"></span>",
+      "css": ".ds-ember { display: inline-block; width: 7px; height: 7px; border-radius: 999px; background: #ffb070; box-shadow: 0 0 0 1.5px #ff7a2a, 0 0 12px 2px rgba(255,122,42,.55); }"
+    },
+    {
+      "name": "Placa de norma",
+      "kind": "card",
+      "refersTo": "placa-norma",
+      "description": "La única caja con borde: humo, ángulo recto y canto dorado arriba.",
+      "html": "<div class=\"ds-placa\"><h4>NFPA <span>921</span></h4><p class=\"ds-placa-name\">Guía de investigación de incendios y explosiones</p><span class=\"ds-placa-rule\"></span><p class=\"ds-placa-plain\">El método que ordena cada conclusión.</p></div>",
+      "css": ".ds-placa { position: relative; max-width: 420px; padding: 40px 36px 44px; background: #1d1815; border: 1px solid rgba(244,238,230,.09); transition: border-color .5s cubic-bezier(.16,1,.3,1); } .ds-placa:hover { border-color: rgba(201,162,107,.3); } .ds-placa::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 1px; background: linear-gradient(90deg, #c9a26b, rgba(201,162,107,.5), transparent); } .ds-placa h4 { margin: 0; font-family: Archivo, sans-serif; font-stretch: 115%; font-weight: 800; font-size: 3rem; line-height: 1; letter-spacing: .01em; text-transform: uppercase; color: #f4eee6; } .ds-placa h4 span { color: #e0c08f; } .ds-placa-name { margin: 16px 0 0; font-family: 'Schibsted Grotesk', sans-serif; font-size: .95rem; color: #b3aaa0; } .ds-placa-rule { display: block; width: 40px; height: 1px; margin-top: 28px; background: rgba(201,162,107,.7); } .ds-placa-plain { margin: 20px 0 0; font-family: 'Schibsted Grotesk', sans-serif; font-size: 1.3rem; font-weight: 500; line-height: 1.35; color: #f4eee6; }"
+    },
+    {
+      "name": "Hoja del informe",
+      "kind": "card",
+      "refersTo": "hoja-informe",
+      "description": "La única superficie clara: papel hueso con caída larga y tintas de revisión.",
+      "html": "<article class=\"ds-hoja\"><p class=\"ds-hoja-line\"><span class=\"ds-mark-ok\">El origen se ubica en la cocina</span>, <span class=\"ds-mark-resp\">por un artefacto eléctrico</span>, <span class=\"ds-mark-no\">sin otra causa posible</span>.</p><span class=\"ds-timbre\">Ejemplo ilustrativo</span></article>",
+      "css": ".ds-hoja { position: relative; max-width: 520px; padding: 32px 48px 44px; background: radial-gradient(90% 60% at 18% 0%, rgba(255,252,246,.6), rgba(255,252,246,0) 70%), radial-gradient(130% 110% at 50% 45%, rgba(120,88,50,0) 58%, rgba(120,88,50,.09) 100%), #f4eee6; color: #2a231e; transform: rotate(-1.5deg); box-shadow: 0 1px 1px rgba(0,0,0,.3), 0 8px 16px -4px rgba(0,0,0,.4), 0 30px 60px -18px rgba(0,0,0,.6), 0 40px 70px -24px rgba(0,0,0,.45); transition: transform .8s cubic-bezier(.16,1,.3,1); } .ds-hoja:hover { transform: rotate(-.6deg); } .ds-hoja-line { font-family: 'Schibsted Grotesk', sans-serif; font-size: 1.06rem; font-weight: 500; line-height: 1.625; margin: 0; } .ds-mark-ok { background: linear-gradient(#9c7a4a, #9c7a4a) no-repeat 0 100% / 100% 2px; } .ds-mark-resp { background: repeating-linear-gradient(90deg, #c08419 0 7px, transparent 7px 11px) no-repeat 0 100% / 100% 2px; } .ds-mark-no { color: rgba(42,35,30,.75); background: linear-gradient(#ff7a2a, #ff7a2a) no-repeat 0 55% / 100% 2px; } .ds-timbre { display: inline-block; margin-top: 24px; padding: 8px 12px; border: 3px double #6b4f2a; color: #6b4f2a; mix-blend-mode: multiply; transform: rotate(2.5deg); font-family: 'Schibsted Grotesk', sans-serif; font-size: .72rem; font-weight: 700; letter-spacing: .15em; text-transform: uppercase; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "La escena después del fuego",
+    "overview": "El fuego es el escenario; el investigador es el sujeto. La página vive en un humo negro y cálido, donde el título se enciende letra por letra y queda carbonizado, como queda una escena cuando el fuego ya se apagó. No hay llamas en primer plano ni rojo de alarma: la luz saturada son unas pocas brasas, y todo lo demás es ceniza, hueso y oro arena.\n\nBajo la hero, la página es de \"el hilo\": NEXUS es el nudo donde se cruzan derecho, ciencia forense e investigación de incendios, y cada conclusión queda atada a su evidencia. El hilo dorado de 1 px es lo único que conecta: dibuja la X de la intersección, recorre el método de nodo en nodo, separa el registro del perfil y toca el canto de las placas. La densidad es baja y la lectura pausada; la sobriedad viene de PRODUCT.md, porque el rubro trata pérdidas reales.\n\nUna sola superficie rompe la oscuridad: la hoja del informe de ejemplo, papel hueso bajo una lámpara, donde las marcas de revisión se escriben solas. Se rechaza expresamente la plantilla de consultora con tarjetas de íconos y filas de cifras.",
+    "keyCharacteristics": [
+      "Fondo de humo cálido (ceniza y humo alternados por sección), nunca negro puro ni azul.",
+      "Tres voces tipográficas con oficios separados: cursiva condensada para gritar, grotesca ancha para nombrar, grotesca de lectura para argumentar.",
+      "El hilo dorado de 1 px como único conector.",
+      "Brasas como única luz saturada; oro arena como único acento.",
+      "Una sola superficie clara: la hoja del informe.",
+      "Movimiento de salida exponencial: todo sube desde una máscara o desde un leve desenfoque."
+    ],
+    "rules": [
+      { "name": "The One Ember Rule", "body": "La brasa es la única luz saturada de la página. Aparece como punto, chispa, resplandor o trazo, nunca como relleno. Ningún otro naranja, rojo o color vivo entra al sistema.", "section": "colors" },
+      { "name": "The Ink Stays on Paper Rule", "body": "El ámbar de revisión y el sepia de timbre son tintas de la hoja del informe y no existen fuera de ella. La única excepción construida es la leyenda que descifra las marcas, que repite el glifo y la muestra de cada nivel junto a la hoja.", "section": "colors" },
+      { "name": "The Single Light Surface Rule", "body": "La hoja del informe es la única superficie clara. Cualquier otro bloque vive en ceniza o humo.", "section": "colors" },
+      { "name": "The One Thesis Rule", "body": "El titular de Intersección va en Schibsted, la voz de lectura, a propósito: es la única frase-tesis de la página. Los demás títulos de sección usan la voz display. Si una segunda sección quiere la voz de lectura en su titular, ya no es una tesis.", "section": "typography" },
+      { "name": "The Three Trades Rule", "body": "Cada voz tiene un oficio. La cursiva condensada titula, la Archivo ancha nombra (personas, normas, hitos) y la Schibsted argumenta. No se cruzan.", "section": "typography" },
+      { "name": "The Physical Pixel Rule", "body": "Todo desplazamiento de parallax se redondea al píxel físico (Math.round(v × devicePixelRatio) / devicePixelRatio). Mover una capa en fracciones de píxel obliga a repintarla entera en cada cuadro; medido en pantalla 2x a 120 Hz, el parallax bajó de ~190 % a ~105 % de CPU.", "section": "layout" },
+      { "name": "The Light Not Lift Rule", "body": "Ninguna tarjeta flota. Las sombras son brillo de oro o de brasa; la única sombra de objeto pertenece a la hoja.", "section": "elevation" },
+      { "name": "The Thread Rule", "body": "El hilo dorado de 1 px es el único conector de la página. Une, separa y señala; ninguna flecha, línea de puntos o borde grueso cumple ese oficio. Se dibuja de izquierda a derecha al entrar y se desvanece hacia la punta.", "section": "shapes" }
+    ],
+    "dos": [
+      "Do alternar ceniza y humo entre secciones para pausar, con el ritmo vertical de clamp(5.5rem, 11vw, 9.5rem).",
+      "Do acentuar una sola línea de cada título de sección en oro claro.",
+      "Do conectar, separar y señalar con el hilo dorado de 1 px y sus nodos circulares.",
+      "Do hacer entrar el contenido subiendo desde una máscara o desde un desenfoque de 6 px, con salida exponencial cubic-bezier(0.16, 1, 0.3, 1), y respetar el movimiento reducido.",
+      "Do redondear al píxel físico todo desplazamiento continuo (parallax, seguimiento del mouse).",
+      "Do prefijar con nx- las clases propias de un componente: next.config procesa todo el CSS como global, así que una clase sin prefijo choca con las demás."
+    ],
+    "donts": [
+      "Don't usar llamas en primer plano ni rojo de alarma; el fuego es atmósfera.",
+      "Don't rellenar superficies o botones con brasa, ni sumar otro color saturado.",
+      "Don't usar ámbar #c08419 ni sepia #6b4f2a fuera de la hoja del informe y su leyenda.",
+      "Don't crear una segunda superficie clara.",
+      "Don't armar tarjetas de íconos ni filas de cifras de consultora.",
+      "Don't poner el titular de otra sección en la voz de lectura; la tesis es una sola.",
+      "Don't usar flechas, líneas de puntos ni bordes gruesos como conectores.",
+      "Don't colocar un rótulo en mayúsculas espaciadas encima de un título."
+    ]
+  }
+}
