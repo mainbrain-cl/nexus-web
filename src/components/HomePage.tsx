@@ -1,3 +1,5 @@
+import type { Locale } from "@/data/idiomas";
+import { LocaleProvider } from "@/components/LocaleProvider";
 import { Navbar } from "@/components/Navbar";
 import { Hero } from "@/components/hero/Hero";
 import { Interseccion } from "@/components/sections/Interseccion";
@@ -8,9 +10,10 @@ import { Perfil } from "@/components/sections/Perfil";
 import { Contacto } from "@/components/sections/Contacto";
 import { Footer } from "@/components/sections/Footer";
 
-export default function Home() {
+/** La página completa en un idioma. La usan `/` (español), `/en/` y `/pt/`. */
+export function HomePage({ locale }: { locale: Locale }) {
   return (
-    <>
+    <LocaleProvider locale={locale}>
       <Navbar />
       <main id="contenido">
         <Hero />
@@ -21,7 +24,7 @@ export default function Home() {
         <Perfil />
         <Contacto />
       </main>
-      <Footer />
-    </>
+      <Footer locale={locale} />
+    </LocaleProvider>
   );
 }

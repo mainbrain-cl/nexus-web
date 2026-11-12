@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
-import { hero, profile, photos, type LedgerRow } from "@/data/nexus";
+import type { LedgerRow } from "@/data/nexus";
+import { useContent } from "@/components/LocaleProvider";
 import { Container, GoldRule, Reveal, Section, useReduce } from "@/components/ui/primitives";
 import { Rich } from "@/components/ui/Rich";
 import { PhotoBand } from "@/components/ui/PhotoBand";
@@ -17,6 +18,7 @@ const THREAD_S = 1.8;
  * El estado vive en un data-atributo y las transiciones son CSS: nada de estado de React por cuadro.
  */
 function Ledger() {
+  const { profile } = useContent();
   const ref = useRef<HTMLOListElement>(null);
   const reduce = useReduce();
 
@@ -108,6 +110,7 @@ function Ledger() {
 }
 
 export function Perfil() {
+  const { hero, profile, photos } = useContent();
   return (
     <Section id="perfil" tone="ceniza" labelledBy="perfil-title" className="pb-[clamp(3.5rem,6vw,5rem)]">
       <Container>
@@ -177,7 +180,7 @@ export function Perfil() {
               <GoldRule className="mt-6 w-[clamp(72px,8vw,120px)]" delay={0.3} />
               <p className="mt-5 max-w-[46ch] text-[0.95rem] font-semibold tracking-[0.08em] text-oro-claro uppercase [text-wrap:balance]">
                 {/* Guion que no se corta: "IAAI-FIT" no debe partirse entre dos líneas */}
-                {profile.role.replace("-", "‑")}
+                {profile.role.replace(/-/g, "‑")}
               </p>
               {/* Logos del portafolio PDF del cliente; Aaron pidió usarlos (10-11). El logo carga la credencial; el nombre va debajo, corto */}
               <ul aria-label={profile.sealsLabel} className="mt-6 grid max-w-[34rem] grid-cols-3 gap-4 sm:gap-6">

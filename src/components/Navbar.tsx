@@ -2,13 +2,16 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { a11y, contact, links, navLinks } from "@/data/nexus";
+import { contact } from "@/data/nexus";
+import { useContent } from "./LocaleProvider";
+import { LanguageSwitcher } from "./LanguageSwitcher";
 import { Logo } from "./Logo";
 import { Arrow } from "./Arrow";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
 export function Navbar() {
+  const { a11y, links, navLinks, navCta } = useContent();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -53,7 +56,8 @@ export function Navbar() {
           <Logo />
         </a>
 
-        <div className="hidden items-center gap-8 lg:flex">
+        {/* Entre 1024 y 1279 px los márgenes internos se acortan para que entren las banderas sin apretar el botón */}
+        <div className="hidden items-center gap-3.5 lg:flex xl:gap-7">
           <ul className="flex items-center" onMouseLeave={() => setHovered(null)}>
             {navLinks.map((l) => (
               <li key={l.href} className="relative">
@@ -61,7 +65,7 @@ export function Navbar() {
                   href={l.href}
                   onMouseEnter={() => setHovered(l.href)}
                   onFocus={() => setHovered(l.href)}
-                  className="relative z-10 block rounded-full px-5 py-2.5 whitespace-nowrap text-[0.97rem] font-medium text-hueso/90 transition-colors duration-300 hover:text-hueso"
+                  className="relative z-10 block rounded-full px-3 py-2.5 whitespace-nowrap xl:px-5 text-[0.97rem] font-medium text-hueso/90 transition-colors duration-300 hover:text-hueso"
                 >
                   {l.label}
                 </a>
@@ -76,15 +80,22 @@ export function Navbar() {
               </li>
             ))}
           </ul>
-          <a href={links.formulario} className="btn btn-oro h-12 px-7 text-[0.9rem] tracking-[0.02em] normal-case">
-            Solicitar asesoría
+          <LanguageSwitcher variant="bar" />
+          <a href={links.formulario} className="btn btn-oro h-12 px-5 text-[0.9rem] tracking-[0.02em] whitespace-nowrap normal-case xl:px-7">
+            {navCta}
             <Arrow className="btn-arrow size-4" />
           </a>
         </div>
 
+        <div className="relative z-10 flex items-center gap-2.5 lg:hidden">
+        {/* En el celular las banderas quedan en la barra; con el menú abierto se esconden, porque el menú trae las suyas */}
+        <LanguageSwitcher
+          variant="bar"
+          className={`transition-opacity duration-300 max-[359px]:hidden ${open ? "invisible opacity-0" : ""}`}
+        />
         <button
           type="button"
-          className="relative z-10 flex size-12 items-center justify-center rounded-full border border-hueso/20 bg-ceniza/40 backdrop-blur-md lg:hidden"
+          className="relative flex size-12 items-center justify-center rounded-full border border-hueso/20 bg-ceniza/40 backdrop-blur-md"
           aria-expanded={open}
           aria-controls="menu-movil"
           aria-label={open ? a11y.closeMenu : a11y.openMenu}
@@ -103,6 +114,7 @@ export function Navbar() {
             />
           </span>
         </button>
+        </div>
       </nav>
 
       <AnimatePresence>
@@ -146,8 +158,9 @@ export function Navbar() {
               exit={{ opacity: 0 }}
               transition={{ delay: 0.42, duration: 0.7, ease }}
             >
-              <a href={links.formulario} className="btn btn-oro h-14 w-full text-[0.95rem]">
-                Solicitar asesoría
+              <LanguageSwitcher variant="menu" />
+              <a href={links.formulario} className="btn btn-oro h-14 w-full text-[0.95rem]" onClick={() => setOpen(false)}>
+                {navCta}
                 <Arrow className="btn-arrow size-4" />
               </a>
               <div className="flex flex-col gap-1 text-[0.95rem] text-gris">

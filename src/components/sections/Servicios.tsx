@@ -6,18 +6,22 @@ import { Arrow } from "@/components/Arrow";
 import { Container, GoldRule, Reveal, Section, SectionTitle, ease, useReduce } from "@/components/ui/primitives";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { Rich } from "@/components/ui/Rich";
-import { services, servicesIntro, type Service } from "@/data/nexus";
+import type { Service } from "@/data/nexus";
+import { useContent } from "@/components/LocaleProvider";
 import { contactFormHref } from "@/data/formulario";
 
 // Ids fijos: la sección existe una sola vez en la página. Escritorio y celular usan prefijos distintos
 // para no repetir ids, porque las dos versiones están en el HTML y solo el CSS decide cuál se ve.
 const TITLE_ID = "servicios-titulo";
 const PANEL_ID = "servicios-panel";
+/** Guion que no se corta: "pre-litigation" o "pré-processual" no deben partirse entre dos líneas. */
+const nobreak = (text: string) => text.replace(/-/g, "‑");
 const tabId = (s: Service) => `servicios-tab-${s.id}`;
 const accButtonId = (s: Service) => `servicios-acc-btn-${s.id}`;
 const accRegionId = (s: Service) => `servicios-acc-${s.id}`;
 
 export function Servicios() {
+  const { services, servicesIntro } = useContent();
   // Solo la versión de escritorio usa este índice; el acordeón lleva su propio estado.
   const [active, setActive] = useState(0);
 
@@ -51,6 +55,7 @@ export function Servicios() {
 /* ---------- Escritorio: lista de situaciones como pestañas ---------- */
 
 function SituationTabs({ active, onSelect }: { active: number; onSelect: (i: number) => void }) {
+  const { services } = useContent();
   const reduce = useReduce();
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -137,7 +142,7 @@ function SituationTabs({ active, onSelect }: { active: number; onSelect: (i: num
                     selected ? "text-hueso" : "text-hueso/80 group-hover:text-hueso/90"
                   }`}
                 >
-                  {s.name}
+                  {nobreak(s.name)}
                 </span>
                 <span
                   className={`mt-1 block text-[0.9rem] leading-snug [text-wrap:pretty] transition-colors duration-500 ease-expo text-gris`}
@@ -177,7 +182,7 @@ function ServicePanel({ service }: { service: Service }) {
           {/* Va dentro del bloque con key: se vuelve a dibujar cada vez que cambia el servicio */}
           <Icon name={service.id as IconName} badge delay={0.1} className="mb-7 size-16" />
           <h3 className="font-display text-[clamp(2rem,2.9vw,2.75rem)] leading-[0.95] text-hueso uppercase italic [text-wrap:balance]">
-            {service.name}
+            {nobreak(service.name)}
           </h3>
           <GoldRule className="mt-6 w-40" />
           <ServiceBody service={service} staggerItems={!reduce} />
@@ -190,6 +195,7 @@ function ServicePanel({ service }: { service: Service }) {
 /* ---------- Contenido común a escritorio y celular ---------- */
 
 function ServiceBody({ service, staggerItems }: { service: Service; staggerItems: boolean }) {
+  const { servicesIntro } = useContent();
   return (
     <>
       <p className="mt-5 max-w-[58ch] text-[1.06rem] leading-relaxed text-hueso/85 [text-wrap:pretty] lg:mt-6">
@@ -229,6 +235,7 @@ function ServiceBody({ service, staggerItems }: { service: Service; staggerItems
 /* ---------- Celular y tablet: acordeón ---------- */
 
 function SituationAccordion() {
+  const { services } = useContent();
   const reduce = useReduce();
   const [open, setOpen] = useState<string | null>(services[0].id);
   const buttons = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -284,7 +291,7 @@ function SituationAccordion() {
                         isOpen ? "text-hueso" : "text-hueso/75"
                       }`}
                     >
-                      {s.name}
+                      {nobreak(s.name)}
                     </span>
                     <span className="mt-1 block text-[0.9rem] leading-snug text-gris">{s.situation}</span>
                   </span>

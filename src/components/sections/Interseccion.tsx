@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, type Variants } from "motion/react";
-import { intersection, photos } from "@/data/nexus";
+import { useContent } from "@/components/LocaleProvider";
 import { Container, Reveal, Section, SectionTitle, ease, useReduce } from "@/components/ui/primitives";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { Rich } from "@/components/ui/Rich";
@@ -129,6 +129,7 @@ const labelPos: Record<(typeof threads)[number]["label"], string> = {
 };
 
 function Nudo() {
+  const { intersection } = useContent();
   const reduce = useReduce();
   const v = buildVariants(!!reduce);
   // Con movimiento reducido el diagrama se pinta completo y quieto desde el primer cuadro.
@@ -259,6 +260,7 @@ function Nudo() {
 const AUDIENCE_ICONS: IconName[] = ["aseguradora", "abogado", "perito", "empresa"];
 
 export function Interseccion() {
+  const { intersection, photos } = useContent();
   const { title, body, audiencesTitle, audiences } = intersection;
 
   return (

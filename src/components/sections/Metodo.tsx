@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useMotionValueEvent, useScroll, type Variants } from "motion/react";
-import { method, photos, type MethodStep } from "@/data/nexus";
+import type { MethodStep } from "@/data/nexus";
+import { useContent } from "@/components/LocaleProvider";
 import { Container, Reveal, Section, SectionTitle, ease, useReduce } from "@/components/ui/primitives";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { Rich } from "@/components/ui/Rich";
@@ -58,6 +59,7 @@ function Paso({
   onLit: (index: number) => void;
   nodeRef: (el: HTMLSpanElement | null) => void;
 }) {
+  const { method } = useContent();
   const ref = useRef<HTMLLIElement>(null);
   const last = index === total - 1;
   const isLoopStart = index + 1 === method.loop.from;
@@ -174,6 +176,8 @@ function HiloDeRetorno({ geometry, drawn, reduce }: { geometry: LoopGeometry; dr
 }
 
 function Pasos() {
+  const { method } = useContent();
+  const { from: loopFrom, to: loopTo } = method.loop;
   const reduce = useReduce();
   const listRef = useRef<HTMLOListElement>(null);
   const nodes = useRef<(HTMLSpanElement | null)[]>([]);
@@ -188,8 +192,8 @@ function Pasos() {
     if (!list) return;
     const measure = () => {
       // Se mide la caja que contiene al nodo, no el nodo: este puede estar a escala 1.4 en su destello.
-      const a = nodes.current[method.loop.to - 1]?.parentElement;
-      const b = nodes.current[method.loop.from - 1]?.parentElement;
+      const a = nodes.current[loopTo - 1]?.parentElement;
+      const b = nodes.current[loopFrom - 1]?.parentElement;
       if (!a || !b) return;
       const box = list.getBoundingClientRect();
       const ra = a.getBoundingClientRect();
@@ -205,7 +209,7 @@ function Pasos() {
     ro.observe(list);
     document.fonts?.ready.then(measure);
     return () => ro.disconnect();
-  }, []);
+  }, [loopFrom, loopTo]);
 
   return (
     // El hilo de retorno va fuera del <ol>, porque una lista solo admite <li>. El div tiene la misma caja que el <ol>.
@@ -231,6 +235,7 @@ function Pasos() {
 }
 
 export function Metodo() {
+  const { method, photos } = useContent();
   return (
     <Section id="metodo" tone="ceniza" labelledBy={TITLE_ID}>
       <Container>

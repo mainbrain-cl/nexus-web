@@ -10,7 +10,7 @@ import {
   type MotionValue,
 } from "motion/react";
 import { useReduce } from "@/components/ui/primitives";
-import { hero, links, profile } from "@/data/nexus";
+import { useContent } from "@/components/LocaleProvider";
 import { Arrow } from "../Arrow";
 import { Embers } from "./Embers";
 import { RotatingTag } from "./RotatingTag";
@@ -90,6 +90,7 @@ function TitleLine({ text, start }: { text: string; start: number }) {
 }
 
 export function Hero() {
+  const { hero, links, profile } = useContent();
   const reduce = useReduce();
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollY } = useScroll();

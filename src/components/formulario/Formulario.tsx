@@ -874,7 +874,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
           </label>
         </div>
         <p className="mt-6 max-w-[62ch] text-[0.88rem] leading-relaxed text-gris">{c.privacy}</p>
-        {TURNSTILE_KEY && <TurnstileBox language={locale} tokenRef={turnstileToken} widgetRef={turnstileWidget} />}
+        {TURNSTILE_KEY && <TurnstileBox language={locale === "pt" ? "pt-br" : locale} tokenRef={turnstileToken} widgetRef={turnstileWidget} />}
       </>
     );
   }

@@ -1,11 +1,13 @@
-import { a11y, contact, footer, links, navLinks, site } from "@/data/nexus";
+import { contact, content } from "@/data/nexus";
+import type { Locale } from "@/data/idiomas";
 import { Logo } from "@/components/Logo";
 import { Container } from "@/components/ui/primitives";
 
 const linkClass =
   "inline-flex min-h-11 items-center text-[1rem] text-gris transition-colors duration-300 hover:text-hueso focus-visible:text-hueso";
 
-export function Footer() {
+export function Footer({ locale }: { locale: Locale }) {
+  const { a11y, footer, links, navLinks, site } = content[locale];
   // El sitio es un export estático: el año queda fijado al compilar, que es cuando se publica.
   const year = new Date().getFullYear();
 

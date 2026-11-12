@@ -3,10 +3,11 @@
 // Preguntas y opciones definidas por Domingo Soto Gamé (12-11), con su redacción.
 // Los ids de opción son estables e independientes del texto: el servidor valida contra ellos y el correo
 // a Domingo se arma siempre con los textos en español, aunque el visitante use otro idioma.
-// Para traducir: copiar `es` como `en` o `pt` dentro de `formTexts` y traducir solo los valores.
+// Los tres idiomas (`es`, `en`, `pt`) tienen la misma forma: TypeScript falla si a uno le falta un texto.
 
-export const locales = ["es", "en", "pt"] as const;
-export type Locale = (typeof locales)[number];
+import type { Locale } from "./idiomas";
+
+export { locales, type Locale } from "./idiomas";
 
 // ---------- Ids estables ----------
 
@@ -276,10 +277,264 @@ const es: FormTexts = {
   alternatives: "¿Prefiere hablar directamente?",
 };
 
-export const formTexts: { es: FormTexts } & Partial<Record<Locale, FormTexts>> = { es };
+const en: FormTexts = {
+  stepOf: (n, total) => `Step ${n} of ${total}`,
+  back: "Back",
+  next: "Continue",
+  submit: "Send inquiry",
+  sending: "Sending…",
+  optional: "optional",
+  honeypotLabel: "Website",
+  unknown: "-",
+  steps: {
+    cliente: {
+      title: "Who is requesting the consultation?",
+      options: [
+        { id: "abogado", label: "Attorney or law firm" },
+        { id: "aseguradora", label: "Insurance company or claims adjusting firm" },
+        { id: "investigador", label: "Fire investigator or expert" },
+        { id: "empresa", label: "Company or organization" },
+        { id: "particular", label: "Individual" },
+        { id: "otro", label: "Other" },
+      ],
+      otherLabel: "Who?",
+      otherPlaceholder: "For example: municipality, homeowners association",
+    },
+    servicio: {
+      title: "What service do you need?",
+      options: [
+        { id: "auditoria", label: "Technical audit of an expert report" },
+        {
+          id: "revision-propia",
+          label: "Independent review of your own report before submission",
+          hint: "New · designed for investigators",
+        },
+        { id: "litigacion", label: "Technical support in court proceedings" },
+        { id: "controvertidas", label: "Review of disputed expert findings" },
+        { id: "investigacion", label: "Investigation of the origin and cause of a fire" },
+        { id: "evaluacion", label: "Preliminary evaluation of the available information" },
+        { id: "capacitacion", label: "Specialized training" },
+        { id: "no-se", label: "I'm not sure which service I need" },
+      ],
+    },
+    estado: {
+      title: "What is the current status of the matter?",
+      help: "You may select more than one.",
+      variants: {
+        revision: [
+          { id: "informe", label: "There is an expert report that needs review" },
+          { id: "informes-distintos", label: "There are two or more reports with different conclusions" },
+          { id: "judicial", label: "The matter is in court proceedings" },
+          { id: "evaluando-acciones", label: "Legal action is being considered" },
+          { id: "antes-de-entrega", label: "A report needs to be reviewed before submission" },
+        ],
+        incendio: [
+          { id: "reciente", label: "The fire occurred recently" },
+          { id: "sitio-disponible", label: "The scene is available for inspection" },
+          { id: "sitio-intervenido", label: "The scene has been altered or disturbed" },
+          { id: "no-se-si-es-posible", label: "I'm not sure an investigation is still possible" },
+        ],
+        general: [
+          { id: "informe", label: "There is an expert report that needs review" },
+          { id: "informes-distintos", label: "There are two or more reports with different conclusions" },
+          { id: "judicial", label: "The matter is in court proceedings" },
+          { id: "evaluando-acciones", label: "Legal action is being considered" },
+          { id: "reciente", label: "A fire occurred recently" },
+          { id: "otra", label: "Other situation" },
+        ],
+      },
+    },
+    caso: {
+      title: "Basic case information",
+      help: "This information allows a preliminary assessment of the nature of the engagement.",
+      lugar: { label: "Where the fire occurred", placeholder: "City or town" },
+      fecha: { label: "Approximate date of the incident", placeholder: "For example: March 2026" },
+      descripcion: {
+        label: "Brief description of your inquiry",
+        placeholder: "Tell us in a few lines what happened and what you need.",
+        placeholderCapacitacion: "Topic, approximate number of participants and tentative dates.",
+      },
+      urgencia: {
+        label: "Are there relevant deadlines or urgency?",
+        options: [
+          { id: "sin-plazo", label: "No urgent deadlines" },
+          { id: "semanas", label: "There is a deadline in the coming weeks" },
+          { id: "urgente", label: "It is urgent" },
+        ],
+      },
+      plazoDetalle: { label: "What is the deadline?", placeholder: "For example: hearing on December 15" },
+    },
+    contacto: {
+      title: "Your contact details",
+      nombre: { label: "Name", placeholder: "First and last name" },
+      empresa: { label: "Company or institution", placeholder: "Firm, company or organization" },
+      correo: { label: "Email", placeholder: "name@company.com" },
+      telefono: { label: "Phone", placeholder: "+1 555 123 4567" },
+      privacy:
+        "Your information is used only to answer this inquiry. It goes directly to Domingo Soto Gamé's email and is not stored on this site.",
+    },
+  },
+  errors: {
+    pick: "Choose an option to continue.",
+    pickSome: "Select at least one option to continue.",
+    descripcion: (min) => `Briefly describe your inquiry (at least ${min} characters).`,
+    nombre: "Please enter your name.",
+    correo: "Please check your email address: it does not appear to be valid.",
+    telefono: "Please check the phone number: use only digits, spaces and the + sign.",
+    invalido: "Some of the information could not be validated. Please review it and try again.",
+    limite: "We received several inquiries in a row from your connection. Please wait a few minutes or message us on WhatsApp.",
+    noDisponible: "The form is not available right now.",
+    envio: "The email service did not respond and your inquiry was not sent. Please try again in a few minutes or message us on WhatsApp.",
+    verificacion: "We could not confirm that the inquiry comes from a person. Please try again or message us on WhatsApp.",
+    vencido: "The form was open for a long time. Please press Send inquiry again.",
+    red: "We could not send your inquiry. Please check your connection and try again.",
+  },
+  done: {
+    title: "Inquiry sent",
+    text: (email) => `Domingo has received your inquiry and will reply to ${email}.`,
+    again: "Send another inquiry",
+  },
+  failure: {
+    title: "We could not send your inquiry",
+    whatsapp: "Message on WhatsApp",
+    email: "Or write to",
+  },
+  whatsappText: (cliente, servicio) =>
+    `Hello Domingo, I would like to request a consultation with NEXUS. Requesting as: ${cliente}. Service: ${servicio}.`,
+  alternatives: "Prefer to talk directly?",
+};
 
-/** Textos en el idioma pedido; mientras no exista la traducción, en español. */
-export const getFormTexts = (locale: Locale = "es"): FormTexts => formTexts[locale] ?? formTexts.es;
+const pt: FormTexts = {
+  stepOf: (n, total) => `Etapa ${n} de ${total}`,
+  back: "Voltar",
+  next: "Continuar",
+  submit: "Enviar consulta",
+  sending: "Enviando…",
+  optional: "opcional",
+  honeypotLabel: "Site",
+  unknown: "-",
+  steps: {
+    cliente: {
+      title: "Quem está solicitando a assessoria?",
+      options: [
+        { id: "abogado", label: "Advogado ou escritório de advocacia" },
+        { id: "aseguradora", label: "Seguradora ou empresa de regulação de sinistros" },
+        { id: "investigador", label: "Investigador de incêndios ou perito" },
+        { id: "empresa", label: "Empresa ou organização" },
+        { id: "particular", label: "Pessoa física" },
+        { id: "otro", label: "Outro" },
+      ],
+      otherLabel: "Quem?",
+      otherPlaceholder: "Por exemplo: prefeitura, associação de moradores",
+    },
+    servicio: {
+      title: "De qual serviço você precisa?",
+      options: [
+        { id: "auditoria", label: "Auditoria técnica de um laudo pericial" },
+        {
+          id: "revision-propia",
+          label: "Revisão independente de um laudo próprio antes da entrega",
+          hint: "Novo · pensado para investigadores",
+        },
+        { id: "litigacion", label: "Assessoria técnica para um processo judicial" },
+        { id: "controvertidas", label: "Revisão de perícias controvertidas" },
+        { id: "investigacion", label: "Investigação da origem e da causa de um incêndio" },
+        { id: "evaluacion", label: "Avaliação preliminar das informações disponíveis" },
+        { id: "capacitacion", label: "Capacitação especializada" },
+        { id: "no-se", label: "Não sei ao certo de qual serviço preciso" },
+      ],
+    },
+    estado: {
+      title: "Qual é a situação atual do caso?",
+      help: "Você pode marcar mais de uma.",
+      variants: {
+        revision: [
+          { id: "informe", label: "Há um laudo pericial que precisa ser revisado" },
+          { id: "informes-distintos", label: "Há dois ou mais laudos com conclusões diferentes" },
+          { id: "judicial", label: "O caso está em um processo judicial" },
+          { id: "evaluando-acciones", label: "Está sendo avaliado o ajuizamento de uma ação" },
+          { id: "antes-de-entrega", label: "É preciso revisar um laudo antes da entrega" },
+        ],
+        incendio: [
+          { id: "reciente", label: "O incêndio ocorreu recentemente" },
+          { id: "sitio-disponible", label: "O local está disponível para inspeção" },
+          { id: "sitio-intervenido", label: "O local foi modificado ou alterado" },
+          { id: "no-se-si-es-posible", label: "Não sei se ainda é possível realizar uma investigação" },
+        ],
+        general: [
+          { id: "informe", label: "Há um laudo pericial que precisa ser revisado" },
+          { id: "informes-distintos", label: "Há dois ou mais laudos com conclusões diferentes" },
+          { id: "judicial", label: "O caso está em um processo judicial" },
+          { id: "evaluando-acciones", label: "Está sendo avaliado o ajuizamento de uma ação" },
+          { id: "reciente", label: "Ocorreu um incêndio recentemente" },
+          { id: "otra", label: "Outra situação" },
+        ],
+      },
+    },
+    caso: {
+      title: "Informações básicas do caso",
+      help: "Essas informações permitem uma avaliação preliminar da natureza do trabalho.",
+      lugar: { label: "Local onde ocorreu o incêndio", placeholder: "Cidade ou município" },
+      fecha: { label: "Data aproximada do incidente", placeholder: "Por exemplo: março de 2026" },
+      descripcion: {
+        label: "Breve descrição da consulta",
+        placeholder: "Conte em poucas linhas o que aconteceu e do que você precisa.",
+        placeholderCapacitacion: "Tema, número aproximado de participantes e datas previstas.",
+      },
+      urgencia: {
+        label: "Há prazos relevantes ou urgência?",
+        options: [
+          { id: "sin-plazo", label: "Sem prazos urgentes" },
+          { id: "semanas", label: "Há um prazo nas próximas semanas" },
+          { id: "urgente", label: "É urgente" },
+        ],
+      },
+      plazoDetalle: { label: "Qual é o prazo?", placeholder: "Por exemplo: audiência em 15 de dezembro" },
+    },
+    contacto: {
+      title: "Seus dados de contato",
+      nombre: { label: "Nome", placeholder: "Nome e sobrenome" },
+      empresa: { label: "Empresa ou instituição", placeholder: "Escritório, empresa ou organização" },
+      correo: { label: "E-mail", placeholder: "nome@empresa.com.br" },
+      telefono: { label: "Telefone", placeholder: "+55 11 91234 5678" },
+      privacy:
+        "Seus dados são usados apenas para responder a esta consulta. Eles são enviados diretamente ao e-mail de Domingo Soto Gamé e não ficam armazenados neste site.",
+    },
+  },
+  errors: {
+    pick: "Escolha uma opção para continuar.",
+    pickSome: "Marque pelo menos uma opção para continuar.",
+    descripcion: (min) => `Descreva brevemente sua consulta (pelo menos ${min} caracteres).`,
+    nombre: "Informe seu nome.",
+    correo: "Verifique seu e-mail: ele não parece válido.",
+    telefono: "Verifique o telefone: use apenas números, espaços e o sinal +.",
+    invalido: "Alguns dados não puderam ser validados. Revise-os e tente novamente.",
+    limite: "Recebemos várias consultas seguidas da sua conexão. Aguarde alguns minutos ou fale conosco pelo WhatsApp.",
+    noDisponible: "O envio pelo formulário não está disponível no momento.",
+    envio: "O serviço de e-mail não respondeu e sua consulta não foi enviada. Tente novamente em alguns minutos ou fale conosco pelo WhatsApp.",
+    verificacion: "Não foi possível confirmar que o envio vem de uma pessoa. Tente novamente ou fale conosco pelo WhatsApp.",
+    vencido: "O formulário ficou aberto por muito tempo. Clique em Enviar consulta novamente.",
+    red: "Não foi possível enviar sua consulta. Verifique sua conexão e tente novamente.",
+  },
+  done: {
+    title: "Consulta enviada",
+    text: (email) => `Domingo recebeu sua consulta e responderá para ${email}.`,
+    again: "Enviar outra consulta",
+  },
+  failure: {
+    title: "Não foi possível enviar sua consulta",
+    whatsapp: "Escrever pelo WhatsApp",
+    email: "Ou escreva para",
+  },
+  whatsappText: (cliente, servicio) =>
+    `Olá, Domingo. Gostaria de solicitar uma assessoria da NEXUS. Solicito como: ${cliente}. Serviço: ${servicio}.`,
+  alternatives: "Prefere falar diretamente?",
+};
+
+export const formTexts: Record<Locale, FormTexts> = { es, en, pt };
+
+/** Textos del formulario en el idioma de la página. */
+export const getFormTexts = (locale: Locale = "es"): FormTexts => formTexts[locale];
 
 // ---------- Correo a Domingo (siempre en español) ----------
 

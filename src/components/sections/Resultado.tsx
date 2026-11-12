@@ -4,7 +4,8 @@ import { Container, Reveal, Section, SectionTitle } from "@/components/ui/primit
 import { Icon, type IconName } from "@/components/ui/icons";
 import { PhotoBand } from "@/components/ui/PhotoBand";
 import { Rich } from "@/components/ui/Rich";
-import { photos, result, type Verdict } from "@/data/nexus";
+import type { Verdict } from "@/data/nexus";
+import { useContent } from "@/components/LocaleProvider";
 
 // Resultado: qué entrega una auditoría o una revisión, en una imagen y tres niveles posibles.
 // Antes era una hoja de informe simulada; Aaron la quitó por ser texto inventado que no aporta (10-11).
@@ -18,6 +19,7 @@ const VERDICT_ICON: Record<Verdict, IconName> = {
 };
 
 export function Resultado() {
+  const { photos, result } = useContent();
   return (
     <Section id="resultado" tone="humo" labelledBy={TITLE_ID}>
       <Container>

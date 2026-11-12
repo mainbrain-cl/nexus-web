@@ -3,7 +3,8 @@
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { useInView } from "motion/react";
 import { WhatsappLogo } from "@phosphor-icons/react";
-import { closing, contact, links } from "@/data/nexus";
+import { contact } from "@/data/nexus";
+import { useContent, useLocale } from "@/components/LocaleProvider";
 import { getFormTexts } from "@/data/formulario";
 import { Formulario } from "@/components/formulario/Formulario";
 import { Embers } from "@/components/hero/Embers";
@@ -100,9 +101,10 @@ function Channel({ icon, label, value, href }: { icon: ReactNode; label: string;
   );
 }
 
-const formTexts = getFormTexts("es");
-
 export function Contacto() {
+  const locale = useLocale();
+  const { closing, links } = useContent();
+  const formTexts = getFormTexts(locale);
   const reduce = useReduce();
   const titleRef = useRef<HTMLHeadingElement>(null);
   const inView = useInView(titleRef, { once: true, amount: 0.6 });
@@ -148,7 +150,7 @@ export function Contacto() {
 
         {/* Canal principal: el formulario, que llega directo al correo de Domingo */}
         <Reveal delay={0.25} className="mt-10 w-full max-w-[920px]">
-          <Formulario />
+          <Formulario locale={locale} />
         </Reveal>
 
         {/* Alternativas visibles: WhatsApp, correo, teléfono y la base */}
