@@ -8,7 +8,8 @@ Next.js 16, React 19, Tailwind CSS v4, Motion y Phosphor Icons. La página se pr
 
 ## Dónde se edita
 
-- **Textos, servicios, contacto y fotos:** `src/data/nexus.ts`. Las palabras entre `**dobles asteriscos**` salen en negrita.
+- **Textos, servicios, contacto y fotos:** `src/data/nexus.ts`, con los textos en `es`, `en` y `pt` (misma forma: TypeScript falla si a un idioma le falta algo). Lo que no es texto (teléfono, fotos, ids, años) se escribe una sola vez arriba. Las palabras entre `**dobles asteriscos**` salen en negrita. Los términos de la traducción que Domingo debe confirmar llevan `// REVISAR:`.
+- **Idiomas:** español en `/`, inglés en `/en/` y portugués en `/pt/`, todos prerenderizados (`src/data/idiomas.ts`). Hay dos layouts raíz porque `<html lang>` cambia: `src/app/(es)` y `src/app/[lang]`; los dos usan `src/components/RootDocument.tsx` (fuentes, metadatos y hreflang). El idioma sale de la ruta y llega a los componentes con `useContent()` (`src/components/LocaleProvider.tsx`). El selector de banderas (`LanguageSwitcher.tsx`, banderas SVG en `Flag.tsx`) conserva la sección en pantalla al cambiar de idioma; nunca se redirige según el navegador.
 - **Secciones:** `src/components/sections/`.
 - **Piezas compartidas:** `src/components/ui/` (títulos, apariciones, íconos y fotos).
 - **Hero:** `src/components/hero/`.
@@ -21,7 +22,7 @@ Next.js 16, React 19, Tailwind CSS v4, Motion y Phosphor Icons. La página se pr
 npm install
 npm run dev         # desarrollo en http://localhost:3000
 npm run build       # build de producción (la página queda prerenderizada)
-npm run test:title  # tras el build: levanta next start y verifica que el título de la hero no se corte
+npm run test:title  # tras el build: levanta next start y verifica que el título de la hero no se corte (/, /en/ y /pt/)
 ```
 
 ## Despliegue

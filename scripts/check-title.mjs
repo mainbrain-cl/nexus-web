@@ -1,4 +1,4 @@
-// Verifica que ninguna letra del título de la hero quede cortada.
+// Verifica que ninguna letra del título de la hero quede cortada, en los tres idiomas (/, /en/ y /pt/).
 //
 // Renderiza el título dos veces en cada pantalla: con su textura de ceniza y con relleno blanco plano.
 // Todo píxel que la letra blanca pinta debe estar pintado también en la versión con textura; si no,
@@ -23,7 +23,8 @@ const next = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start"
 });
 const stopNext = () => next.exitCode === null && next.kill();
 process.on("exit", stopNext);
-const url = `http://127.0.0.1:${port}/`;
+const base = `http://127.0.0.1:${port}`;
+const url = `${base}/`;
 for (let i = 0; ; i++) {
   if (next.exitCode !== null) throw new Error("next start terminó antes de responder. ¿Corriste npm run build?");
   try {
@@ -32,6 +33,9 @@ for (let i = 0; ; i++) {
   if (i > 120) throw new Error("next start no respondió a tiempo");
   await new Promise((r) => setTimeout(r, 500));
 }
+
+// Español, inglés y portugués: cada idioma tiene su propio título.
+const PATHS = ["/", "/en/", "/pt/"];
 
 const CASES = [
   { width: 390, height: 844, dpr: 3 },
@@ -57,10 +61,10 @@ try {
 }
 
 let failed = 0;
-for (const c of CASES) {
+for (const path of PATHS) for (const c of CASES) {
   const page = await browser.newPage({ viewport: { width: c.width, height: c.height }, deviceScaleFactor: c.dpr });
   await page.emulateMedia({ reducedMotion: "reduce" }); // estado final, sin entrada ni parallax
-  await page.goto(url, { waitUntil: "load" });
+  await page.goto(base + path, { waitUntil: "load" });
   await page.addStyleTag({ content: ISOLATE });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(400);
@@ -91,7 +95,7 @@ for (const c of CASES) {
   const ratio = r.missing / Math.max(1, r.glyph);
   const ok = r.glyph > 1000 && ratio < 0.0005;
   if (!ok) failed++;
-  console.log(`${ok ? "OK  " : "FALLA"} ${c.width}x${c.height} @${c.dpr}x  píxeles de letra: ${r.glyph}  sin textura: ${r.missing} (${(ratio * 100).toFixed(3)} %)`);
+  console.log(`${ok ? "OK  " : "FALLA"} ${path.padEnd(5)} ${c.width}x${c.height} @${c.dpr}x  píxeles de letra: ${r.glyph}  sin textura: ${r.missing} (${(ratio * 100).toFixed(3)} %)`);
   await page.close();
 }
 
