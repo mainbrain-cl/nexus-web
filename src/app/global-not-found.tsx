@@ -7,9 +7,8 @@ import "./globals.css";
 // layouts, así que trae su propio <html>, las fuentes y el CSS. El idioma se ajusta en el navegador según la ruta.
 
 // El título lo pone NotFoundPage con <title>, en el idioma de la ruta.
-export const metadata: Metadata = {
-  robots: { index: false },
-};
+// Next ya agrega noindex a la 404.
+export const metadata: Metadata = {};
 
 export const viewport: Viewport = {
   themeColor: "#120f0d",

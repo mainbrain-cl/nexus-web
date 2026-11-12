@@ -270,14 +270,6 @@
   .in-cta {
     animation: in-up 1.1s var(--ease-expo) var(--d, 1.1s) both;
   }
-
-  .in-scroll {
-    animation: in-up 1s var(--ease-expo) 1.3s both;
-  }
-
-  .scroll-dot {
-    animation: scroll-dot 2.2s var(--ease-in-out-expo) 2s infinite;
-  }
 }
 
 @keyframes in-bg {
@@ -461,20 +453,3 @@
   }
 }
 
-@keyframes scroll-dot {
-  0% {
-    transform: translateY(0);
-    opacity: 0;
-  }
-  20% {
-    opacity: 1;
-  }
-  80% {
-    transform: translateY(14px);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(14px);
-    opacity: 0;
-  }
-}

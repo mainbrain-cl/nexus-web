@@ -75,8 +75,16 @@ function ServicesMenu({
     const onDown = (e: PointerEvent) => {
       if (!wrapRef.current?.contains(e.target as Node)) close();
     };
+    // Escape cierra aunque el foco esté fuera del panel (abierto con el mouse): WCAG 1.4.13.
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
     document.addEventListener("pointerdown", onDown);
-    return () => document.removeEventListener("pointerdown", onDown);
+    document.addEventListener("keydown", onEsc);
+    return () => {
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("keydown", onEsc);
+    };
   }, [open]);
 
   useEffect(() => () => window.clearTimeout(leaveTimer.current), []);
@@ -241,9 +249,14 @@ export function Navbar() {
       }
     };
     window.addEventListener("keydown", onKey);
+    // Si la pantalla pasa a escritorio (por ejemplo, al girar un iPad), el menú móvil se esconde: se cierra para no dejar la página trabada.
+    const wide = window.matchMedia("(min-width: 1024px)");
+    const onWide = () => wide.matches && setOpen(false);
+    wide.addEventListener("change", onWide);
     return () => {
       behind.forEach((el) => (el.inert = false));
       window.removeEventListener("keydown", onKey);
+      wide.removeEventListener("change", onWide);
     };
   }, [open]);
 

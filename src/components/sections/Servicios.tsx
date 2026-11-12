@@ -62,8 +62,9 @@ export function Servicios() {
       }
       const s = services[i];
       setActive(i);
-      setOpen(s.id);
       const desktop = window.matchMedia("(min-width: 1024px)").matches;
+      // En escritorio el acordeón está oculto: abrirlo hace que Motion mida y devuelva el scroll, y corta el desplazamiento.
+      if (!desktop) setOpen(s.id);
       const go = () => {
         // En celular se llega al rótulo de la línea; en escritorio, al inicio de la sección.
         (desktop ? section : document.getElementById(accGroupId(s.group)))?.scrollIntoView({ block: "start" });
