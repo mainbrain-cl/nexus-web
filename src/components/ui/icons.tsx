@@ -2,12 +2,14 @@
 
 import { motion, type Variants } from "motion/react";
 import {
+  ArrowsCounterClockwise,
   Buildings,
   Camera,
   ChalkboardTeacher,
   ChartLineUp,
   Compass,
   Envelope,
+  Flask,
   FileMagnifyingGlass,
   Flame,
   Gavel,
@@ -15,13 +17,15 @@ import {
   HardHat,
   MagnifyingGlass,
   MapPin,
+  PenNib,
   Phone,
   Scales,
   SealCheck,
   SealQuestion,
+  SealWarning,
   ShieldCheck,
   Stamp,
-  XCircle,
+  Target,
   type Icon as PhosphorIcon,
 } from "@phosphor-icons/react";
 import { ease, useReduce } from "./primitives";
@@ -35,20 +39,25 @@ const ICONS = {
   lupa: MagnifyingGlass,
   llama: Flame,
   sello: SealCheck,
-  // Cadena del método
+  // Los siete pasos del método (NFPA 921)
+  necesidad: Flame,
+  problema: Target,
   camara: Camera,
   analisis: ChartLineUp,
   hipotesis: GitFork,
+  prueba: Flask,
   conclusion: Stamp,
+  ciclo: ArrowsCounterClockwise,
   // Servicios
   auditoria: FileMagnifyingGlass,
+  revision: PenNib,
   litigacion: Gavel,
   controvertidas: SealQuestion,
   investigacion: Flame,
   prejudicial: Compass,
   formacion: ChalkboardTeacher,
   // Resultado de una revisión
-  descartada: XCircle,
+  insuficiente: SealWarning,
   // A quiénes aportamos valor
   perito: HardHat,
   abogado: Gavel,

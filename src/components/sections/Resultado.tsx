@@ -6,7 +6,7 @@ import { PhotoBand } from "@/components/ui/PhotoBand";
 import { Rich } from "@/components/ui/Rich";
 import { photos, result, type Verdict } from "@/data/nexus";
 
-// Resultado: qué entrega una auditoría, en una imagen y tres resultados posibles.
+// Resultado: qué entrega una auditoría o una revisión, en una imagen y tres niveles posibles.
 // Antes era una hoja de informe simulada; Aaron la quitó por ser texto inventado que no aporta (10-11).
 
 const TITLE_ID = "resultado-titulo";
@@ -14,7 +14,7 @@ const TITLE_ID = "resultado-titulo";
 const VERDICT_ICON: Record<Verdict, IconName> = {
   sustentada: "sello",
   respaldo: "controvertidas",
-  no: "descartada",
+  insuficiente: "insuficiente",
 };
 
 export function Resultado() {
@@ -30,7 +30,7 @@ export function Resultado() {
               <Rich text={result.text} />
             </Reveal>
 
-            {/* Los tres resultados posibles de una revisión: ícono relleno y nombre, nada más */}
+            {/* Los tres niveles posibles de una conclusión: ícono relleno y nombre, nada más */}
             <ul className="mt-9 grid gap-3">
               {result.levels.map((level, i) => (
                 <Reveal

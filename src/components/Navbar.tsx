@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
-import { contact, links, navLinks } from "@/data/nexus";
+import { a11y, contact, links, navLinks } from "@/data/nexus";
 import { Logo } from "./Logo";
 import { Arrow } from "./Arrow";
 
@@ -44,7 +44,7 @@ export function Navbar() {
       />
 
       <nav
-        aria-label="Principal"
+        aria-label={a11y.mainNav}
         className={`in-nav relative z-10 mx-auto flex max-w-[1440px] items-center justify-between px-5 transition-[padding] duration-700 sm:px-8 lg:px-[8.5vw] xl:px-[min(8.5vw,140px)] ${
           scrolled ? "py-3" : "py-4 sm:py-6"
         }`}
@@ -87,7 +87,7 @@ export function Navbar() {
           className="relative z-10 flex size-12 items-center justify-center rounded-full border border-hueso/20 bg-ceniza/40 backdrop-blur-md lg:hidden"
           aria-expanded={open}
           aria-controls="menu-movil"
-          aria-label={open ? "Cerrar menú" : "Abrir menú"}
+          aria-label={open ? a11y.closeMenu : a11y.openMenu}
           onClick={() => setOpen((v) => !v)}
         >
           <span className="relative block h-3 w-5" aria-hidden="true">

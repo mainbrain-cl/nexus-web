@@ -241,7 +241,7 @@ export function Hero() {
             {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
             <img
               src="/hero/domingo.webp"
-              alt="Domingo Soto Gamé con uniforme de la International Association of Arson Investigators"
+              alt={hero.photoAlt}
               width={950}
               height={1503}
               fetchPriority="high"
@@ -338,7 +338,7 @@ export function Hero() {
           alineados con el logo. En celular y tablet esa esquina choca con los botones: van arriba, bajo el logo. */}
       <div className="pointer-events-none absolute inset-x-0 top-[4.9rem] z-20 sm:top-[6.2rem] lg:top-auto lg:bottom-[max(2.4rem,5.5svh)]">
         <ul
-          aria-label="Afiliaciones y credencial IAAI"
+          aria-label={hero.sealsLabel}
           className="in-cta mx-auto flex max-w-[1440px] items-center px-5 sm:px-8 lg:px-[8.5vw] xl:px-[min(8.5vw,140px)]"
           style={{ "--d": "3.6s" } as Vars}
         >

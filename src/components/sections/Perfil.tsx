@@ -1,15 +1,10 @@
 "use client";
 
 import { useEffect, useRef, type CSSProperties } from "react";
-import { hero, profile, photos } from "@/data/nexus";
+import { hero, profile, photos, type LedgerRow } from "@/data/nexus";
 import { Container, GoldRule, Reveal, Section, useReduce } from "@/components/ui/primitives";
 import { Rich } from "@/components/ui/Rich";
 import { PhotoBand } from "@/components/ui/PhotoBand";
-
-// Texto que no está en nexus.ts: solo lo leen los lectores de pantalla.
-const copy = {
-  sealsLabel: "Credenciales",
-};
 
 type Vars = CSSProperties & Record<`--${string}`, string>;
 
@@ -56,16 +51,39 @@ function Ledger() {
         aria-hidden="true"
         className="pointer-events-none absolute inset-y-0 left-[5.5rem] w-px origin-top bg-gradient-to-b from-oro-claro via-oro/55 to-oro/15 transition-transform duration-[1800ms] ease-[cubic-bezier(0.45,0.1,0.35,1)] group-data-[phase=armed]:scale-y-0 sm:left-[8rem]"
       />
-      {profile.ledger.map((row, i) => {
+      {profile.ledger.map((row: LedgerRow, i) => {
         // Retraso de la fila: el momento en que el hilo llega a su altura.
         const d = { "--d": `${0.12 + (THREAD_S * (i + 0.35)) / n}s` } as Vars;
         return (
           <li key={`${row.year}-${row.name}`} className="grid grid-cols-[5.5rem_minmax(0,1fr)] border-t border-hueso/10 sm:grid-cols-[8rem_minmax(0,1fr)]">
             <span
-              className="py-6 pr-4 font-name text-[clamp(1.45rem,2.3vw,2.05rem)] leading-none font-extrabold text-oro tabular-nums [font-stretch:115%] transition-[opacity,filter] duration-700 ease-expo [transition-delay:var(--d)] group-data-[phase=armed]:opacity-0 group-data-[phase=armed]:blur-[3px] sm:py-7"
+              className="py-6 pr-4 transition-[opacity,filter] duration-700 ease-expo [transition-delay:var(--d)] group-data-[phase=armed]:opacity-0 group-data-[phase=armed]:blur-[3px] sm:py-7"
               style={d}
             >
-              {row.year}
+              {/* "Desde" sobre el año en lo que sigue vigente: sube al relleno de la fila para no mover el año */}
+              {row.yearNote && (
+                <span className="-mt-[1.1rem] mb-1.5 block text-[0.72rem] leading-none font-semibold tracking-[0.14em] text-oro-claro/80 uppercase">
+                  {row.yearNote}
+                </span>
+              )}
+              {row.year ? (
+                <span className="block font-name text-[clamp(1.45rem,2.3vw,2.05rem)] leading-none font-extrabold text-oro tabular-nums [font-stretch:115%]">
+                  {row.year}
+                </span>
+              ) : (
+                row.logo && (
+                  // eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes
+                  <img
+                    src={row.logo}
+                    alt=""
+                    width={320}
+                    height={320}
+                    loading="lazy"
+                    decoding="async"
+                    className="-mt-1 size-11 rounded-full shadow-[0_6px_18px_-8px_rgba(0,0,0,.85)] sm:size-12"
+                  />
+                )
+              )}
             </span>
             <div className="relative py-6 pl-6 sm:py-7 sm:pl-9">
               {/* Nudo donde el hilo toca la fila */}
@@ -79,7 +97,7 @@ function Ledger() {
                 style={d}
               >
                 <p className="text-[1.08rem] leading-snug font-semibold text-hueso sm:text-[1.15rem]">{row.name}</p>
-                <p className="mt-1.5 text-[0.98rem] leading-relaxed text-gris">{row.by}</p>
+                {row.by && <p className="mt-1.5 text-[0.98rem] leading-relaxed text-gris">{row.by}</p>}
               </div>
             </div>
           </li>
@@ -125,7 +143,7 @@ export function Perfil() {
               {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
               <img
                 src="/hero/domingo.webp"
-                alt="Retrato de Domingo Soto Gamé con la camisa de la International Association of Arson Investigators y el parche de Fire Investigation Technician"
+                alt={profile.portraitAlt}
                 width={950}
                 height={1503}
                 loading="lazy"
@@ -162,13 +180,13 @@ export function Perfil() {
                 {profile.role.replace("-", "‑")}
               </p>
               {/* Logos del portafolio PDF del cliente; Aaron pidió usarlos (10-11). El logo carga la credencial; el nombre va debajo, corto */}
-              <ul aria-label={copy.sealsLabel} className="mt-6 grid max-w-[34rem] grid-cols-3 gap-4 sm:gap-6">
+              <ul aria-label={profile.sealsLabel} className="mt-6 grid max-w-[34rem] grid-cols-3 gap-4 sm:gap-6">
                 {profile.seals.map((seal, i) => (
                   <Reveal as="li" key={seal.name} delay={0.1 + i * 0.1} className="flex flex-col items-center text-center">
                     {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
                     <img
                       src={seal.logo}
-                      alt={`Sello ${seal.name}`}
+                      alt={profile.sealAlt(seal.name)}
                       width={320}
                       height={320}
                       loading="lazy"

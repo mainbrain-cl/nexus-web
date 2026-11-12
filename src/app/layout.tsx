@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Archivo, Barlow_Condensed, Schibsted_Grotesk } from "next/font/google";
-import { site } from "@/data/nexus";
+import { a11y, site } from "@/data/nexus";
 import { MotionProvider } from "@/components/MotionProvider";
 import "./globals.css";
 
@@ -51,7 +51,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           href="#contenido"
           className="sr-only rounded-full bg-oro px-5 py-3 font-semibold text-ceniza focus:not-sr-only focus:fixed focus:top-3 focus:left-3 focus:z-[60]"
         >
-          Saltar al contenido
+          {a11y.skipLink}
         </a>
         <MotionProvider>{children}</MotionProvider>
       </body>

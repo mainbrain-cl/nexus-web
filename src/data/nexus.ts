@@ -1,5 +1,11 @@
 // Todo lo editable del sitio vive aquí. Ningún texto ni dato de contacto va escrito dentro de los componentes.
-// Fuente: portafolio PDF 2026 y brochure de NEXUS. Lo que no está en esos materiales no se publica.
+// Fuente: portafolio PDF 2026, brochure de NEXUS y respuestas de Domingo del 12-11. Lo que no está en esos
+// materiales no se publica.
+//
+// Tono (Domingo, 12-11): NEXUS no fiscaliza a sus pares ni busca errores para desacreditar a nadie. Ofrece una
+// evaluación independiente que integra investigación de incendios, análisis técnico-científico y comprensión
+// jurídica de la prueba pericial: sirve a quien evalúa un informe y a quien quiere fortalecer el suyo.
+// Evitar "cuestionar", "desacreditar", "no se sostiene", "interrogar" y cualquier tono de confrontación.
 
 const phoneE164 = "+56998835977";
 const whatsappText = "Hola Domingo, quiero solicitar una asesoría con NEXUS.";
@@ -31,6 +37,17 @@ export const navLinks = [
   { href: "#contacto", label: "Contacto" },
 ] as const;
 
+/** Textos que solo leen los lectores de pantalla o que no se ven en pantalla. */
+export const a11y = {
+  skipLink: "Saltar al contenido",
+  mainNav: "Principal",
+  openMenu: "Abrir menú",
+  closeMenu: "Cerrar menú",
+  footerNav: "Secciones del sitio",
+  footerContact: "Contacto",
+  backHome: "volver al inicio",
+};
+
 export const hero = {
   titleLines: ["Investigación", "de incendios"],
   name: "Domingo Soto Gamé",
@@ -38,28 +55,42 @@ export const hero = {
   lastName: "Soto Gamé",
   // Dos partes para cortar la línea en móvil
   roleLines: ["Auditoría forense e", "investigación de incendios"],
-  // Etiqueta rotativa junto al nombre: solo datos del portafolio, nada inventado.
+  // Etiqueta rotativa junto al nombre: solo datos de la trayectoria, nada inventado.
   tags: ["Abogado desde 1997", "Investigador IAAI-FIT", "Método NFPA 921", "IAAI · Capítulo 82 Chile"],
   primaryCta: "Solicitar asesoría",
   secondaryCta: "Ver servicios",
+  photoAlt: "Domingo Soto Gamé con uniforme de la International Association of Arson Investigators",
+  sealsLabel: "Afiliaciones y credencial IAAI",
 };
 
 // ---------- Intersección: qué es NEXUS ----------
 // Un solo bloque (Aaron, 10-11): título, una línea, a quiénes atiende como etiquetas, la X y la foto de terreno.
+// Las tres competencias van en palabras de Domingo (12-11).
 
 export const intersection = {
-  title: ["Tres disciplinas,", "un solo criterio"],
+  title: ["Tres competencias,", "un solo criterio"],
   // Las palabras entre **dobles asteriscos** se destacan en negrita.
-  body: "Derecho, ciencia forense e investigación de incendios en un mismo análisis. **El mismo criterio, sin importar quién contrata.**",
+  body: "Investigación de incendios, análisis técnico-científico y comprensión jurídica de la prueba pericial en una misma evaluación independiente. **Sirve a quien evalúa un informe y a quien quiere fortalecer el suyo.**",
   // Los tres hilos que llegan a la X del logo.
-  threads: ["Derecho", "Ciencia forense", "Investigación de incendios"],
+  threads: ["Investigación de incendios", "Análisis técnico-científico", "Comprensión jurídica de la prueba pericial"],
   knot: "Una conclusión fundada",
+  // Descripción del diagrama para lectores de pantalla.
+  diagramLabel:
+    "Diagrama: la investigación de incendios, el análisis técnico-científico y la comprensión jurídica de la prueba pericial se cruzan en la X de NEXUS. De ese cruce sale un solo hilo: una conclusión fundada.",
   audiencesTitle: "Trabajamos con",
-  audiences: ["Peritos e investigadores", "Abogados y estudios jurídicos", "Aseguradoras", "Empresas"],
+  // Orden pedido por Domingo (12-11).
+  audiences: [
+    "Aseguradoras y liquidadores",
+    "Abogados y estudios jurídicos",
+    "Investigadores y empresas de investigación",
+    "Empresas",
+  ],
 };
 
 // ---------- Servicios ----------
 // "Formación especializada" viene del brochure; Aaron confirmó incluirla el 10-11.
+// "Revisión independiente de informe pericial" la pidió Domingo el 12-11: es para quien escribe un informe.
+// La Auditoría, en cambio, es para quien recibe uno.
 
 export type Service = {
   id: string;
@@ -84,25 +115,37 @@ export const services: Service[] = [
   {
     id: "auditoria",
     cta: "Pedir auditoría por WhatsApp",
-    situation: "Tengo un informe pericial y necesito saber si se sostiene",
+    situation: "Recibí un informe pericial y necesito una opinión independiente",
     name: "Auditoría técnica de informes periciales",
-    text: "Revisión **independiente** de un informe pericial: metodología, sustento técnico y conclusiones.",
+    text: "Evaluación **independiente** de un informe pericial presentado en su caso, para decidir con fundamento.",
     includes: ["Evaluación conforme a NFPA 921", "Coherencia y trazabilidad del razonamiento", "Informe con observaciones fundadas"],
+  },
+  {
+    id: "revision",
+    cta: "Pedir revisión por WhatsApp",
+    situation: "Soy investigador y quiero reforzar mi informe antes de entregarlo",
+    name: "Revisión independiente de informe pericial",
+    text: "Metodología, sustento técnico y conclusiones: una segunda mirada **técnica y jurídica**, confidencial, antes de entregar su informe.",
+    includes: [
+      "Metodología y sustento técnico según NFPA 921",
+      "Lectura jurídica del informe como prueba pericial",
+      "Observaciones confidenciales, solo para usted",
+    ],
   },
   {
     id: "litigacion",
     cta: "Pedir asesoría por WhatsApp",
-    situation: "Estoy en juicio y debo usar o cuestionar prueba técnica",
+    situation: "Estoy en juicio y la prueba técnica es decisiva",
     name: "Consultoría técnica para litigación",
-    text: "Asesoría a abogados para **comprender, usar y cuestionar** la evidencia técnica.",
-    includes: ["Lectura técnica de informes periciales", "Puntos clave para la teoría del caso", "Preparación para interrogar peritos"],
+    text: "Asesoría a abogados para **comprender y usar con solidez** la prueba técnica.",
+    includes: ["Lectura técnica de informes periciales", "Puntos clave para la teoría del caso", "Preparación de audiencias con prueba pericial"],
   },
   {
     id: "controvertidas",
-    cta: "Pedir revisión por WhatsApp",
-    situation: "Hay una pericia en disputa",
+    cta: "Pedir análisis por WhatsApp",
+    situation: "Hay pericias que llegan a conclusiones distintas",
     name: "Revisión técnica de pericias controvertidas",
-    text: "Evaluación de pericias cuya **metodología o conclusiones** están en disputa.",
+    text: "Análisis técnico de pericias **con conclusiones en discusión**, para ordenar el debate sobre bases verificables.",
     includes: ["Contraste entre datos y conclusiones", "Análisis de hipótesis alternativas", "Fundamentos técnicos para la discusión"],
   },
   {
@@ -135,66 +178,134 @@ export const services: Service[] = [
 export const serviceWhatsapp = (s: Service) => whatsapp(`Hola Domingo, quiero consultar por el servicio de ${s.name.toLowerCase()}.`);
 
 // ---------- Método ----------
-// Una línea, las dos normas como etiquetas, la foto y la cadena con frases cortas (Aaron, 10-11).
+// Los siete pasos del método científico de NFPA 921 (edición 2024), con los nombres que dio Domingo (12-11).
+// Las frases resumen la norma sin agregarle requisitos.
+
+export type MethodStep = {
+  name: string;
+  /** Condición que completa el nombre; se muestra más pequeña, tras una coma. */
+  note?: string;
+  text: string;
+};
 
 export const method = {
   title: ["Cada conclusión,", "atada a su evidencia"],
-  text: "Método científico: **todas las hipótesis razonables**, toda la evidencia disponible.",
+  text: "La investigación sigue el **método científico de NFPA 921**: siete pasos, y ninguna hipótesis se adopta sin ponerla a prueba contra los hechos.",
   standards: [
     { code: "NFPA 921", name: "Investigación de incendios" },
     { code: "NFPA 1033", name: "Competencia del investigador" },
   ],
-  // La cadena de trazabilidad: el orden es información, por eso se muestra en secuencia.
-  chain: [
-    { name: "Datos", text: "Examen y registro **del sitio**." },
-    { name: "Análisis", text: "**Patrones de fuego** y fuentes posibles." },
-    { name: "Hipótesis", text: "**Todas las razonables**, no solo la obvia." },
-    { name: "Conclusión", text: "Solo lo que **la evidencia sostiene**." },
-  ],
+  standardsLabel: "Normas de referencia",
+  stepsLabel: "Los siete pasos del método científico según NFPA 921",
+  steps: [
+    { name: "Reconocer la necesidad", text: "Ocurrió un incendio y **su causa debe determinarse**." },
+    { name: "Definir el problema", text: "Se precisa **qué debe resolverse** y cómo abordarlo: origen, causa o responsabilidad." },
+    { name: "Recopilar datos", text: "Se reúnen **hechos verificables**: observación del sitio, registros, testimonios y ensayos." },
+    { name: "Analizar los datos", text: "Los datos se interpretan **con fundamento científico**, a partir de conocimiento, formación y experiencia." },
+    { name: "Desarrollar hipótesis", text: "A partir del análisis se formulan **hipótesis que expliquen** lo observado." },
+    { name: "Poner a prueba las hipótesis", text: "Cada hipótesis se contrasta con **todos los hechos conocidos**, por razonamiento deductivo." },
+    {
+      name: "Seleccionar una hipótesis final",
+      note: "cuando los antecedentes lo permitan",
+      text: "Se adopta la que **resiste la prueba**. Si ninguna lo hace, la causa queda como no determinada.",
+    },
+  ] as MethodStep[],
+  // El ciclo de NFPA 921: una hipótesis que no resiste la prueba devuelve el trabajo a los datos.
+  // Los pasos se cuentan desde 1: el hilo de retorno va del paso 6 al 3.
+  loop: {
+    from: 6,
+    to: 3,
+    text: "Si una hipótesis no resiste, se descarta y el ciclo vuelve a los datos: nuevos antecedentes o un nuevo análisis.",
+  },
 };
 
-// ---------- Resultado: informe de ejemplo ----------
+// ---------- Resultado: qué entrega una revisión ----------
 
-export type Verdict = "sustentada" | "respaldo" | "no";
+export type Verdict = "sustentada" | "respaldo" | "insuficiente";
 
 export const result = {
-  title: ["Qué se sostiene", "y qué no"],
-  text: "Cada conclusión del informe revisado queda en **uno de estos tres niveles**, con su fundamento.",
+  title: ["Qué está sólido", "y qué reforzar"],
+  text: "Cada conclusión del informe queda en **uno de estos tres niveles**, con su fundamento y lo que haría falta para reforzarla.",
   levels: [
     { id: "sustentada", name: "Sustentada" },
     { id: "respaldo", name: "Requiere respaldo" },
-    { id: "no", name: "No se sostiene" },
+    { id: "insuficiente", name: "Sin sustento suficiente" },
   ] as { id: Verdict; name: string }[],
 };
 
 // ---------- Perfil ----------
-// Bio de una frase; las credenciales van como etiquetas; la trayectoria queda como registro con años.
+// Bio de una frase; las credenciales van como sellos; la trayectoria es la lista de Domingo (12-11), con sus
+// palabras, ordenada por año y con el año separado del nombre.
+
+export type LedgerRow = {
+  /** Año del hito. Vacío si Domingo no lo indicó. */
+  year: string;
+  /** Rótulo corto sobre el año: "Desde" en lo que sigue vigente. */
+  yearNote?: string;
+  /** Sello que ocupa el lugar del año cuando no hay año. */
+  logo?: string;
+  name: string;
+  by?: string;
+};
 
 export const profile = {
   role: "Dirección técnica · Abogado · Investigador de incendios IAAI-FIT",
-  bio: "Abogado desde 1997 e investigador certificado: une el **análisis jurídico de la prueba** con la **investigación técnica de incendios**.",
+  bio: "Abogado desde 1997 e investigador de incendios desde 2012. Une la **investigación técnica** con la **comprensión jurídica de la prueba pericial**.",
+  portraitAlt:
+    "Retrato de Domingo Soto Gamé con la camisa de la International Association of Arson Investigators y el parche de Fire Investigator Technician",
+  sealsLabel: "Credenciales",
+  sealAlt: (name: string) => `Sello ${name}`,
   // Sellos de afiliación y credencial, con los logos del portafolio PDF del cliente (Aaron pidió usarlos, 10-11).
   seals: [
     { logo: "/logos/iaai.webp", name: "IAAI", by: "International Association of Arson Investigators" },
     { logo: "/logos/iaai-capitulo-82.webp", name: "IAAI Capítulo 82 Chile", by: "Miembro" },
-    { logo: "/logos/iaai-fit.webp", name: "IAAI-FIT®", by: "Fire Investigation Technician" },
+    { logo: "/logos/iaai-fit.webp", name: "IAAI-FIT®", by: "Fire Investigator Technician" },
   ],
   ledgerTitle: "Trayectoria",
   ledger: [
-    { year: "1997", name: "Abogado", by: "Ejercicio profesional" },
-    { year: "2011", name: "Investigación de Incendios y Explosiones", by: "Academia Nacional de Bomberos de Chile" },
-    { year: "2023", name: "Investigación de Incendios, Nivel II", by: "Cuerpo de Bomberos de Santiago" },
-    { year: "2023", name: "Investigación de Incendios Forestales", by: "IAAI" },
-  ],
+    { year: "1997", name: "Abogado" },
+    {
+      year: "2011",
+      name: "Curso de Investigación de Incendios y Explosiones",
+      by: "ANB – Academia Nacional de Bomberos de Chile",
+    },
+    {
+      year: "2012",
+      yearNote: "Desde",
+      name: "Investigador de Incendios",
+      by: "Cuerpo de Bomberos de Valdivia. Desde 2020 Inspector jefe del Departamento de Investigación de Incendios del CB",
+    },
+    {
+      year: "2023",
+      name: "Curso de Investigación de Incendios Nivel II",
+      by: "Escuela de Bomberos del Cuerpo de Bomberos de Santiago",
+    },
+    {
+      year: "2023",
+      name: "Curso de Investigación de Incendios Forestales",
+      by: "Capítulo 79 Hispanoamericano – IAAI International Association of Arson Investigators",
+    },
+    { year: "2023", name: "Miembro de Cap 82 Chile IAAI", by: "International Association of Arson Investigators" },
+    { year: "2024", yearNote: "Desde", name: "Miembro IAAI", by: "International Association of Arson Investigators" },
+    {
+      year: "",
+      logo: "/logos/iaai-fit.webp",
+      name: "Fire Investigator Technician (IAAI-FIT)",
+      by: "Técnico en Investigación de Incendios",
+    },
+  ] as LedgerRow[],
 };
 
-/** Lista plana de credenciales. */
+/** Lista plana de credenciales, tal como la escribió Domingo (12-11). */
 export const credentials = [
-  "IAAI-FIT®, Fire Investigation Technician, International Association of Arson Investigators",
-  "Miembro IAAI, Capítulo 82 Chile",
-  "Investigación de Incendios y Explosiones, Academia Nacional de Bomberos de Chile, 2011",
-  "Investigación de Incendios, Nivel II, Cuerpo de Bomberos de Santiago, 2023",
-  "Investigación de Incendios Forestales, IAAI, 2023",
+  "Abogado (1997)",
+  "Curso de Investigación de Incendios y Explosiones, ANB – Academia Nacional de Bomberos de Chile (2011)",
+  "Curso de Investigación de Incendios Nivel II, Escuela de Bomberos del Cuerpo de Bomberos de Santiago (2023)",
+  "Miembro IAAI International Association of Arson Investigators desde (2024)",
+  "Miembro de Cap 82 Chile IAAI International Association of Arson Investigators (2023)",
+  "Curso de Investigación de Incendios Forestales, Capítulo 79 Hispanoamericano – IAAI International Association of Arson Investigators (2023)",
+  "Investigador de Incendios – Cuerpo de Bomberos de Valdivia desde 2012. Desde 2020 Inspector jefe del Departamento de Investigación de Incendios del CB",
+  "Fire Investigator Technician (IAAI-FIT) – Técnico en Investigación de Incendios",
 ];
 
 // ---------- Contacto ----------
@@ -210,6 +321,7 @@ export const closing = {
 
 // Fotos entregadas por Aaron el 10-11; aparentan ser generadas con IA. Aaron pidió usarlas todas y sin el rótulo
 // "Imagen referencial". Las dos en que aparece Domingo requieren su aprobación antes de publicar el sitio.
+// Domingo no quiere fotos reales de Bomberos (12-11).
 export const photos = {
   terreno: {
     src: "/fotos/terreno.webp",
@@ -246,7 +358,7 @@ export const site = {
   name: "NEXUS",
   title: "NEXUS | Auditoría forense e investigación de incendios",
   description:
-    "Auditoría técnica de informes periciales, investigación de incendios y consultoría para litigación, según NFPA 921. Domingo Soto Gamé, abogado e investigador IAAI-FIT. Valdivia, Chile.",
+    "Evaluación independiente de informes periciales e investigación de incendios según NFPA 921, con mirada técnica y jurídica. Domingo Soto Gamé, abogado e investigador IAAI-FIT. Valdivia, Chile.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://nexuschile.net",
   tagline: "Método científico. Utilidad jurídica.",
 };

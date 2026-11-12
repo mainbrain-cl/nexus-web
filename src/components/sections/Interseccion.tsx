@@ -13,17 +13,6 @@ import { PhotoBand } from "@/components/ui/PhotoBand";
 const TITLE_ID = "interseccion-titulo";
 const AUDIENCES_ID = "interseccion-publicos";
 
-/** Texto accesible del diagrama, armado con los datos para no duplicar contenido. Pasar a nexus.ts si se quiere editar. */
-const copy = {
-  diagramLabel: (() => {
-    const t = intersection.threads.map((s) => s.toLowerCase());
-    const last = t[t.length - 1];
-    const and = /^h?i/.test(last) ? "e" : "y"; // "e investigación", no "y investigación"
-    const list = `${t.slice(0, -1).join(", ")} ${and} ${last}`;
-    return `Diagrama: ${list.charAt(0).toUpperCase()}${list.slice(1)} se cruzan en la X de NEXUS. De ese cruce sale un solo hilo: ${intersection.knot.toLowerCase()}.`;
-  })(),
-};
-
 /* ---------- Geometría del nudo (viewBox 520 × 560) ----------
    La X es la del Logo, escalada ×1.4 y centrada en C. Cada hilo llega alineado con el eje de un brazo,
    así parece que el hilo se convierte en ese brazo; la salida emerge por el cuarto brazo y se endereza. */
@@ -34,17 +23,20 @@ const X_TRANSFORM = "translate(216 183.6) scale(1.4)";
 
 const pct = (v: number, total: number) => `${((v / total) * 100).toFixed(2)}%`;
 
+// En el mismo orden que intersection.threads. El rótulo más largo (la competencia jurídica) va abajo a la
+// izquierda, donde tiene espacio para crecer hacia abajo sin salirse del diagrama.
 const threads = [
-  // Derecho: desde arriba a la izquierda, entra por el brazo superior izquierdo.
+  // Investigación de incendios: desde arriba a la izquierda, entra por el brazo superior izquierdo.
   { d: "M30 104 C120 100 208 121 286 262", from: { x: 30, y: 104 }, label: "above-left" },
-  // Ciencia forense: desde abajo a la izquierda, entra por el brazo inferior izquierdo.
-  { d: "M30 404 C110 406 190 403 286 262", from: { x: 30, y: 404 }, label: "below-left" },
-  // Investigación de incendios: desde arriba a la derecha, entra por el brazo superior derecho.
+  // Análisis técnico-científico: desde arriba a la derecha, entra por el brazo superior derecho.
   { d: "M490 80 C440 84 384 121 286 262", from: { x: 490, y: 80 }, label: "above-right" },
+  // Comprensión jurídica de la prueba pericial: desde abajo a la izquierda, entra por el brazo inferior izquierdo.
+  { d: "M30 404 C110 406 190 403 286 262", from: { x: 30, y: 404 }, label: "below-left" },
 ] as const;
 
-// Cada disciplina con su ícono: balanza (derecho), lupa (ciencia forense) y llama (investigación de incendios).
-const THREAD_ICONS: IconName[] = ["balanza", "lupa", "llama"];
+// Cada competencia con su ícono: llama (investigación de incendios), lupa (análisis técnico-científico) y
+// balanza (comprensión jurídica de la prueba pericial).
+const THREAD_ICONS: IconName[] = ["llama", "lupa", "balanza"];
 
 const OUT = { d: "M286 262 C326 330 352 390 352 476", end: { x: 352, y: 476 } };
 
@@ -147,7 +139,7 @@ function Nudo() {
   return (
     <motion.figure
       role="img"
-      aria-label={copy.diagramLabel}
+      aria-label={intersection.diagramLabel}
       className="relative mx-auto aspect-[520/560] w-full max-w-[440px] sm:max-w-[520px]"
       {...trigger}
     >
@@ -235,9 +227,9 @@ function Nudo() {
           aria-hidden="true"
           variants={v.label}
           custom={i}
-          className={`absolute flex max-w-[11.5rem] items-center gap-2.5 text-[0.9rem] leading-[1.25] font-medium text-hueso/85 [text-wrap:balance] sm:max-w-[13.5rem] sm:text-[0.98rem] ${
+          className={`absolute flex items-center gap-2.5 text-[0.9rem] leading-[1.25] font-medium text-hueso/85 [text-wrap:balance] sm:text-[0.98rem] ${
             t.label === "above-right" ? "flex-row-reverse" : ""
-          } ${labelPos[t.label]}`}
+          } ${t.label === "below-left" ? "max-w-[15.5rem] sm:max-w-[17rem]" : "max-w-[11.5rem] sm:max-w-[13.5rem]"} ${labelPos[t.label]}`}
           style={{
             top: pct(t.from.y, VB.h),
             ...(t.label === "above-right" ? { right: pct(VB.w - t.from.x, VB.w) } : { left: pct(t.from.x, VB.w) }),
@@ -245,7 +237,8 @@ function Nudo() {
         >
           {/* El ícono se dibuja junto con su hilo */}
           <Icon name={THREAD_ICONS[i]} mode="inherit" badge delay={T.thread(i) + 0.25} className="size-9 sm:size-10" />
-          <span>{intersection.threads[i]}</span>
+          {/* Guion que no se corta: "técnico-científico" no debe partirse entre dos líneas */}
+          <span>{intersection.threads[i].replace(/-/g, "‑")}</span>
         </motion.span>
       ))}
 
@@ -263,7 +256,7 @@ function Nudo() {
 }
 
 // Ícono de cada público, en el mismo orden que intersection.audiences.
-const AUDIENCE_ICONS: IconName[] = ["perito", "abogado", "aseguradora", "empresa"];
+const AUDIENCE_ICONS: IconName[] = ["aseguradora", "abogado", "perito", "empresa"];
 
 export function Interseccion() {
   const { title, body, audiencesTitle, audiences } = intersection;
