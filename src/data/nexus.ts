@@ -387,7 +387,7 @@ const es: Texts = {
   },
   photoAlts: {
     terreno:
-      "Domingo Soto Gamé, con la camisa del uniforme IAAI, inspecciona con una linterna un muro calcinado en una vivienda quemada",
+      "Domingo Soto Gamé, con casco IAAI, lentes, respirador y guantes, inspecciona con una linterna un muro calcinado en una vivienda quemada, con una tabla de notas en la mano",
     reunion: "Domingo Soto Gamé explica un informe con fotografías a un abogado en una oficina",
     evidencia:
       "Muro con un patrón de quemadura en forma de V sobre una caja eléctrica dañada, junto a una cinta métrica y un marcador de evidencia numerado",
@@ -583,7 +583,7 @@ const en: Texts = {
   },
   photoAlts: {
     terreno:
-      "Domingo Soto Gamé, wearing the IAAI uniform shirt, uses a flashlight to inspect a charred wall in a burned house",
+      "Domingo Soto Gamé, wearing an IAAI hard hat, safety glasses, a respirator and gloves, uses a flashlight to inspect a charred wall in a burned house, clipboard in hand",
     reunion: "Domingo Soto Gamé walks an attorney through a report with photographs in an office",
     evidencia:
       "Wall with a V-shaped burn pattern above a damaged electrical box, next to a measuring tape and a numbered evidence marker",
@@ -772,7 +772,7 @@ const pt: Texts = {
   },
   photoAlts: {
     terreno:
-      "Domingo Soto Gamé, com a camisa do uniforme da IAAI, inspeciona com uma lanterna uma parede carbonizada em uma casa incendiada",
+      "Domingo Soto Gamé, com capacete da IAAI, óculos, respirador e luvas, inspeciona com uma lanterna uma parede carbonizada em uma casa incendiada, com uma prancheta na mão",
     reunion: "Domingo Soto Gamé explica um laudo com fotografias a um advogado em um escritório",
     evidencia:
       "Parede com um padrão de queima em forma de V sobre uma caixa elétrica danificada, ao lado de uma trena e de um marcador de evidência numerado",

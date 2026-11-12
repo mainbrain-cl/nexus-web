@@ -28,12 +28,8 @@ const nodeVariants: Variants = {
     scale: 1,
     transition: { duration: 0.5 },
   },
-  lit: {
-    backgroundColor: ["#ff7a2a", "#ff7a2a", "#c9a26b"],
-    borderColor: ["#ff7a2a", "#ffb27a", "#e0c08f"],
-    scale: [1, 1.4, 1],
-    transition: { duration: 1.2, times: [0, 0.22, 1], ease: "easeOut" },
-  },
+  // Prende de una, sin destello naranja ni pulso (Aaron, 12-11).
+  lit: { backgroundColor: "#c9a26b", borderColor: "#e0c08f", scale: 1, transition: { duration: 0.15, ease: "easeOut" } },
   // Estado final sin animación, para reduced-motion.
   on: { backgroundColor: "#c9a26b", borderColor: "#e0c08f", scale: 1, transition: { duration: 0 } },
 };

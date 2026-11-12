@@ -28,7 +28,7 @@ import {
   Target,
   type Icon as PhosphorIcon,
 } from "@phosphor-icons/react";
-import { ease, useReduce } from "./primitives";
+import { useReduce } from "./primitives";
 
 // Íconos rellenos (Phosphor, peso "fill"): Aaron los pidió rellenos, no lineales (10-11), para acompañar
 // los botones redondeados. Al aparecer se "encienden": nacen pequeños en color brasa y se asientan en dorado.
@@ -101,22 +101,10 @@ export function Icon({ name, className = "size-6", delay = 0, badge = false, mod
 
   if (mode === "static") return <span className={shell}>{glyph}</span>;
 
+  // Prende de una (Aaron, 12-11): el salto de tamaño y el destello de brasa se leían como un parpadeo.
   const variants: Variants = {
-    hidden: { opacity: 0, scale: 0.55 },
-    shown: {
-      opacity: 1,
-      scale: reduce ? 1 : [0.55, 1.12, 1],
-      transition: reduce ? { duration: 0 } : { duration: 0.9, times: [0, 0.55, 1], ease, delay },
-    },
-  };
-
-  // El brillo de brasa vive en el glifo: pasa por naranja encendido y se enfría a su color.
-  const flash: Variants = {
-    hidden: { filter: "brightness(1.6) saturate(1.4)" },
-    shown: {
-      filter: "brightness(1) saturate(1)",
-      transition: reduce ? { duration: 0 } : { duration: 1.2, ease: "easeOut", delay: delay + 0.15 },
-    },
+    hidden: { opacity: 0 },
+    shown: { opacity: 1, transition: reduce ? { duration: 0 } : { duration: 0.15, ease: "easeOut", delay } },
   };
 
   const trigger =
@@ -128,9 +116,7 @@ export function Icon({ name, className = "size-6", delay = 0, badge = false, mod
 
   return (
     <motion.span className={shell} variants={variants} {...trigger}>
-      <motion.span className="grid size-full place-items-center" variants={flash}>
-        {glyph}
-      </motion.span>
+      {glyph}
     </motion.span>
   );
 }
