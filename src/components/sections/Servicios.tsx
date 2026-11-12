@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type KeyboardEvent } from "react";
+import { Fragment, useRef, useState, type KeyboardEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Arrow } from "@/components/Arrow";
 import { Container, GoldRule, Reveal, Section, SectionTitle, ease, useReduce } from "@/components/ui/primitives";
@@ -17,8 +17,12 @@ const PANEL_ID = "servicios-panel";
 /** Guion que no se corta: "pre-litigation" o "pré-processual" no deben partirse entre dos líneas. */
 const nobreak = (text: string) => text.replace(/-/g, "‑");
 const tabId = (s: Service) => `servicios-tab-${s.id}`;
+const tabGroupId = (s: Service) => `servicios-grupo-${s.group}`;
 const accButtonId = (s: Service) => `servicios-acc-btn-${s.id}`;
 const accRegionId = (s: Service) => `servicios-acc-${s.id}`;
+const accGroupId = (group: Service["group"]) => `servicios-acc-grupo-${group}`;
+/** El servicio abre una línea nueva: es el primero o su línea cambia respecto del anterior. */
+const startsGroup = (list: Service[], i: number) => i === 0 || list[i - 1].group !== list[i].group;
 
 export function Servicios() {
   const { services, servicesIntro } = useContent();
@@ -55,7 +59,7 @@ export function Servicios() {
 /* ---------- Escritorio: lista de situaciones como pestañas ---------- */
 
 function SituationTabs({ active, onSelect }: { active: number; onSelect: (i: number) => void }) {
-  const { services } = useContent();
+  const { services, servicesIntro } = useContent();
   const reduce = useReduce();
   const tabs = useRef<(HTMLButtonElement | null)[]>([]);
 
@@ -98,60 +102,75 @@ function SituationTabs({ active, onSelect }: { active: number; onSelect: (i: num
       {services.map((s, i) => {
         const selected = i === active;
         return (
-          <button
-            key={s.id}
-            ref={(el) => {
-              tabs.current[i] = el;
-            }}
-            id={tabId(s)}
-            type="button"
-            role="tab"
-            aria-selected={selected}
-            aria-controls={PANEL_ID}
-            tabIndex={selected ? 0 : -1}
-            onClick={() => onSelect(i)}
-            className="group relative block w-full cursor-pointer rounded-none py-5 pr-4 pl-9 text-left text-[1.15rem] focus-visible:rounded-xl"
-          >
-            {selected && (
-              <>
-                <motion.span
-                  layoutId="servicios-hilo"
-                  aria-hidden="true"
-                  className="absolute top-[calc(1.25rem+0.69em)] bottom-5 left-0 w-px bg-gradient-to-b from-oro-claro via-oro/70 to-oro/0"
-                  transition={slide}
-                />
-                <motion.span
-                  layoutId="servicios-brasa"
-                  aria-hidden="true"
-                  className="absolute top-[calc(1.25rem+0.69em-3.5px)] left-[-3px] size-[7px] rounded-full bg-[#ffb070] shadow-[0_0_0_1.5px_#ff7a2a,0_0_12px_2px_rgba(255,122,42,0.55)]"
-                  transition={emberSlide}
-                />
-              </>
+          <Fragment key={s.id}>
+            {/* Rótulo de la línea: solo visual dentro del tablist (que admite solo pestañas). Los lectores de
+                pantalla lo oyen como descripción de cada pestaña, por aria-describedby. */}
+            {startsGroup(services, i) && (
+              <div
+                id={tabGroupId(s)}
+                role="presentation"
+                aria-hidden="true"
+                className={`nx-servicios-grupo pl-9 ${i === 0 ? "pb-1" : "pt-8 pb-1"}`}
+              >
+                <span className={`absolute left-0 h-px w-6 bg-gradient-to-r from-oro/60 to-oro/0 ${i === 0 ? "top-[0.65em]" : "top-[calc(2rem+0.65em)]"}`} />
+                {servicesIntro.groups[s.group]}
+              </div>
             )}
-            {/* El nombre del servicio es lo primero que se lee; la situación lo explica en palabras del cliente */}
-            <span className="flex items-start gap-3.5">
-              <Icon
-                name={s.id as IconName}
-                mode="static"
-                badge
-                className={`mt-[-0.15rem] size-9 transition-opacity duration-500 ${selected ? "opacity-100" : "opacity-80 group-hover:opacity-100"}`}
-              />
-              <span className="min-w-0">
-                <span
-                  className={`block text-[1.08rem] leading-snug font-semibold [text-wrap:balance] transition-colors duration-500 ease-expo ${
-                    selected ? "text-hueso" : "text-hueso/80 group-hover:text-hueso/90"
-                  }`}
-                >
-                  {nobreak(s.name)}
-                </span>
-                <span
-                  className={`mt-1 block text-[0.9rem] leading-snug [text-wrap:pretty] transition-colors duration-500 ease-expo text-gris`}
-                >
-                  {s.situation}
+            <button
+              ref={(el) => {
+                tabs.current[i] = el;
+              }}
+              id={tabId(s)}
+              type="button"
+              role="tab"
+              aria-selected={selected}
+              aria-controls={PANEL_ID}
+              aria-describedby={tabGroupId(s)}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => onSelect(i)}
+              className="group relative block w-full cursor-pointer rounded-none py-5 pr-4 pl-9 text-left text-[1.15rem] focus-visible:rounded-xl"
+            >
+              {selected && (
+                <>
+                  <motion.span
+                    layoutId="servicios-hilo"
+                    aria-hidden="true"
+                    className="absolute top-[calc(1.25rem+0.69em)] bottom-5 left-0 w-px bg-gradient-to-b from-oro-claro via-oro/70 to-oro/0"
+                    transition={slide}
+                  />
+                  <motion.span
+                    layoutId="servicios-brasa"
+                    aria-hidden="true"
+                    className="absolute top-[calc(1.25rem+0.69em-3.5px)] left-[-3px] size-[7px] rounded-full bg-[#ffb070] shadow-[0_0_0_1.5px_#ff7a2a,0_0_12px_2px_rgba(255,122,42,0.55)]"
+                    transition={emberSlide}
+                  />
+                </>
+              )}
+              {/* El nombre del servicio es lo primero que se lee; la situación lo explica en palabras del cliente */}
+              <span className="flex items-start gap-3.5">
+                <Icon
+                  name={s.id as IconName}
+                  mode="static"
+                  badge
+                  className={`mt-[-0.15rem] size-9 transition-opacity duration-500 ${selected ? "opacity-100" : "opacity-80 group-hover:opacity-100"}`}
+                />
+                <span className="min-w-0">
+                  <span
+                    className={`block text-[1.08rem] leading-snug font-semibold [text-wrap:balance] transition-colors duration-500 ease-expo ${
+                      selected ? "text-hueso" : "text-hueso/80 group-hover:text-hueso/90"
+                    }`}
+                  >
+                    {nobreak(s.name)}
+                  </span>
+                  <span
+                    className={`mt-1 block text-[0.9rem] leading-snug [text-wrap:pretty] transition-colors duration-500 ease-expo text-gris`}
+                  >
+                    {s.situation}
+                  </span>
                 </span>
               </span>
-            </span>
-          </button>
+            </button>
+          </Fragment>
         );
       })}
     </div>
@@ -235,7 +254,13 @@ function ServiceBody({ service, staggerItems }: { service: Service; staggerItems
 /* ---------- Celular y tablet: acordeón ---------- */
 
 function SituationAccordion() {
-  const { services } = useContent();
+  const { services, servicesIntro } = useContent();
+  // Una lista por línea de servicio, en el orden de la página.
+  const groups = services.reduce<Service[][]>((acc, s, i) => {
+    if (startsGroup(services, i)) acc.push([]);
+    acc[acc.length - 1].push(s);
+    return acc;
+  }, []);
   const reduce = useReduce();
   const [open, setOpen] = useState<string | null>(services[0].id);
   const buttons = useRef<Record<string, HTMLButtonElement | null>>({});
@@ -250,79 +275,90 @@ function SituationAccordion() {
   };
 
   return (
-    <ul className="mt-12 border-b border-hueso/10 lg:hidden">
-      {services.map((s) => {
-        const isOpen = open === s.id;
-        return (
-          <li key={s.id} className="relative border-t border-hueso/10">
-            {/* El hilo dorado y la brasa marcan la situación abierta, igual que en escritorio */}
-            <motion.span
-              aria-hidden="true"
-              className="absolute -top-px left-0 h-px w-full origin-left bg-gradient-to-r from-oro-claro via-oro/60 to-transparent"
-              initial={false}
-              animate={{ scaleX: isOpen ? 1 : 0 }}
-              transition={reduce ? { duration: 0 } : { duration: 0.7, ease }}
-            />
-            <motion.span
-              aria-hidden="true"
-              className="absolute -top-[4px] left-0 size-[7px] rounded-full bg-[#ffb070] shadow-[0_0_0_1.5px_#ff7a2a,0_0_12px_2px_rgba(255,122,42,0.55)]"
-              initial={false}
-              animate={{ opacity: isOpen ? 1 : 0, scale: isOpen ? 1 : 0.4 }}
-              transition={reduce ? { duration: 0 } : { duration: 0.5, ease }}
-            />
+    <div className="mt-12 space-y-10 lg:hidden">
+      {groups.map((list) => (
+        // Cada línea es un grupo con nombre: el lector de pantalla anuncia la línea al entrar en ella.
+        <div key={list[0].group} role="group" aria-labelledby={accGroupId(list[0].group)}>
+          <p id={accGroupId(list[0].group)} className="nx-servicios-grupo pb-3 pl-8">
+            <span aria-hidden="true" className="absolute top-[0.65em] left-0 h-px w-5 bg-gradient-to-r from-oro/60 to-oro/0" />
+            {servicesIntro.groups[list[0].group]}
+          </p>
+          <ul className="border-b border-hueso/10">
+            {list.map((s) => {
+              const isOpen = open === s.id;
+              return (
+                <li key={s.id} className="relative border-t border-hueso/10">
+                  {/* El hilo dorado y la brasa marcan la situación abierta, igual que en escritorio */}
+                  <motion.span
+                    aria-hidden="true"
+                    className="absolute -top-px left-0 h-px w-full origin-left bg-gradient-to-r from-oro-claro via-oro/60 to-transparent"
+                    initial={false}
+                    animate={{ scaleX: isOpen ? 1 : 0 }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.7, ease }}
+                  />
+                  <motion.span
+                    aria-hidden="true"
+                    className="absolute -top-[4px] left-0 size-[7px] rounded-full bg-[#ffb070] shadow-[0_0_0_1.5px_#ff7a2a,0_0_12px_2px_rgba(255,122,42,0.55)]"
+                    initial={false}
+                    animate={{ opacity: isOpen ? 1 : 0, scale: isOpen ? 1 : 0.4 }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.5, ease }}
+                  />
 
-            <h3>
-              <button
-                ref={(el) => {
-                  buttons.current[s.id] = el;
-                }}
-                id={accButtonId(s)}
-                type="button"
-                aria-expanded={isOpen}
-                aria-controls={accRegionId(s)}
-                onClick={() => setOpen(isOpen ? null : s.id)}
-                className="flex min-h-[44px] w-full cursor-pointer items-start justify-between gap-5 py-6 text-left focus-visible:rounded-xl"
-              >
-                <span className="flex items-start gap-3.5">
-                  <Icon name={s.id as IconName} mode="static" badge className={`mt-[-0.1rem] size-9 ${isOpen ? "opacity-100" : "opacity-60"}`} />
-                  <span className="min-w-0">
-                    <span
-                      className={`block text-[1.08rem] leading-snug font-semibold [text-wrap:balance] transition-colors duration-500 ease-expo ${
-                        isOpen ? "text-hueso" : "text-hueso/75"
-                      }`}
+                  <h3>
+                    <button
+                      ref={(el) => {
+                        buttons.current[s.id] = el;
+                      }}
+                      id={accButtonId(s)}
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-controls={accRegionId(s)}
+                      onClick={() => setOpen(isOpen ? null : s.id)}
+                      className="flex min-h-[44px] w-full cursor-pointer items-start justify-between gap-5 py-6 text-left focus-visible:rounded-xl"
                     >
-                      {nobreak(s.name)}
-                    </span>
-                    <span className="mt-1 block text-[0.9rem] leading-snug text-gris">{s.situation}</span>
-                  </span>
-                </span>
-                <PlusMinus open={isOpen} />
-              </button>
-            </h3>
+                      <span className="flex items-start gap-3.5">
+                        <Icon name={s.id as IconName} mode="static" badge className={`mt-[-0.1rem] size-9 ${isOpen ? "opacity-100" : "opacity-60"}`} />
+                        <span className="min-w-0">
+                          <span
+                            className={`block text-[1.08rem] leading-snug font-semibold [text-wrap:balance] transition-colors duration-500 ease-expo ${
+                              isOpen ? "text-hueso" : "text-hueso/75"
+                            }`}
+                          >
+                            {nobreak(s.name)}
+                          </span>
+                          <span className="mt-1 block text-[0.9rem] leading-snug text-gris">{s.situation}</span>
+                        </span>
+                      </span>
+                      <PlusMinus open={isOpen} />
+                    </button>
+                  </h3>
 
-            <motion.div
-              id={accRegionId(s)}
-              role="region"
-              aria-labelledby={accButtonId(s)}
-              // inert saca el contenido cerrado del foco y del lector de pantalla, aunque siga en el HTML.
-              inert={!isOpen}
-              className="-mx-4 overflow-hidden px-4"
-              initial={false}
-              animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-              transition={reduce ? { duration: 0 } : { duration: 0.55, ease }}
-              onAnimationComplete={() => {
-                if (isOpen) keepInView(s);
-              }}
-            >
-              <div className="pb-9">
-                <span aria-hidden="true" className="block h-px w-24 bg-gradient-to-r from-oro-claro via-oro/60 to-transparent" />
-                <ServiceBody service={s} staggerItems={false} />
-              </div>
-            </motion.div>
-          </li>
-        );
-      })}
-    </ul>
+                  <motion.div
+                    id={accRegionId(s)}
+                    role="region"
+                    aria-labelledby={accButtonId(s)}
+                    // inert saca el contenido cerrado del foco y del lector de pantalla, aunque siga en el HTML.
+                    inert={!isOpen}
+                    className="-mx-4 overflow-hidden px-4"
+                    initial={false}
+                    animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+                    transition={reduce ? { duration: 0 } : { duration: 0.55, ease }}
+                    onAnimationComplete={() => {
+                      if (isOpen) keepInView(s);
+                    }}
+                  >
+                    <div className="pb-9">
+                      <span aria-hidden="true" className="block h-px w-24 bg-gradient-to-r from-oro-claro via-oro/60 to-transparent" />
+                      <ServiceBody service={s} staggerItems={false} />
+                    </div>
+                  </motion.div>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
   );
 }
 
