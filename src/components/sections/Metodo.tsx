@@ -20,7 +20,7 @@ const TITLE_ID = "metodo-titulo";
 // Un ícono por paso, en el orden de method.steps.
 const STEP_ICONS: IconName[] = ["necesidad", "problema", "camara", "analisis", "hipotesis", "prueba", "conclusion"];
 
-// El nodo se enciende como brasa: destello naranja breve y queda en dorado.
+// El nodo pasa de apagado a dorado con un fundido corto.
 const nodeVariants: Variants = {
   idle: {
     backgroundColor: "#120f0d",
@@ -32,12 +32,6 @@ const nodeVariants: Variants = {
   lit: { backgroundColor: "#c9a26b", borderColor: "#e0c08f", scale: 1, transition: { duration: 0.15, ease: "easeOut" } },
   // Estado final sin animación, para reduced-motion.
   on: { backgroundColor: "#c9a26b", borderColor: "#e0c08f", scale: 1, transition: { duration: 0 } },
-};
-
-const glowVariants: Variants = {
-  idle: { opacity: 0, scale: 0.5, transition: { duration: 0.3 } },
-  lit: { opacity: [0, 0.9, 0], scale: [0.5, 1.6, 2.3], transition: { duration: 1.2, times: [0, 0.2, 1], ease: "easeOut" } },
-  on: { opacity: 0, scale: 0.5, transition: { duration: 0 } },
 };
 
 function Paso({
@@ -89,12 +83,6 @@ function Paso({
       )}
 
       <span aria-hidden="true" className="relative z-10 flex h-11 w-[29px] items-center justify-center">
-        <motion.span
-          className="absolute size-10 rounded-full bg-[radial-gradient(circle,rgba(255,122,42,0.75),rgba(255,122,42,0)_68%)]"
-          variants={glowVariants}
-          initial={false}
-          animate={state}
-        />
         <motion.span
           ref={nodeRef}
           className="relative size-[13px] rounded-full border"
@@ -187,7 +175,7 @@ function Pasos() {
     const list = listRef.current;
     if (!list) return;
     const measure = () => {
-      // Se mide la caja que contiene al nodo, no el nodo: este puede estar a escala 1.4 en su destello.
+      // Se mide la caja que contiene al nodo, no el nodo.
       const a = nodes.current[loopTo - 1]?.parentElement;
       const b = nodes.current[loopFrom - 1]?.parentElement;
       if (!a || !b) return;

@@ -31,7 +31,7 @@ import {
 import { useReduce } from "./primitives";
 
 // Íconos rellenos (Phosphor, peso "fill"): Aaron los pidió rellenos, no lineales (10-11), para acompañar
-// los botones redondeados. Al aparecer se "encienden": nacen pequeños en color brasa y se asientan en dorado.
+// los botones redondeados. Al aparecer prenden de una, con un fundido corto.
 
 const ICONS = {
   // Disciplinas (Intersección)
