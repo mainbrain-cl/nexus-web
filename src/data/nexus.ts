@@ -259,7 +259,7 @@ export const profile = {
   seals: [
     { logo: "/logos/iaai.webp", name: "IAAI", by: "International Association of Arson Investigators" },
     { logo: "/logos/iaai-capitulo-82.webp", name: "IAAI Capítulo 82 Chile", by: "Miembro" },
-    { logo: "/logos/iaai-fit.webp", name: "IAAI-FIT", by: "Fire Investigator Technician (IAAI-FIT) – Técnico en Investigación de Incendios" },
+    { logo: "/logos/iaai-fit.webp", name: "IAAI-FIT", by: "Fire Investigator Technician" },
   ],
   ledgerTitle: "Trayectoria",
   ledger: [
