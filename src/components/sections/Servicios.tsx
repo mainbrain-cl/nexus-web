@@ -6,7 +6,8 @@ import { Arrow } from "@/components/Arrow";
 import { Container, GoldRule, Reveal, Section, SectionTitle, ease, useReduce } from "@/components/ui/primitives";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { Rich } from "@/components/ui/Rich";
-import { serviceWhatsapp, services, servicesIntro, type Service } from "@/data/nexus";
+import { services, servicesIntro, type Service } from "@/data/nexus";
+import { contactFormHref } from "@/data/formulario";
 
 // Ids fijos: la sección existe una sola vez en la página. Escritorio y celular usan prefijos distintos
 // para no repetir ids, porque las dos versiones están en el HTML y solo el CSS decide cuál se ve.
@@ -213,9 +214,7 @@ function ServiceBody({ service, staggerItems }: { service: Service; staggerItems
       </ul>
 
       <a
-        href={serviceWhatsapp(service)}
-        target="_blank"
-        rel="noopener"
+        href={contactFormHref(service.id)}
         className="btn btn-oro mt-8 h-14 w-full justify-center px-8 text-[0.85rem] max-sm:px-5 max-sm:text-[0.78rem] max-sm:tracking-[0.06em] max-sm:whitespace-nowrap sm:w-auto"
       >
         {service.cta}

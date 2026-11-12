@@ -4,12 +4,12 @@ import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
 import {
   motion,
   useMotionValue,
-  useReducedMotion,
   useScroll,
   useSpring,
   useTransform,
   type MotionValue,
 } from "motion/react";
+import { useReduce } from "@/components/ui/primitives";
 import { hero, links, profile } from "@/data/nexus";
 import { Arrow } from "../Arrow";
 import { Embers } from "./Embers";
@@ -90,7 +90,7 @@ function TitleLine({ text, start }: { text: string; start: number }) {
 }
 
 export function Hero() {
-  const reduce = useReducedMotion();
+  const reduce = useReduce();
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollY } = useScroll();
 
@@ -315,9 +315,7 @@ export function Hero() {
         </p>
         <div className="mt-[clamp(1.4rem,4.4svh,2.6rem)] flex w-full max-w-[340px] flex-col items-stretch gap-3 sm:max-w-none sm:w-auto sm:flex-row sm:items-center sm:gap-[clamp(1rem,3vw,3.2rem)]">
           <a
-            href={links.asesoria}
-            target="_blank"
-            rel="noopener"
+            href={links.formulario}
             className="in-cta btn btn-oro h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[19rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
             style={{ "--d": "3.25s" } as Vars}
           >

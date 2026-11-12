@@ -76,7 +76,7 @@ export function Navbar() {
               </li>
             ))}
           </ul>
-          <a href={links.asesoria} target="_blank" rel="noopener" className="btn btn-oro h-12 px-7 text-[0.9rem] tracking-[0.02em] normal-case">
+          <a href={links.formulario} className="btn btn-oro h-12 px-7 text-[0.9rem] tracking-[0.02em] normal-case">
             Solicitar asesoría
             <Arrow className="btn-arrow size-4" />
           </a>
@@ -146,7 +146,7 @@ export function Navbar() {
               exit={{ opacity: 0 }}
               transition={{ delay: 0.42, duration: 0.7, ease }}
             >
-              <a href={links.asesoria} target="_blank" rel="noopener" className="btn btn-oro h-14 w-full text-[0.95rem]">
+              <a href={links.formulario} className="btn btn-oro h-14 w-full text-[0.95rem]">
                 Solicitar asesoría
                 <Arrow className="btn-arrow size-4" />
               </a>

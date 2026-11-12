@@ -107,7 +107,7 @@ function Paso({
       </span>
 
       <div className="min-w-0">
-        <div className="flex items-center gap-4">
+        <div className={`flex gap-4 ${step.note ? "items-start" : "items-center"}`}>
           {/* El ícono se dibuja cuando el hilo alcanza su paso */}
           <Icon name={STEP_ICONS[index]} mode={lit ? "shown" : "hidden"} delay={0.15} badge className="size-11 shrink-0" />
           <h3 className="min-w-0 font-display text-[clamp(1.55rem,2.3vw,2.15rem)] leading-[0.98] text-hueso uppercase italic opacity-50 [text-wrap:balance] transition-opacity duration-700 ease-expo group-data-[lit=true]:opacity-100 motion-reduce:transition-none">
@@ -208,22 +208,25 @@ function Pasos() {
   }, []);
 
   return (
-    <ol ref={listRef} aria-label={method.stepsLabel} className="relative pl-6 sm:pl-8">
+    // El hilo de retorno va fuera del <ol>, porque una lista solo admite <li>. El div tiene la misma caja que el <ol>.
+    <div className="relative">
       {geometry && <HiloDeRetorno geometry={geometry} drawn={litUpTo >= method.loop.from - 1} reduce={reduce} />}
-      {method.steps.map((step, i) => (
-        <Paso
-          key={step.name}
-          step={step}
-          index={i}
-          total={method.steps.length}
-          reduce={reduce}
-          onLit={onLit}
-          nodeRef={(el) => {
-            nodes.current[i] = el;
-          }}
-        />
-      ))}
-    </ol>
+      <ol ref={listRef} aria-label={method.stepsLabel} className="relative pl-6 sm:pl-8">
+        {method.steps.map((step, i) => (
+          <Paso
+            key={step.name}
+            step={step}
+            index={i}
+            total={method.steps.length}
+            reduce={reduce}
+            onLit={onLit}
+            nodeRef={(el) => {
+              nodes.current[i] = el;
+            }}
+          />
+        ))}
+      </ol>
+    </div>
   );
 }
 

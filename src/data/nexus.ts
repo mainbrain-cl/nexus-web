@@ -23,6 +23,8 @@ export const contact = {
 export const whatsapp = (text: string) => `https://wa.me/${phoneE164.replace("+", "")}?text=${encodeURIComponent(text)}`;
 
 export const links = {
+  // Formulario de contacto (Domingo y Aaron, 12-11): canal principal. WhatsApp queda como alternativa.
+  formulario: "#contacto",
   // Canal principal: WhatsApp, con correo y teléfono como alternativas, sin formulario (Aaron, 10-11).
   asesoria: whatsapp(whatsappText),
   email: `mailto:${contact.email}`,
@@ -56,7 +58,7 @@ export const hero = {
   // Dos partes para cortar la línea en móvil
   roleLines: ["Auditoría forense e", "investigación de incendios"],
   // Etiqueta rotativa junto al nombre: solo datos de la trayectoria, nada inventado.
-  tags: ["Abogado desde 1997", "Investigador IAAI-FIT", "Método NFPA 921", "IAAI · Capítulo 82 Chile"],
+  tags: ["Abogado desde 1997", "IAAI-FIT", "Método NFPA 921", "IAAI · Capítulo 82 Chile"],
   primaryCta: "Solicitar asesoría",
   secondaryCta: "Ver servicios",
   photoAlt: "Domingo Soto Gamé con uniforme de la International Association of Arson Investigators",
@@ -114,7 +116,7 @@ export const servicesIntro = {
 export const services: Service[] = [
   {
     id: "auditoria",
-    cta: "Pedir auditoría por WhatsApp",
+    cta: "Pedir auditoría",
     situation: "Recibí un informe pericial y necesito una opinión independiente",
     name: "Auditoría técnica de informes periciales",
     text: "Evaluación **independiente** de un informe pericial presentado en su caso, para decidir con fundamento.",
@@ -122,9 +124,9 @@ export const services: Service[] = [
   },
   {
     id: "revision",
-    cta: "Pedir revisión por WhatsApp",
+    cta: "Pedir revisión",
     situation: "Soy investigador y quiero reforzar mi informe antes de entregarlo",
-    name: "Revisión independiente de informe pericial",
+    name: "Revisión independiente antes de la entrega",
     text: "Metodología, sustento técnico y conclusiones: una segunda mirada **técnica y jurídica**, confidencial, antes de entregar su informe.",
     includes: [
       "Metodología y sustento técnico según NFPA 921",
@@ -134,7 +136,7 @@ export const services: Service[] = [
   },
   {
     id: "litigacion",
-    cta: "Pedir asesoría por WhatsApp",
+    cta: "Pedir asesoría",
     situation: "Estoy en juicio y la prueba técnica es decisiva",
     name: "Consultoría técnica para litigación",
     text: "Asesoría a abogados para **comprender y usar con solidez** la prueba técnica.",
@@ -142,7 +144,7 @@ export const services: Service[] = [
   },
   {
     id: "controvertidas",
-    cta: "Pedir análisis por WhatsApp",
+    cta: "Pedir análisis",
     situation: "Hay pericias que llegan a conclusiones distintas",
     name: "Revisión técnica de pericias controvertidas",
     text: "Análisis técnico de pericias **con conclusiones en discusión**, para ordenar el debate sobre bases verificables.",
@@ -150,7 +152,7 @@ export const services: Service[] = [
   },
   {
     id: "investigacion",
-    cta: "Pedir investigación por WhatsApp",
+    cta: "Pedir investigación",
     situation: "Ocurrió un incendio y hay que determinar su origen y causa",
     name: "Investigación de incendios",
     text: "Determinación del **origen y la causa** del incendio, con un proceso documentado.",
@@ -158,7 +160,7 @@ export const services: Service[] = [
   },
   {
     id: "prejudicial",
-    cta: "Pedir evaluación por WhatsApp",
+    cta: "Pedir evaluación",
     situation: "Todavía no judicializo y quiero evaluar el caso",
     name: "Asesoría prejudicial estratégica",
     text: "Evaluación técnica **antes de judicializar**: alcance de la evidencia y próximos pasos.",
@@ -166,7 +168,7 @@ export const services: Service[] = [
   },
   {
     id: "formacion",
-    cta: "Consultar formación por WhatsApp",
+    cta: "Consultar formación",
     situation: "Mi equipo necesita formarse en investigación de incendios",
     name: "Formación especializada",
     text: "Capacitaciones en **investigación de incendios**, análisis de evidencia e informes.",
@@ -174,8 +176,6 @@ export const services: Service[] = [
   },
 ];
 
-/** Mensaje de WhatsApp para consultar por un servicio puntual. */
-export const serviceWhatsapp = (s: Service) => whatsapp(`Hola Domingo, quiero consultar por el servicio de ${s.name.toLowerCase()}.`);
 
 // ---------- Método ----------
 // Los siete pasos del método científico de NFPA 921 (edición 2024), con los nombres que dio Domingo (12-11).
@@ -203,7 +203,7 @@ export const method = {
     { name: "Recopilar datos", text: "Se reúnen **hechos verificables**: observación del sitio, registros, testimonios y ensayos." },
     { name: "Analizar los datos", text: "Los datos se interpretan **con fundamento científico**, a partir de conocimiento, formación y experiencia." },
     { name: "Desarrollar hipótesis", text: "A partir del análisis se formulan **hipótesis que expliquen** lo observado." },
-    { name: "Poner a prueba las hipótesis", text: "Cada hipótesis se contrasta con **todos los hechos conocidos**, por razonamiento deductivo." },
+    { name: "Poner a prueba las hipótesis", text: "Cada hipótesis se contrasta con **los hechos conocidos** y con el conocimiento científico aplicable, por razonamiento deductivo." },
     {
       name: "Seleccionar una hipótesis final",
       note: "cuando los antecedentes lo permitan",
@@ -215,7 +215,7 @@ export const method = {
   loop: {
     from: 6,
     to: 3,
-    text: "Si una hipótesis no resiste, se descarta y el ciclo vuelve a los datos: nuevos antecedentes o un nuevo análisis.",
+    text: "Si una hipótesis no resiste, se descarta y se desarrollan otras. Eso puede requerir nuevos datos o un nuevo análisis de los existentes.",
   },
 };
 
@@ -225,7 +225,7 @@ export type Verdict = "sustentada" | "respaldo" | "insuficiente";
 
 export const result = {
   title: ["Qué está sólido", "y qué reforzar"],
-  text: "Cada conclusión del informe queda en **uno de estos tres niveles**, con su fundamento y lo que haría falta para reforzarla.",
+  text: "Cada conclusión del informe queda en **uno de estos tres niveles**, con su fundamento y lo que falta para respaldarla.",
   levels: [
     { id: "sustentada", name: "Sustentada" },
     { id: "respaldo", name: "Requiere respaldo" },
@@ -249,17 +249,17 @@ export type LedgerRow = {
 };
 
 export const profile = {
-  role: "Dirección técnica · Abogado · Investigador de incendios IAAI-FIT",
+  role: "Dirección técnica · Abogado · Investigador de incendios · IAAI-FIT",
   bio: "Abogado desde 1997 e investigador de incendios desde 2012. Une la **investigación técnica** con la **comprensión jurídica de la prueba pericial**.",
   portraitAlt:
-    "Retrato de Domingo Soto Gamé con la camisa de la International Association of Arson Investigators y el parche de Fire Investigator Technician",
+    "Retrato de Domingo Soto Gamé con la camisa de la International Association of Arson Investigators y el parche de Fire Investigator Technician (IAAI-FIT)",
   sealsLabel: "Credenciales",
   sealAlt: (name: string) => `Sello ${name}`,
   // Sellos de afiliación y credencial, con los logos del portafolio PDF del cliente (Aaron pidió usarlos, 10-11).
   seals: [
     { logo: "/logos/iaai.webp", name: "IAAI", by: "International Association of Arson Investigators" },
     { logo: "/logos/iaai-capitulo-82.webp", name: "IAAI Capítulo 82 Chile", by: "Miembro" },
-    { logo: "/logos/iaai-fit.webp", name: "IAAI-FIT®", by: "Fire Investigator Technician" },
+    { logo: "/logos/iaai-fit.webp", name: "IAAI-FIT", by: "Fire Investigator Technician (IAAI-FIT) – Técnico en Investigación de Incendios" },
   ],
   ledgerTitle: "Trayectoria",
   ledger: [
@@ -290,23 +290,10 @@ export const profile = {
     {
       year: "",
       logo: "/logos/iaai-fit.webp",
-      name: "Fire Investigator Technician (IAAI-FIT)",
-      by: "Técnico en Investigación de Incendios",
+      name: "Fire Investigator Technician (IAAI-FIT) – Técnico en Investigación de Incendios",
     },
   ] as LedgerRow[],
 };
-
-/** Lista plana de credenciales, tal como la escribió Domingo (12-11). */
-export const credentials = [
-  "Abogado (1997)",
-  "Curso de Investigación de Incendios y Explosiones, ANB – Academia Nacional de Bomberos de Chile (2011)",
-  "Curso de Investigación de Incendios Nivel II, Escuela de Bomberos del Cuerpo de Bomberos de Santiago (2023)",
-  "Miembro IAAI International Association of Arson Investigators desde (2024)",
-  "Miembro de Cap 82 Chile IAAI International Association of Arson Investigators (2023)",
-  "Curso de Investigación de Incendios Forestales, Capítulo 79 Hispanoamericano – IAAI International Association of Arson Investigators (2023)",
-  "Investigador de Incendios – Cuerpo de Bomberos de Valdivia desde 2012. Desde 2020 Inspector jefe del Departamento de Investigación de Incendios del CB",
-  "Fire Investigator Technician (IAAI-FIT) – Técnico en Investigación de Incendios",
-];
 
 // ---------- Contacto ----------
 
@@ -358,7 +345,7 @@ export const site = {
   name: "NEXUS",
   title: "NEXUS | Auditoría forense e investigación de incendios",
   description:
-    "Evaluación independiente de informes periciales e investigación de incendios según NFPA 921, con mirada técnica y jurídica. Domingo Soto Gamé, abogado e investigador IAAI-FIT. Valdivia, Chile.",
+    "Evaluación independiente de informes periciales e investigación de incendios según NFPA 921, con mirada técnica y jurídica. Domingo Soto Gamé, abogado e investigador de incendios, IAAI-FIT. Valdivia, Chile.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://nexuschile.net",
   tagline: "Método científico. Utilidad jurídica.",
 };

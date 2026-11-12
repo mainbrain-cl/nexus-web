@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
+import { useReduce } from "@/components/ui/primitives";
 
 const ease = [0.16, 1, 0.3, 1] as const;
 
@@ -12,7 +13,7 @@ export function RotatingTag({ items, startDelay = 4600, every = 2600, className 
   every?: number;
   className?: string;
 }) {
-  const reduce = useReducedMotion();
+  const reduce = useReduce();
   const [i, setI] = useState(0);
 
   useEffect(() => {

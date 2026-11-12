@@ -32,6 +32,7 @@ export type ServiceId = (typeof serviceIds)[number];
 export const serviceAliases: Record<string, ServiceId> = {
   prejudicial: "evaluacion",
   formacion: "capacitacion",
+  revision: "revision-propia",
 };
 
 export const statusIds = {
