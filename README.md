@@ -4,7 +4,7 @@ Sitio de NEXUS, auditoría forense e investigación de incendios (Domingo Soto G
 
 ## Stack
 
-Next.js 16, React 19, Tailwind CSS v4, Motion y Phosphor Icons. La página se prerenderiza como estática; lo único que corre en el servidor es `POST /api/contacto`, que envía el formulario de contacto al correo de Domingo con Resend. WhatsApp, correo y teléfono quedan como alternativas.
+Next.js 16, React 19, Tailwind CSS v4, Motion y Phosphor Icons. La página se prerenderiza como estática; lo único que corre en el servidor es `/api/contacto` (GET entrega el token del formulario; POST envía el formulario de contacto al correo de Domingo con Resend). WhatsApp, correo y teléfono quedan como alternativas.
 
 ## Dónde se edita
 
@@ -37,8 +37,31 @@ Variables de entorno (en Vercel: Settings → Environment Variables):
 | `RESEND_API_KEY` | Sí, en producción | — | Clave de la API de Resend. |
 | `FORM_TO` | No | `domingosoto@nexuschile.net` | Correo que recibe las consultas. |
 | `FORM_FROM` | No | `NEXUS Web <onboarding@resend.dev>` | Remitente. |
+| `FORM_SECRET` | Recomendada | Se deriva de `RESEND_API_KEY` | Clave del token de tiempo firmado (al menos 32 caracteres aleatorios, por ejemplo `openssl rand -base64 48`). |
+| `NEXT_PUBLIC_TURNSTILE_SITE_KEY` | No | — | Clave pública de Cloudflare Turnstile (widget). |
+| `TURNSTILE_SECRET_KEY` | No | — | Clave secreta de Turnstile (verificación en el servidor). |
 
 Sin `RESEND_API_KEY`, en desarrollo el correo se muestra en la consola y el formulario responde bien; en producción la ruta responde 503 y el formulario ofrece WhatsApp y correo.
+
+#### Defensas contra abuso
+
+- **Token de tiempo firmado.** En la primera interacción el formulario pide `GET /api/contacto/` y recibe un token con la hora de emisión, firmado con HMAC (`FORM_SECRET`; si falta, una clave derivada de `RESEND_API_KEY`; si faltan las dos, el token se desactiva y queda un aviso en los logs). El servidor exige al menos 4 s desde la emisión, rechaza tokens de más de 6 h (el formulario pide uno nuevo antes) y no acepta reutilizar uno ya enviado. Un token malo recibe un error real, nunca un éxito falso: solo la trampa invisible (honeypot) responde `ok` sin enviar.
+- **Límite por IP:** 5 consultas cada 15 min por IP (las IPv6 se agrupan por su /64) y 60 por hora en total, en memoria de cada instancia. **Depende de Vercel:** la IP sale de `x-real-ip`, que Vercel escribe con la IP real. Fuera de Vercel esa cabecera no es confiable y todas las visitas sin ella comparten un mismo cupo.
+- **Origen:** si el navegador manda `Origin`, debe ser `NEXT_PUBLIC_SITE_URL` (o su variante con o sin `www`), `https://nexus-web-beryl-five.vercel.app`, `VERCEL_URL` o `VERCEL_BRANCH_URL`. En desarrollo se acepta `localhost`.
+- **Cuerpo:** solo `application/json` (con `charset=utf-8` opcional), hasta 32 KB y UTF-8 válido. Los textos no admiten caracteres de control ni invisibles (ancho cero, marcas de dirección, uso privado, surrogates sueltos); la tabulación se convierte en espacio.
+- **Correo a Domingo:** lleva un aviso fijo sobre lo escrito por el visitante, los enlaces desactivados (`https://x.com` → `hxxps://x[.]com`) y, en texto plano, la descripción con sangría para que no pueda imitar una sección.
+- **Cabeceras de seguridad** en `next.config.ts`: `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy` y `Permissions-Policy`.
+
+#### Cloudflare Turnstile (opcional)
+
+Con las dos variables `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`, el último paso carga el widget (invisible salvo que Cloudflare pida marcar una casilla) y el servidor verifica el token con `siteverify` antes de enviar. Sin ellas, el formulario funciona igual que antes. Para activarlo:
+
+1. Crear una cuenta gratuita en [dash.cloudflare.com](https://dash.cloudflare.com/sign-up) (no hace falta mover el dominio a Cloudflare).
+2. En el panel: **Turnstile → Add widget**. Nombre: `NEXUS web`. Hostnames: `nexuschile.net`, `www.nexuschile.net` y `nexus-web-beryl-five.vercel.app` (más `localhost` si se quiere probar en local). Widget mode: **Managed** (o **Invisible**).
+3. Copiar la **Site Key** a `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y la **Secret Key** a `TURNSTILE_SECRET_KEY` en Vercel (Production y Preview).
+4. Volver a desplegar: la clave pública se incrusta en el build.
+
+Si Cloudflare no responde, el envío falla con un mensaje de error y el formulario ofrece WhatsApp y correo.
 
 Para activarlo:
 

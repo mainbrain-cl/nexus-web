@@ -10,7 +10,7 @@ web
 
 ## Stack
 
-Next.js + TypeScript con exportación estática, Tailwind CSS v4 y Motion. Es la misma base técnica de la web de Monza, elegida por Aaron (agencia Main Brain). Sin backend.
+Next.js + TypeScript, Tailwind CSS v4 y Motion, en Vercel. Es la misma base técnica de la web de Monza, elegida por Aaron (agencia Main Brain). La página se prerenderiza como estática; el único backend es la ruta `/api/contacto`, que envía el formulario de contacto al correo de Domingo con Resend y no guarda datos.
 
 ## Users
 
@@ -33,14 +33,13 @@ Su director técnico, Domingo Soto Gamé, es a la vez abogado (desde 1997) e inv
 
 ## Operating Context
 
-- Servicios del PDF: auditoría técnica de informes periciales, consultoría técnica para litigación, revisión técnica de pericias controvertidas, investigación de incendios y asesoría prejudicial estratégica.
-- El brochure suma "Formación especializada" (capacitaciones). Está pendiente de confirmar.
+- Siete servicios en el sitio: auditoría técnica de informes periciales, revisión independiente antes de la entrega (nuevo, pensado para investigadores), consultoría técnica para litigación, revisión técnica de pericias controvertidas, investigación de incendios, asesoría prejudicial estratégica y formación especializada (capacitaciones).
 - Marco de trabajo: NFPA 921 (guía de investigación de incendios y explosiones) y NFPA 1033 (competencia profesional del investigador).
 - Contacto: Domingo Soto Gamé, +56 9 9883 5977, domingosoto@nexuschile.net, nexuschile.net, Valdivia, Chile.
 
 ## Capabilities and Constraints
 
-- Sitio estático, sin formulario por ahora. Está por decidir si el contacto será por WhatsApp, por correo o por un formulario.
+- Contacto principal: un formulario condicional de cinco pasos (quién solicita, servicio, estado del asunto, datos del caso y contacto), con las preguntas de Domingo. Envía la consulta a su correo; WhatsApp y correo quedan como alternativas. Tiene defensas contra abuso (token de tiempo, límite por IP, Turnstile opcional).
 - Cobertura geográfica sin confirmar: solo Valdivia o todo Chile.
 - No hay precios publicados.
 
