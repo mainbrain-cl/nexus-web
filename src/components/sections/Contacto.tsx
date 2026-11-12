@@ -2,8 +2,10 @@
 
 import { useLayoutEffect, useRef, type CSSProperties, type ReactNode } from "react";
 import { useInView } from "motion/react";
+import { WhatsappLogo } from "@phosphor-icons/react";
 import { closing, contact, links } from "@/data/nexus";
-import { Arrow } from "@/components/Arrow";
+import { getFormTexts } from "@/data/formulario";
+import { Formulario } from "@/components/formulario/Formulario";
 import { Embers } from "@/components/hero/Embers";
 import { Container, Reveal, Section, useReduce } from "@/components/ui/primitives";
 import { Icon } from "@/components/ui/icons";
@@ -98,6 +100,8 @@ function Channel({ icon, label, value, href }: { icon: ReactNode; label: string;
   );
 }
 
+const formTexts = getFormTexts("es");
+
 export function Contacto() {
   const reduce = useReduce();
   const titleRef = useRef<HTMLHeadingElement>(null);
@@ -142,20 +146,22 @@ export function Contacto() {
           </p>
         </Reveal>
 
-        <Reveal delay={0.25} className="mt-9 w-full sm:w-auto">
-          <a
-            href={links.asesoria}
-            target="_blank"
-            rel="noopener"
-            className="btn btn-oro h-[3.6rem] w-full px-10 text-[0.95rem] sm:h-16 sm:w-auto sm:min-w-[21rem] sm:text-[1.02rem]"
-          >
+        {/* Canal principal: el formulario, que llega directo al correo de Domingo */}
+        <Reveal delay={0.25} className="mt-10 w-full max-w-[920px]">
+          <Formulario />
+        </Reveal>
+
+        {/* Alternativas visibles: WhatsApp, correo, teléfono y la base */}
+        <Reveal delay={0.1} className="mt-14 flex w-full flex-col items-center gap-5">
+          <p className="text-[1.05rem] text-hueso/85">{formTexts.alternatives}</p>
+          <a href={links.asesoria} target="_blank" rel="noopener" className="btn btn-linea h-[3.4rem] w-full px-9 text-[0.88rem] sm:w-auto">
+            <WhatsappLogo weight="fill" aria-hidden="true" className="size-5" />
             {closing.whatsappLabel}
-            <Arrow className="btn-arrow size-[1.1em]" />
           </a>
         </Reveal>
 
-        {/* Alternativas: correo, teléfono y la base, separadas por hilos */}
-        <Reveal delay={0.35} className="mt-12 w-full max-w-[1060px]">
+        {/* Correo, teléfono y la base, separados por hilos */}
+        <Reveal delay={0.2} className="mt-10 w-full max-w-[1060px]">
           <div className="grid border-y border-hueso/10 sm:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)_minmax(0,1fr)] sm:divide-x sm:divide-hueso/10 max-sm:divide-y max-sm:divide-hueso/10">
             <Channel icon={<Icon name="correo" mode="static" badge className="size-10" />} label={closing.emailLabel} value={contact.email} href={links.email} />
             <Channel icon={<Icon name="telefono" mode="static" badge className="size-10" />} label={closing.phoneLabel} value={contact.phoneDisplay} href={links.phone} />
