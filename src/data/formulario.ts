@@ -86,21 +86,24 @@ export const limits = {
 
 type Option<Id extends string> = { id: Id; label: string; hint?: string };
 
+/** Opciones del paso 3, cada variante con sus propios ids. */
+type StatusOptions = { [V in StatusVariant]: Option<(typeof statusIds)[V][number]>[] };
+
 export type FormTexts = {
-  /** Encabezado sobre el formulario. */
-  intro: string;
   stepOf: (n: number, total: number) => string;
   back: string;
   next: string;
   submit: string;
   sending: string;
   optional: string;
-  /** Aviso para lectores de pantalla al elegir varias opciones. */
-  multiHint: string;
+  /** Etiqueta del campo trampa para robots (invisible para las personas). */
+  honeypotLabel: string;
+  /** Valor en el mensaje de WhatsApp cuando aún no se eligió quién solicita o el servicio. */
+  unknown: string;
   steps: {
     cliente: { title: string; options: Option<ClientId>[]; otherLabel: string; otherPlaceholder: string };
     servicio: { title: string; options: Option<ServiceId>[] };
-    estado: { title: string; help: string; variants: Record<StatusVariant, Option<StatusId>[]> };
+    estado: { title: string; help: string; variants: StatusOptions };
     caso: {
       title: string;
       help: string;
@@ -122,7 +125,7 @@ export type FormTexts = {
   errors: {
     pick: string;
     pickSome: string;
-    descripcion: string;
+    descripcion: (min: number) => string;
     nombre: string;
     correo: string;
     telefono: string;
@@ -130,6 +133,12 @@ export type FormTexts = {
     invalido: string;
     limite: string;
     noDisponible: string;
+    /** El servidor recibió la consulta pero el servicio de correo falló. */
+    envio: string;
+    /** La verificación anti-robots (Turnstile) no se superó. */
+    verificacion: string;
+    /** El formulario estuvo abierto demasiado tiempo. */
+    vencido: string;
     red: string;
   };
   done: { title: string; text: (email: string) => string; again: string };
@@ -141,14 +150,14 @@ export type FormTexts = {
 };
 
 const es: FormTexts = {
-  intro: "Responda unas preguntas breves y Domingo recibirá su consulta directamente.",
   stepOf: (n, total) => `Paso ${n} de ${total}`,
   back: "Volver",
   next: "Continuar",
   submit: "Enviar consulta",
   sending: "Enviando…",
   optional: "opcional",
-  multiHint: "Puede marcar más de una.",
+  honeypotLabel: "Sitio web",
+  unknown: "-",
   steps: {
     cliente: {
       title: "¿Quién solicita la asesoría?",
@@ -240,13 +249,16 @@ const es: FormTexts = {
   errors: {
     pick: "Elija una opción para continuar.",
     pickSome: "Marque al menos una opción para continuar.",
-    descripcion: "Describa brevemente su consulta (al menos 10 caracteres).",
+    descripcion: (min) => `Describa brevemente su consulta (al menos ${min} caracteres).`,
     nombre: "Indique su nombre.",
     correo: "Revise su correo electrónico: no parece válido.",
     telefono: "Revise el teléfono: use solo números, espacios y el signo +.",
     invalido: "Algunos datos no se pudieron validar. Revíselos e intente de nuevo.",
     limite: "Recibimos varias consultas seguidas desde su conexión. Espere unos minutos o escríbanos por WhatsApp.",
     noDisponible: "El envío por formulario no está disponible en este momento.",
+    envio: "El servicio de correo no respondió y su consulta no se envió. Intente de nuevo en unos minutos o escríbanos por WhatsApp.",
+    verificacion: "No pudimos confirmar que el envío viene de una persona. Intente de nuevo o escríbanos por WhatsApp.",
+    vencido: "El formulario estuvo abierto mucho tiempo. Presione Enviar consulta de nuevo.",
     red: "No pudimos enviar su consulta. Revise su conexión e intente de nuevo.",
   },
   done: {
@@ -292,6 +304,7 @@ export const emailTexts = {
     correo: "Correo",
     telefono: "Teléfono",
   },
+  visitorNotice: "Texto escrito por el visitante, no verificado. No abra enlaces ni adjuntos de terceros.",
   empty: "No indicado",
   skipped: "No aplica",
   replyHint: "Responda este correo para contestar directamente al remitente.",

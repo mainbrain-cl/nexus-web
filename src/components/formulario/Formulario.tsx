@@ -17,7 +17,7 @@ import {
   type UrgencyId,
 } from "@/data/formulario";
 import { contact, whatsapp } from "@/data/nexus";
-import { cleanLine, isEmail, isPhone, type ContactPayload } from "@/lib/contacto";
+import { cleanLine, isEmail, isPhone, stripForbidden, type ContactPayload } from "@/lib/contacto";
 import { Arrow } from "@/components/Arrow";
 import { ease, useReduce } from "@/components/ui/primitives";
 
@@ -45,7 +45,35 @@ type Data = {
 type Field = keyof Data;
 type Errors = Partial<Record<Field, string>>;
 type Phase = "form" | "sending" | "done";
-type SendError = "invalido" | "limite" | "noDisponible" | "red" | null;
+type SendError = "invalido" | "limite" | "noDisponible" | "envio" | "verificacion" | "vencido" | "red" | null;
+
+/** Código de error del servidor → mensaje del formulario. */
+const SERVER_ERRORS: Record<string, Exclude<SendError, null>> = {
+  invalido: "invalido",
+  limite: "limite",
+  "no-disponible": "noDisponible",
+  error: "envio",
+  verificacion: "verificacion",
+  vencido: "vencido",
+};
+
+/** Altura de la barra de navegación fija; coincide con el `scroll-padding-top` global (6rem). */
+const NAV_HEIGHT = 96;
+/** Espera mínima entre recibir el token y enviar: el servidor exige 4 s y aquí se deja margen. */
+const TOKEN_WAIT_MS = 4500;
+/** Pasado este tiempo se pide un token nuevo antes de enviar (el servidor los acepta hasta 6 h). */
+const TOKEN_REFRESH_MS = 5 * 60 * 60 * 1000;
+
+const TURNSTILE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
+
+type Token = { value: string; at: number };
+type TurnstileApi = {
+  render: (el: HTMLElement, options: Record<string, unknown>) => string;
+  reset: (id?: string) => void;
+  remove: (id?: string) => void;
+};
+
+const sleep = (ms: number) => new Promise((ok) => window.setTimeout(ok, ms));
 
 const EMPTY: Data = {
   cliente: "",
@@ -144,12 +172,22 @@ function FieldShell({
 }
 
 /** Progreso: el hilo dorado con un nodo por paso. */
-function Progress({ index, total, label }: { index: number; total: number; label: string }) {
+function Progress({ id, index, total, label }: { id: string; index: number; total: number; label: string }) {
   const reduce = useReduce();
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[0.74rem] font-semibold tracking-[0.18em] text-gris uppercase">{label}</p>
-      <div className="relative h-[13px]" role="progressbar" aria-valuemin={1} aria-valuemax={total} aria-valuenow={index + 1} aria-valuetext={label}>
+      <p id={id} className="text-[0.74rem] font-semibold tracking-[0.18em] text-gris uppercase">
+        {label}
+      </p>
+      <div
+        className="relative h-[13px]"
+        role="progressbar"
+        aria-labelledby={id}
+        aria-valuemin={1}
+        aria-valuemax={total}
+        aria-valuenow={index + 1}
+        aria-valuetext={label}
+      >
         <span aria-hidden="true" className="absolute inset-x-[6px] top-1/2 h-px -translate-y-1/2 bg-hueso/15" />
         <motion.span
           aria-hidden="true"
@@ -178,6 +216,81 @@ function Progress({ index, total, label }: { index: number; total: number; label
   );
 }
 
+// ---------- Cloudflare Turnstile (solo si existe NEXT_PUBLIC_TURNSTILE_SITE_KEY) ----------
+
+let turnstileScript: Promise<void> | null = null;
+
+function loadTurnstile(): Promise<void> {
+  if ((window as { turnstile?: TurnstileApi }).turnstile) return Promise.resolve();
+  turnstileScript ??= new Promise<void>((ok, ko) => {
+    const s = document.createElement("script");
+    s.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+    s.async = true;
+    s.onload = () => ok();
+    s.onerror = () => {
+      turnstileScript = null;
+      ko(new Error("turnstile"));
+    };
+    document.head.appendChild(s);
+  });
+  return turnstileScript;
+}
+
+const turnstileApi = () => (window as { turnstile?: TurnstileApi }).turnstile;
+
+/**
+ * Verificación anti-robots en el último paso. Con `appearance: "interaction-only"` no se ve nada salvo que
+ * Cloudflare necesite que la persona marque la casilla.
+ */
+function TurnstileBox({
+  language,
+  tokenRef,
+  widgetRef,
+}: {
+  language: string;
+  tokenRef: { current: string };
+  widgetRef: { current: string | null };
+}) {
+  const box = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    let alive = true;
+    let id: string | null = null;
+    loadTurnstile()
+      .then(() => {
+        const api = turnstileApi();
+        if (!alive || !box.current || !api) return;
+        id = api.render(box.current, {
+          sitekey: TURNSTILE_KEY,
+          appearance: "interaction-only",
+          theme: "dark",
+          language,
+          action: "contacto",
+          "refresh-expired": "auto",
+          callback: (token: string) => {
+            tokenRef.current = token;
+          },
+          "expired-callback": () => {
+            tokenRef.current = "";
+          },
+          "error-callback": () => {
+            tokenRef.current = "";
+          },
+        });
+        widgetRef.current = id;
+      })
+      .catch(() => {
+        // Sin el script de Cloudflare el envío avisa con el mensaje de verificación.
+      });
+    return () => {
+      alive = false;
+      tokenRef.current = "";
+      widgetRef.current = null;
+      if (id) turnstileApi()?.remove(id);
+    };
+  }, [language, tokenRef, widgetRef]);
+  return <div ref={box} className="mt-6 empty:hidden" />;
+}
+
 // ---------- Formulario ----------
 
 export function Formulario({ locale = "es" }: { locale?: Locale }) {
@@ -197,31 +310,81 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
 
   const rootRef = useRef<HTMLDivElement>(null);
   const headingRef = useRef<HTMLHeadingElement | null>(null);
+  const errorTitleRef = useRef<HTMLParagraphElement>(null);
+  const errorPanelRef = useRef<HTMLDivElement>(null);
   const dataRef = useRef<Data>(EMPTY);
+  const stepRef = useRef<StepId>("cliente");
+  const phaseRef = useRef<Phase>("form");
+  const sendingRef = useRef(false);
   const honeypotRef = useRef<HTMLInputElement>(null);
-  const startedAt = useRef(0);
+  // Token de tiempo firmado por el servidor: se pide en la primera interacción con el formulario.
+  const tokenRef = useRef<Token | null>(null);
+  const tokenPromise = useRef<Promise<Token> | null>(null);
+  const turnstileToken = useRef("");
+  const turnstileWidget = useRef<string | null>(null);
   const navigated = useRef(false);
   const timer = useRef<number | undefined>(undefined);
 
   const steps = stepsFor(data);
   const index = Math.max(0, steps.indexOf(step));
   const st = t.steps;
+  const done = phase === "done";
 
   useEffect(() => {
     dataRef.current = data;
-  }, [data]);
+    stepRef.current = step;
+    phaseRef.current = phase;
+  }, [data, step, phase]);
 
-  useEffect(() => {
-    startedAt.current = Date.now();
-    return () => window.clearTimeout(timer.current);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+
+  // ----- Token de tiempo -----
+  const fetchToken = useCallback(() => {
+    const p = fetch("/api/contacto/", { cache: "no-store" })
+      .then((r) => (r.ok ? (r.json() as Promise<{ token?: unknown }>) : Promise.reject(new Error(String(r.status)))))
+      .then((b) => {
+        const tk: Token = { value: typeof b.token === "string" ? b.token : "", at: Date.now() };
+        if (tokenPromise.current === p) tokenRef.current = tk;
+        return tk;
+      });
+    tokenPromise.current = p;
+    p.catch(() => {
+      if (tokenPromise.current === p) tokenPromise.current = null;
+    });
+    return p;
   }, []);
 
-  // Al cambiar de paso (no al cargar la página), si el formulario quedó fuera de vista, se trae.
+  /** Token nuevo: después de un envío exitoso o al empezar otra consulta. */
+  const renewToken = useCallback(() => {
+    tokenRef.current = null;
+    fetchToken().catch(() => {});
+  }, [fetchToken]);
+
+  /** Primera interacción: pide el token si aún no lo hay. */
+  const touch = useCallback(() => {
+    if (!tokenRef.current && !tokenPromise.current) fetchToken().catch(() => {});
+  }, [fetchToken]);
+
+  const getToken = async (): Promise<Token> => {
+    const tk = tokenRef.current;
+    if (tk && Date.now() - tk.at < TOKEN_REFRESH_MS) return tk;
+    if (!tk && tokenPromise.current) return tokenPromise.current;
+    return fetchToken();
+  };
+
+  // Al cambiar de paso o al terminar (no al cargar la página), si el formulario quedó bajo la barra fija, se trae.
   useEffect(() => {
     if (!navigated.current) return;
     const root = rootRef.current;
-    if (root && root.getBoundingClientRect().top < 0) root.scrollIntoView({ block: "start" });
-  }, [step, phase]);
+    if (root && root.getBoundingClientRect().top < NAV_HEIGHT) root.scrollIntoView({ block: "start" });
+  }, [step, done]);
+
+  // Si el envío falla, el panel de error queda a la vista y con el foco.
+  useEffect(() => {
+    if (!sendError || phase !== "form") return;
+    errorTitleRef.current?.focus({ preventScroll: true });
+    errorPanelRef.current?.scrollIntoView({ block: "nearest" });
+  }, [sendError, phase]);
 
   // El foco va a la pregunta recién cuando aparece: con AnimatePresence el paso nuevo se monta después de la salida.
   const headingCallback = useCallback((el: HTMLHeadingElement | null) => {
@@ -250,38 +413,56 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
 
   // ----- Abrir con un servicio elegido: `#contacto?servicio=…`, `?servicio=…#contacto` o el evento -----
   const preselect = useCallback(
-    (raw: string | null | undefined, scroll: boolean) => {
+    (raw: string | null | undefined, fromClick: boolean) => {
       const servicio = resolveServiceId(raw);
       const section = document.getElementById("contacto");
-      if (scroll && section) section.scrollIntoView({ block: "start" });
-      if (!servicio) return;
+      if (section) section.scrollIntoView({ block: "start" });
+      // Mientras se envía, no se toca la consulta en curso.
+      if (!servicio || phaseRef.current === "sending") return;
+      const wasDone = phaseRef.current === "done";
       setPhase("form");
       setSendError(null);
       setPreselected(true);
-      const d = dataRef.current;
+      // Después de una consulta enviada se parte de cero y con un token nuevo.
+      if (wasDone) renewToken();
+      else touch();
+      const d = wasDone ? EMPTY : dataRef.current;
       const nd = { ...d, servicio, estado: d.servicio === servicio ? d.estado : [] };
       setData(nd);
-      go(nd.cliente ? (stepsFor(nd).includes("estado") ? "estado" : "caso") : "cliente", 1);
+      const to: StepId = nd.cliente ? (stepsFor(nd).includes("estado") ? "estado" : "caso") : "cliente";
+      const sameStep = !wasDone && stepRef.current === to;
+      go(to, 1);
+      // Desde un clic, el foco va a la pregunta. Si el paso cambia, lo hace `headingCallback` al montarse.
+      if (fromClick && sameStep) requestAnimationFrame(() => headingRef.current?.focus({ preventScroll: true }));
     },
-    [go],
+    [go, renewToken, touch],
   );
 
   useEffect(() => {
-    const fromUrl = () => {
+    const fromUrl = (fromClick: boolean) => {
       const { hash, search, pathname } = window.location;
       const m = /^#contacto\?(.*)$/.exec(hash);
-      const value = m ? new URLSearchParams(m[1]).get("servicio") : hash === "#contacto" ? new URLSearchParams(search).get("servicio") : null;
+      const hashParams = new URLSearchParams(m ? m[1] : "");
+      const searchParams = new URLSearchParams(search);
+      const value = m ? hashParams.get("servicio") : hash === "#contacto" ? searchParams.get("servicio") : null;
       if (!m && value === null) return;
-      // Se limpia la dirección para que un segundo clic en el mismo enlace vuelva a funcionar.
-      window.history.replaceState(window.history.state, "", `${pathname}#contacto`);
-      preselect(value, true);
+      if (value !== null) {
+        // Se borra solo `servicio` (se conservan utm_* y los demás) para que un segundo clic en el mismo enlace
+        // vuelva a funcionar.
+        (m ? hashParams : searchParams).delete("servicio");
+        const query = searchParams.toString();
+        const rest = hashParams.toString();
+        window.history.replaceState(window.history.state, "", `${pathname}${query ? `?${query}` : ""}#contacto${rest ? `?${rest}` : ""}`);
+      }
+      preselect(value, fromClick);
     };
+    const onHash = () => fromUrl(true);
     const onEvent = (e: Event) => preselect((e as CustomEvent<{ servicio?: string }>).detail?.servicio, true);
-    fromUrl();
-    window.addEventListener("hashchange", fromUrl);
+    fromUrl(false);
+    window.addEventListener("hashchange", onHash);
     window.addEventListener(openFormEvent, onEvent);
     return () => {
-      window.removeEventListener("hashchange", fromUrl);
+      window.removeEventListener("hashchange", onHash);
       window.removeEventListener(openFormEvent, onEvent);
     };
   }, [preselect]);
@@ -321,11 +502,14 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
     if (s === "cliente" && !data.cliente) e.cliente = t.errors.pick;
     if (s === "servicio" && !data.servicio) e.servicio = t.errors.pick;
     if (s === "estado" && data.estado.length === 0) e.estado = t.errors.pickSome;
-    if (s === "caso" && data.descripcion.trim().length < limits.descripcionMin) e.descripcion = t.errors.descripcion;
+    if (s === "caso" && stripForbidden(data.descripcion, true).trim().length < limits.descripcionMin) {
+      e.descripcion = t.errors.descripcion(limits.descripcionMin);
+    }
     if (s === "contacto") {
-      if (cleanLine(data.nombre).length < limits.nombreMin) e.nombre = t.errors.nombre;
-      if (!isEmail(cleanLine(data.correo))) e.correo = t.errors.correo;
-      if (cleanLine(data.telefono) && !isPhone(cleanLine(data.telefono))) e.telefono = t.errors.telefono;
+      const telefono = cleanLine(stripForbidden(data.telefono));
+      if (cleanLine(stripForbidden(data.nombre)).length < limits.nombreMin) e.nombre = t.errors.nombre;
+      if (!isEmail(cleanLine(stripForbidden(data.correo)))) e.correo = t.errors.correo;
+      if (telefono && !isPhone(telefono)) e.telefono = t.errors.telefono;
     }
     return e;
   };
@@ -340,6 +524,8 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
   };
 
   const onNext = () => {
+    // Un segundo Enter o clic mientras se envía no hace nada.
+    if (phase === "sending" || sendingRef.current) return;
     const e = validate(step);
     if (Object.keys(e).length) {
       setErrors(e);
@@ -361,42 +547,73 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
 
   // ----- Envío -----
   const submit = async () => {
+    sendingRef.current = true;
     setPhase("sending");
     setSendError(null);
     const variant = variantOf(data);
     const noIncident = data.servicio !== "" && servicesWithoutIncident.includes(data.servicio);
+    // Se quitan los caracteres invisibles que se cuelan al pegar; el servidor rechaza los que lleguen.
+    const line = (v: string) => stripForbidden(v);
     const datos: ContactPayload = {
       cliente: data.cliente as ClientId,
-      clienteOtro: data.cliente === "otro" ? data.clienteOtro : "",
+      clienteOtro: data.cliente === "otro" ? line(data.clienteOtro) : "",
       servicio: data.servicio as ServiceId,
       estado: variant ? data.estado : [],
-      lugar: noIncident ? "" : data.lugar,
-      fecha: noIncident ? "" : data.fecha,
-      descripcion: data.descripcion,
+      lugar: noIncident ? "" : line(data.lugar),
+      fecha: noIncident ? "" : line(data.fecha),
+      descripcion: stripForbidden(data.descripcion, true),
       urgencia: data.urgencia,
-      plazoDetalle: needsDeadline(data.urgencia) ? data.plazoDetalle : "",
-      nombre: data.nombre,
-      empresa: data.cliente === "particular" ? "" : data.empresa,
-      correo: cleanLine(data.correo),
-      telefono: data.telefono,
+      plazoDetalle: needsDeadline(data.urgencia) ? line(data.plazoDetalle) : "",
+      nombre: line(data.nombre),
+      empresa: data.cliente === "particular" ? "" : line(data.empresa),
+      correo: cleanLine(line(data.correo)),
+      telefono: line(data.telefono),
       idioma: locale,
     };
+    let error: Exclude<SendError, null> = "red";
     try {
-      const res = await fetch("/api/contacto/", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({ datos, web: honeypotRef.current?.value ?? "", tiempo: Date.now() - startedAt.current }),
-      });
-      const body = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
-      if (res.ok && body?.ok) {
-        navigated.current = true;
-        setPhase("done");
-        return;
+      const token = await getToken();
+      // El servidor rechaza un envío a menos de 4 s de emitido el token: se espera lo que falte.
+      if (token.value) {
+        const wait = token.at + TOKEN_WAIT_MS - Date.now();
+        if (wait > 0) await sleep(wait);
       }
-      setSendError(body?.error === "limite" ? "limite" : body?.error === "invalido" ? "invalido" : body?.error === "no-disponible" ? "noDisponible" : "red");
+      let turnstile = "";
+      if (TURNSTILE_KEY) {
+        // El widget suele resolver en uno o dos segundos; se le dan hasta 10.
+        for (let i = 0; i < 50 && !turnstileToken.current; i++) await sleep(200);
+        turnstile = turnstileToken.current;
+      }
+      if (TURNSTILE_KEY && !turnstile) {
+        error = "verificacion";
+      } else {
+        const res = await fetch("/api/contacto/", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ datos, web: honeypotRef.current?.value ?? "", token: token.value, turnstile }),
+        });
+        const body = (await res.json().catch(() => null)) as { ok?: boolean; error?: string } | null;
+        if (res.ok && body?.ok) {
+          tokenRef.current = null; // ya se usó
+          tokenPromise.current = null;
+          navigated.current = true;
+          setPhase("done");
+          return;
+        }
+        error = (body?.error && SERVER_ERRORS[body.error]) || (res.status >= 500 ? "envio" : "red");
+        // El token de Turnstile es de un solo uso.
+        if (turnstile && turnstileWidget.current) {
+          turnstileToken.current = "";
+          turnstileApi()?.reset(turnstileWidget.current);
+        }
+        if (error === "vencido") renewToken();
+      }
     } catch {
-      setSendError("red");
+      error = "red";
+    } finally {
+      sendingRef.current = false;
     }
+    setSendError(error);
     setPhase("form");
   };
 
@@ -404,7 +621,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
     setData(EMPTY);
     setPreselected(false);
     setSendError(null);
-    startedAt.current = Date.now();
+    renewToken();
     setPhase("form");
     go("cliente", -1);
   };
@@ -412,7 +629,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
   // ----- Render -----
   const clienteLabel = st.cliente.options.find((o) => o.id === data.cliente)?.label ?? "";
   const servicioLabel = st.servicio.options.find((o) => o.id === data.servicio)?.label ?? "";
-  const waHref = whatsapp(t.whatsappText(clienteLabel || "-", servicioLabel || "-"));
+  const waHref = whatsapp(t.whatsappText(clienteLabel || t.unknown, servicioLabel || t.unknown));
   const firstError = Object.values(errors).find(Boolean) ?? "";
   const describedBy = (k: Field) => (errors[k] ? `${fid(k)}-error` : undefined);
 
@@ -488,7 +705,6 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
               maxLength={limits.clienteOtro}
               value={data.clienteOtro}
               onChange={(e) => set("clienteOtro", e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), onNext())}
               placeholder={st.cliente.otherPlaceholder}
               className={`${INPUT} h-[3.25rem] rounded-full focus-visible:rounded-full border-hueso/15`}
             />
@@ -520,7 +736,11 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
   } else if (step === "estado") {
     const variant = variantOf(data) ?? "revision";
     body = (
-      <fieldset aria-labelledby={fid("pregunta")} aria-describedby={fid("estado-ayuda")}>
+      <fieldset
+        aria-labelledby={fid("pregunta")}
+        aria-describedby={errors.estado ? `${fid("estado-ayuda")} ${fid("estado-error")}` : fid("estado-ayuda")}
+        aria-invalid={!!errors.estado}
+      >
         {heading(st.estado.title)}
         <p id={fid("estado-ayuda")} className="mt-2 text-[1rem] text-gris">
           {st.estado.help}
@@ -533,7 +753,13 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
                 <label
                   className={`${OPTION} cursor-pointer has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-4 has-[:focus-visible]:outline-oro-claro ${on ? OPTION_ON : OPTION_OFF}`}
                 >
-                  <input type="checkbox" className="sr-only" checked={on} onChange={() => toggleEstado(o.id)} />
+                  <input
+                    id={i === 0 ? fid("estado") : undefined}
+                    type="checkbox"
+                    className="sr-only"
+                    checked={on}
+                    onChange={() => toggleEstado(o.id)}
+                  />
                   <Node on={on} multi />
                   <OptionText label={o.label} />
                 </label>
@@ -616,7 +842,6 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
         aria-describedby={describedBy(k)}
         value={data[k]}
         onChange={(e) => set(k, e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), onNext())}
         placeholder={c[k].placeholder}
         className={`${INPUT} h-[3.25rem] rounded-full focus-visible:rounded-full ${errors[k] ? "border-brasa" : "border-hueso/15"}`}
         {...(type === "tel" ? { inputMode: "tel" as const } : {})}
@@ -644,11 +869,12 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
         {/* Trampa para robots: invisible y fuera del orden de tabulación. Una persona nunca la llena. */}
         <div aria-hidden="true" className="absolute -left-[9999px] h-px w-px overflow-hidden">
           <label>
-            Sitio web
+            {t.honeypotLabel}
             <input ref={honeypotRef} type="text" name="sitio_web" tabIndex={-1} autoComplete="off" defaultValue="" />
           </label>
         </div>
         <p className="mt-6 max-w-[62ch] text-[0.88rem] leading-relaxed text-gris">{c.privacy}</p>
+        {TURNSTILE_KEY && <TurnstileBox language={locale} tokenRef={turnstileToken} widgetRef={turnstileWidget} />}
       </>
     );
   }
@@ -660,7 +886,10 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
   return (
     <div
       ref={rootRef}
-      className="relative w-full scroll-mt-28 border border-hueso/[0.09] max-sm:-mx-5 max-sm:w-[calc(100%+2.5rem)] max-sm:border-x-0 bg-humo/85 text-left backdrop-blur-sm before:absolute before:inset-x-0 before:-top-px before:h-px before:bg-gradient-to-r before:from-transparent before:via-oro/80 before:to-transparent"
+      onPointerDown={touch}
+      onFocus={touch}
+      onKeyDown={touch}
+      className="relative w-full border border-hueso/[0.09] max-sm:-mx-5 max-sm:w-[calc(100%+2.5rem)] max-sm:border-x-0 bg-humo/85 text-left backdrop-blur-sm before:absolute before:inset-x-0 before:-top-px before:h-px before:bg-gradient-to-r before:from-transparent before:via-oro/80 before:to-transparent"
     >
       <form
         noValidate
@@ -673,7 +902,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
         {phase !== "done" && (
           <div className="mb-8 flex items-start gap-5">
             <div className="flex-1">
-              <Progress index={index} total={steps.length} label={t.stepOf(index + 1, steps.length)} />
+              <Progress id={fid("progreso")} index={index} total={steps.length} label={t.stepOf(index + 1, steps.length)} />
             </div>
           </div>
         )}
@@ -690,15 +919,21 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
               {(step === "cliente" || step === "servicio") && firstError && (
                 <p className="mt-4 text-[0.9rem] text-brasa">{firstError}</p>
               )}
-              {step === "estado" && errors.estado && <p className="mt-4 text-[0.9rem] text-brasa">{errors.estado}</p>}
+              {step === "estado" && errors.estado && (
+                <p id={fid("estado-error")} className="mt-4 text-[0.9rem] text-brasa">
+                  {errors.estado}
+                </p>
+              )}
             </motion.div>
           </AnimatePresence>
         </div>
 
         {phase !== "done" && sendError && (
-          <div role="group" className="mt-7 flex flex-col gap-4 border-t border-hueso/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
+          <div ref={errorPanelRef} role="group" aria-labelledby={fid("envio-error")} className="mt-7 flex flex-col gap-4 border-t border-hueso/10 pt-6 sm:flex-row sm:items-center sm:justify-between">
             <div className="flex flex-col gap-1">
-              <p className="font-semibold text-hueso">{t.failure.title}</p>
+              <p ref={errorTitleRef} id={fid("envio-error")} tabIndex={-1} className="font-semibold text-hueso focus:outline-none">
+                {t.failure.title}
+              </p>
               <p className="text-[0.95rem] text-gris">{t.errors[sendError]}</p>
               <p className="text-[0.9rem] text-gris">
                 {t.failure.email}{" "}

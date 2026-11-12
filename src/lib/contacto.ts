@@ -38,18 +38,31 @@ export type ContactPayload = {
 // Correo: parte local y dominio con al menos un punto, sin espacios ni caracteres de control.
 const EMAIL = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
 const PHONE = /^\+?[0-9 ()\-.]{6,30}$/;
-// Caracteres de control, separadores de línea Unicode y marcas de dirección (que pueden disfrazar texto).
-const CONTROL_ALL = /[\u0000-\u001F\u007F-\u009F\u2028\u2029\u202A-\u202E\u2066-\u2069]/;
-// En textos largos se permite el salto de línea y la tabulación.
-const CONTROL_MULTILINE = /[\u0000-\u0008\u000B-\u001F\u007F-\u009F\u2028\u2029\u202A-\u202E\u2066-\u2069]/;
+// Caracteres prohibidos en todo texto del visitante: de control, de formato invisibles (ancho cero, marcas de
+// dirección, etiquetas), surrogates sueltos, de uso privado y separadores de línea o párrafo Unicode.
+const FORBIDDEN = /[\p{Cc}\p{Cf}\p{Cs}\p{Co}\p{Zl}\p{Zp}]/u;
+// En textos de varias líneas se permite el salto de línea.
+const FORBIDDEN_MULTILINE = /(?!\n)\p{Cc}|[\p{Cf}\p{Cs}\p{Co}\p{Zl}\p{Zp}]/u;
+const FORBIDDEN_ALL = new RegExp(FORBIDDEN.source, "gu");
+const FORBIDDEN_MULTILINE_ALL = new RegExp(FORBIDDEN_MULTILINE.source, "gu");
+
+/** Paso previo a validar, igual en el navegador y el servidor: tabulación → espacio y saltos de línea uniformes. */
+export const normalizeInput = (v: string) => v.replace(/\t/g, " ").replace(/\r\n?/g, "\n");
+
+/**
+ * Solo en el navegador: quita los caracteres prohibidos que suelen colarse al pegar (espacios de ancho cero,
+ * guiones blandos), para que una persona no reciba un rechazo que no entiende. El servidor no limpia: rechaza.
+ */
+export const stripForbidden = (v: string, multi = false) =>
+  normalizeInput(v).replace(multi ? FORBIDDEN_MULTILINE_ALL : FORBIDDEN_ALL, "");
 
 export const isEmail = (v: string) => v.length <= limits.correo && EMAIL.test(v);
 export const isPhone = (v: string) => PHONE.test(v) && /[0-9].*[0-9].*[0-9].*[0-9].*[0-9].*[0-9]/.test(v);
 
 /** Texto de una línea: recorta espacios y une los espacios repetidos. */
 export const cleanLine = (v: string) => v.trim().replace(/\s+/g, " ");
-/** Texto de varias líneas: normaliza saltos de línea y recorta. */
-export const cleanMultiline = (v: string) => v.replace(/\r\n?/g, "\n").trim();
+/** Texto de varias líneas: normaliza tabulaciones y saltos de línea, y recorta. */
+export const cleanMultiline = (v: string) => normalizeInput(v).trim();
 
 type Result = { ok: true; data: ContactPayload } | { ok: false };
 
@@ -59,9 +72,11 @@ const oneOf = <T extends string>(list: readonly T[], v: unknown): v is T => type
 function line(v: unknown, max: number, min = 0): string | null {
   if (v === undefined || v === null) v = "";
   if (typeof v !== "string") return null;
-  // Antes de limpiar: un salto de línea o un carácter de control invalida el campo, no se disimula.
-  if (v.length > max * 2 || CONTROL_ALL.test(v)) return null;
-  const s = cleanLine(v);
+  if (v.length > max * 2) return null;
+  // Antes de limpiar: un salto de línea o un carácter invisible invalida el campo, no se disimula.
+  const n = v.replace(/\t/g, " ");
+  if (FORBIDDEN.test(n)) return null;
+  const s = cleanLine(n);
   if (s.length > max || s.length < min) return null;
   return s;
 }
@@ -69,7 +84,7 @@ function line(v: unknown, max: number, min = 0): string | null {
 function multiline(v: unknown, max: number, min: number): string | null {
   if (typeof v !== "string" || v.length > max * 2) return null;
   const s = cleanMultiline(v);
-  if (CONTROL_MULTILINE.test(s) || s.length > max || s.length < min) return null;
+  if (FORBIDDEN_MULTILINE.test(s) || s.length > max || s.length < min) return null;
   return s;
 }
 
