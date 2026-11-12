@@ -186,9 +186,25 @@
   font-variant-caps: all-small-caps;
   color: var(--color-oro);
 }
+
+/* ---------- Fotos de sección ---------- */
+
+/* Encuadre de la foto: puede cambiar desde 1024 px, donde algunas fotos se recortan con otra proporción. */
+.nx-photo {
+  object-position: var(--nx-pos, 50% 50%);
+}
+
+@media (min-width: 1024px) {
+  .nx-photo {
+    object-position: var(--nx-pos-lg, var(--nx-pos, 50% 50%));
+  }
+}
 }
 
 /* ---------- Coreografía de entrada ---------- */
+
+/* Comprimida el 12-11: título, nombre, rol y botones en pantalla antes de ~1,5 s. Mismas curvas y duraciones;
+   solo se adelantan los retrasos. */
 
 @media (prefers-reduced-motion: no-preference) {
   html {
@@ -196,15 +212,15 @@
   }
 
   .in-bg {
-    animation: in-bg 2.6s var(--ease-expo) 1.35s both;
+    animation: in-bg 2.6s var(--ease-expo) 0.5s both;
   }
 
   .in-glow {
-    animation: in-glow 2.4s ease-out 1.2s both;
+    animation: in-glow 2.4s ease-out 0.4s both;
   }
 
   .in-nav {
-    animation: in-nav 1.1s var(--ease-expo) 2.7s both;
+    animation: in-nav 1.1s var(--ease-expo) 1.15s both;
   }
 
   /* La letra carbonizada aparece recién cuando su letra encendida ya brilla */
@@ -217,50 +233,50 @@
   }
 
   .in-person {
-    animation: in-person 1.9s var(--ease-expo) 1.95s both;
+    animation: in-person 1.9s var(--ease-expo) 0.55s both;
   }
 
   .in-rim {
     will-change: opacity;
     animation:
-      in-rim 2.2s ease-out 2.1s both,
-      flicker 5s ease-in-out 4.3s infinite;
+      in-rim 2.2s ease-out 0.7s both,
+      flicker 5s ease-in-out 2.9s infinite;
   }
 
   .in-word {
-    animation: in-word 1.25s var(--ease-expo) var(--d, 1.5s) both;
+    animation: in-word 1.25s var(--ease-expo) var(--d, 1s) both;
   }
 
   .in-tag {
-    animation: in-tag 1.1s var(--ease-expo) 2.45s both;
+    animation: in-tag 1.1s var(--ease-expo) 0.75s both;
   }
 
   .in-tag-text {
-    animation: in-tag-text 0.9s var(--ease-expo) 2.7s both;
+    animation: in-tag-text 0.9s var(--ease-expo) 0.9s both;
   }
 
   .ember-ping {
-    animation: ember-ping 2.2s cubic-bezier(0, 0, 0.2, 1) 3.2s infinite;
+    animation: ember-ping 2.2s cubic-bezier(0, 0, 0.2, 1) 1.8s infinite;
   }
 
   .in-rule {
-    animation: in-rule 1.1s var(--ease-in-out-expo) 2.95s both;
+    animation: in-rule 1.1s var(--ease-in-out-expo) 1s both;
   }
 
   .in-role {
-    animation: in-up 1.1s var(--ease-expo) 3.1s both;
+    animation: in-up 1.1s var(--ease-expo) 1.02s both;
   }
 
   .in-cta {
-    animation: in-up 1.1s var(--ease-expo) var(--d, 3.25s) both;
+    animation: in-up 1.1s var(--ease-expo) var(--d, 1.1s) both;
   }
 
   .in-scroll {
-    animation: in-up 1s var(--ease-expo) 2.8s both;
+    animation: in-up 1s var(--ease-expo) 1.3s both;
   }
 
   .scroll-dot {
-    animation: scroll-dot 2.2s var(--ease-in-out-expo) 3.4s infinite;
+    animation: scroll-dot 2.2s var(--ease-in-out-expo) 2s infinite;
   }
 }
 

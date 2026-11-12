@@ -112,12 +112,12 @@ const OPTION_ON = "border-oro bg-oro/[0.13] text-hueso";
 const INPUT =
   "w-full border bg-ceniza/70 px-5 text-[1.02rem] text-hueso placeholder:text-gris/55 transition-[border-color,box-shadow] duration-300 focus-visible:outline-none focus:border-oro-claro focus:shadow-[0_0_0_3px_rgba(224,192,143,0.22)]";
 
-/** Nodo del hilo: marca de la opción. Circular para elección única, con visto para varias. */
+/** Marca de la opción: círculo para elección única y casilla cuadrada con visto para varias. */
 function Node({ on, multi }: { on: boolean; multi?: boolean }) {
   return (
     <span
       aria-hidden="true"
-      className={`grid size-[1.35rem] shrink-0 place-items-center rounded-full border transition-[background-color,border-color,box-shadow] duration-300 ${
+      className={`grid size-[1.35rem] shrink-0 place-items-center border ${multi ? "rounded-[0.3rem]" : "rounded-full"} transition-[background-color,border-color,box-shadow] duration-300 ${
         on ? "border-oro-claro bg-oro-claro shadow-[0_0_12px_2px_rgba(255,122,42,0.45)]" : "border-hueso/30 group-hover:border-oro/70"
       }`}
     >
@@ -508,7 +508,9 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
     if (s === "contacto") {
       const telefono = cleanLine(stripForbidden(data.telefono));
       if (cleanLine(stripForbidden(data.nombre)).length < limits.nombreMin) e.nombre = t.errors.nombre;
-      if (!isEmail(cleanLine(stripForbidden(data.correo)))) e.correo = t.errors.correo;
+      const correo = cleanLine(stripForbidden(data.correo));
+      if (!correo) e.correo = t.errors.correoVacio;
+      else if (!isEmail(correo)) e.correo = t.errors.correo;
       if (telefono && !isPhone(telefono)) e.telefono = t.errors.telefono;
     }
     return e;

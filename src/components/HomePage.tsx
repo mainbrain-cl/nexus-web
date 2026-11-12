@@ -18,10 +18,12 @@ export function HomePage({ locale }: { locale: Locale }) {
       <main id="contenido">
         <Hero />
         <Interseccion />
+        {/* Perfil sube junto a Servicios: quién hace el trabajo, antes de cómo se hace (revisión general, 12-11).
+            Los fondos alternan desde Servicios: humo, ceniza, humo, ceniza, humo. */}
         <Servicios />
+        <Perfil />
         <Metodo />
         <Resultado />
-        <Perfil />
         <Contacto />
       </main>
       <Footer locale={locale} />

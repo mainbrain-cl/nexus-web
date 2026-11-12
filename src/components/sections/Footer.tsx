@@ -7,7 +7,7 @@ const linkClass =
   "inline-flex min-h-11 items-center text-[1rem] text-gris transition-colors duration-300 hover:text-hueso focus-visible:text-hueso";
 
 export function Footer({ locale }: { locale: Locale }) {
-  const { a11y, footer, links, navLinks, site } = content[locale];
+  const { a11y, footer, footerLinks, links, site } = content[locale];
   // El sitio es un export estático: el año queda fijado al compilar, que es cuando se publica.
   const year = new Date().getFullYear();
 
@@ -28,7 +28,7 @@ export function Footer({ locale }: { locale: Locale }) {
 
           <nav aria-label={a11y.footerNav}>
             <ul className="grid grid-cols-2 gap-x-6 md:flex md:flex-col">
-              {navLinks.map((l) => (
+              {footerLinks.map((l) => (
                 <li key={l.href}>
                   <a href={l.href} className={linkClass}>
                     {l.label}

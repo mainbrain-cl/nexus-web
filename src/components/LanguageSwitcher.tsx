@@ -60,7 +60,8 @@ export function LanguageSwitcher({ variant, className = "" }: { variant: "bar" |
               }}
               className={`group relative transition-colors duration-300 ${
                 bar
-                  ? "grid size-9 place-items-center rounded-full lg:size-8 xl:size-9"
+                  ? // 44 px de toque; la bandera sigue del mismo tamaño.
+                    "grid size-11 place-items-center rounded-full"
                   : "flex flex-col items-center gap-2 rounded-[1.1rem] px-2 py-3.5 text-[0.95rem] font-medium"
               } ${
                 active

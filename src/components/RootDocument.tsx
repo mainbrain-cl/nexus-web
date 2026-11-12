@@ -30,14 +30,19 @@ const name = Archivo({
   axes: ["wdth"],
 });
 
+/** Variables de las tres fuentes, para `<html>`. También las usa la página 404 (`app/global-not-found.tsx`). */
+export const fontVariables = `${display.variable} ${sans.variable} ${name.variable}`;
+
 export const viewport: Viewport = {
   themeColor: "#120f0d",
 };
 
 /** Título, descripción, Open Graph y versiones en otros idiomas (hreflang), con x-default en el español. */
 export function buildMetadata(locale: Locale): Metadata {
-  const { site } = content[locale];
+  const { site, og } = content[locale];
   const info = localeInfo[locale];
+  // Imagen al compartir: una por idioma, generada con scripts/og.mjs.
+  const image = { url: og.image, width: og.width, height: og.height, alt: og.alt };
   return {
     metadataBase: new URL(site.url),
     title: site.title,
@@ -57,13 +62,20 @@ export function buildMetadata(locale: Locale): Metadata {
       alternateLocale: locales.filter((l) => l !== locale).map((l) => localeInfo[l].ogLocale),
       type: "website",
       siteName: site.name,
+      images: [image],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: site.title,
+      description: site.description,
+      images: [image],
     },
   };
 }
 
 export function RootDocument({ locale, children }: { locale: Locale; children: ReactNode }) {
   return (
-    <html lang={localeInfo[locale].htmlLang} className={`${display.variable} ${sans.variable} ${name.variable}`}>
+    <html lang={localeInfo[locale].htmlLang} className={fontVariables}>
       <body>
         <a
           href="#contenido"

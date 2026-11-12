@@ -1,10 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { motion, useMotionValue, useMotionValueEvent, useScroll, type Variants } from "motion/react";
 import type { MethodStep } from "@/data/nexus";
 import { useContent } from "@/components/LocaleProvider";
-import { Container, Reveal, Section, SectionTitle, ease, useReduce } from "@/components/ui/primitives";
+import { Container, Reveal, Section, SectionTitle, useReduce } from "@/components/ui/primitives";
 import { Icon, type IconName } from "@/components/ui/icons";
 import { Rich } from "@/components/ui/Rich";
 import { PhotoBand } from "@/components/ui/PhotoBand";
@@ -12,8 +12,8 @@ import { PhotoBand } from "@/components/ui/PhotoBand";
 // Método: los siete pasos del método científico de NFPA 921 en una sola columna vertical, en escritorio y en
 // celular. Siete pasos no caben en una fila sin achicar los nombres, y en vertical el orden se lee de corrido.
 // En escritorio la foto y las normas quedan fijas a la izquierda mientras la cadena avanza a la derecha.
-// Un hilo de retorno une el paso 6 con el 3: el ciclo de la norma, en que una hipótesis que no resiste la
-// prueba devuelve el trabajo a los datos.
+// El ciclo de la norma (una hipótesis que no resiste la prueba devuelve el trabajo a los datos) va como nota
+// bajo el paso 6. Aaron quitó el hilo de retorno que lo dibujaba (12-11).
 
 const TITLE_ID = "metodo-titulo";
 
@@ -23,7 +23,8 @@ const STEP_ICONS: IconName[] = ["necesidad", "problema", "camara", "analisis", "
 // El nodo pasa de apagado a dorado con un fundido corto.
 const nodeVariants: Variants = {
   idle: {
-    backgroundColor: "#120f0d",
+    // El fondo de la sección (humo): el nodo apagado es solo un aro.
+    backgroundColor: "#1d1815",
     borderColor: "rgba(201, 162, 107, 0.45)",
     scale: 1,
     transition: { duration: 0.5 },
@@ -39,20 +40,16 @@ function Paso({
   index,
   total,
   reduce,
-  onLit,
-  nodeRef,
 }: {
   step: MethodStep;
   index: number;
   total: number;
   reduce: boolean;
-  onLit: (index: number) => void;
-  nodeRef: (el: HTMLSpanElement | null) => void;
 }) {
   const { method } = useContent();
   const ref = useRef<HTMLLIElement>(null);
   const last = index === total - 1;
-  const isLoopStart = index + 1 === method.loop.from;
+  const hasLoopNote = index + 1 === method.loop.from;
 
   // Cada paso sigue su propio avance, así el hilo baja al ritmo real de la lectura aunque los textos tengan
   // alturas distintas. El frente del hilo va a 60 % de la pantalla.
@@ -68,10 +65,6 @@ function Paso({
   const lit = reduce || litScroll;
   const state = reduce ? "on" : lit ? "lit" : "idle";
 
-  useEffect(() => {
-    if (lit) onLit(index);
-  }, [lit, index, onLit]);
-
   return (
     <li ref={ref} data-lit={lit} className="group relative grid grid-cols-[29px_minmax(0,1fr)] gap-x-4 pb-11 last:pb-0 sm:gap-x-7 lg:pb-14">
       {/* Hilo hacia el siguiente paso: base tenue y, encima, el dorado que se llena con el scroll.
@@ -84,7 +77,6 @@ function Paso({
 
       <span aria-hidden="true" className="relative z-10 flex h-11 w-[29px] items-center justify-center">
         <motion.span
-          ref={nodeRef}
           className="relative size-[13px] rounded-full border"
           variants={nodeVariants}
           initial={false}
@@ -117,8 +109,8 @@ function Paso({
         <p className="mt-3 max-w-[46ch] text-[1.02rem] leading-relaxed text-gris opacity-[0.72] [text-wrap:pretty] transition-opacity duration-700 ease-expo group-data-[lit=true]:opacity-100 motion-reduce:transition-none sm:pl-[3.75rem] lg:text-[1.06rem]">
           <Rich text={step.text} />
         </p>
-        {isLoopStart && (
-          // Nota del ciclo: explica el hilo de retorno que sale de este nodo hacia el paso de los datos.
+        {hasLoopNote && (
+          // Nota del ciclo: si la hipótesis no resiste, el trabajo vuelve a los datos.
           <p className="mt-4 flex max-w-[46ch] items-start gap-2.5 text-[0.95rem] leading-snug text-oro-claro opacity-60 transition-opacity duration-700 ease-expo group-data-[lit=true]:opacity-100 motion-reduce:transition-none sm:pl-[3.75rem]">
             <Icon name="ciclo" mode="static" className="mt-[0.15em] size-4 shrink-0" />
             <span>{method.loop.text}</span>
@@ -129,99 +121,22 @@ function Paso({
   );
 }
 
-type LoopGeometry = { top: number; height: number; x: number };
-
-/** Hilo de retorno: sale por la izquierda del nodo del paso 6, sube y entra al nodo del paso 3. */
-function HiloDeRetorno({ geometry, drawn, reduce }: { geometry: LoopGeometry; drawn: boolean; reduce: boolean }) {
-  const { top, height: h, x } = geometry;
-  const r = Math.min(12, h / 2);
-  const x0 = 0.5;
-  const d = `M ${x} ${h} H ${x0 + r} Q ${x0} ${h} ${x0} ${h - r} V ${r} Q ${x0} 0 ${x0 + r} 0 H ${x}`;
-
-  return (
-    <svg
-      aria-hidden="true"
-      className="pointer-events-none absolute left-0 overflow-visible"
-      style={{ top, height: h, width: x }}
-      viewBox={`0 0 ${x} ${h}`}
-      fill="none"
-    >
-      <path d={d} stroke="#f4eee6" strokeOpacity={0.1} strokeWidth={1} />
-      <motion.path
-        d={d}
-        stroke="#c9a26b"
-        strokeWidth={1}
-        initial={false}
-        animate={{ pathLength: reduce || drawn ? 1 : 0, opacity: reduce || drawn ? 1 : 0 }}
-        transition={reduce ? { duration: 0 } : { pathLength: { duration: 1.6, ease }, opacity: { duration: 0.2 } }}
-      />
-    </svg>
-  );
-}
-
 function Pasos() {
   const { method } = useContent();
-  const { from: loopFrom, to: loopTo } = method.loop;
   const reduce = useReduce();
-  const listRef = useRef<HTMLOListElement>(null);
-  const nodes = useRef<(HTMLSpanElement | null)[]>([]);
-  const [litUpTo, setLitUpTo] = useState(-1);
-  const [geometry, setGeometry] = useState<LoopGeometry | null>(null);
-
-  const onLit = useCallback((i: number) => setLitUpTo((v) => Math.max(v, i)), []);
-
-  // El hilo de retorno depende de dónde caen los nodos, que cambia con el ancho y con las fuentes.
-  useEffect(() => {
-    const list = listRef.current;
-    if (!list) return;
-    const measure = () => {
-      // Se mide la caja que contiene al nodo, no el nodo.
-      const a = nodes.current[loopTo - 1]?.parentElement;
-      const b = nodes.current[loopFrom - 1]?.parentElement;
-      if (!a || !b) return;
-      const box = list.getBoundingClientRect();
-      const ra = a.getBoundingClientRect();
-      const rb = b.getBoundingClientRect();
-      const top = Math.round(ra.top + ra.height / 2 - box.top);
-      const bottom = Math.round(rb.top + rb.height / 2 - box.top);
-      // El hilo termina en el borde izquierdo del nodo: (29 - 13) / 2 = 8 px dentro de su caja.
-      const x = Math.round(ra.left - box.left + 8);
-      setGeometry({ top, height: bottom - top, x });
-    };
-    measure();
-    const ro = new ResizeObserver(measure);
-    ro.observe(list);
-    document.fonts?.ready.then(measure);
-    return () => ro.disconnect();
-  }, [loopFrom, loopTo]);
-
   return (
-    // El hilo de retorno va fuera del <ol>, porque una lista solo admite <li>. El div tiene la misma caja que el <ol>.
-    <div className="relative">
-      {geometry && <HiloDeRetorno geometry={geometry} drawn={litUpTo >= method.loop.from - 1} reduce={reduce} />}
-      <ol ref={listRef} aria-label={method.stepsLabel} className="relative pl-6 sm:pl-8">
-        {method.steps.map((step, i) => (
-          <Paso
-            key={step.name}
-            step={step}
-            index={i}
-            total={method.steps.length}
-            reduce={reduce}
-            onLit={onLit}
-            nodeRef={(el) => {
-              nodes.current[i] = el;
-            }}
-          />
-        ))}
-      </ol>
-    </div>
+    <ol aria-label={method.stepsLabel} className="relative pl-6 sm:pl-8">
+      {method.steps.map((step, i) => (
+        <Paso key={step.name} step={step} index={i} total={method.steps.length} reduce={reduce} />
+      ))}
+    </ol>
   );
 }
 
 export function Metodo() {
   const { method, photos } = useContent();
   return (
-    <Section id="metodo" tone="ceniza" labelledBy={TITLE_ID}>
+    <Section id="metodo" tone="humo" labelledBy={TITLE_ID}>
       <Container>
         <SectionTitle id={TITLE_ID} lines={method.title} accent={1} />
 

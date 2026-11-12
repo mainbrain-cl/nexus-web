@@ -111,7 +111,7 @@ export function Contacto() {
   const lit = inView && !reduce;
 
   return (
-    <Section id="contacto" tone="ceniza" labelledBy="contacto-title" className="pb-[clamp(4.5rem,9vw,7.5rem)]">
+    <Section id="contacto" tone="humo" labelledBy="contacto-title" className="pb-[clamp(4.5rem,9vw,7.5rem)]">
       {/* Resplandor de brasas al ras del suelo: gradientes fijos, sin animación */}
       <div
         aria-hidden="true"

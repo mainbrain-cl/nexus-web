@@ -1,6 +1,6 @@
 "use client";
 
-import { Fragment, useRef, useState, type KeyboardEvent } from "react";
+import { Fragment, useEffect, useRef, useState, type KeyboardEvent } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Arrow } from "@/components/Arrow";
 import { Container, GoldRule, Reveal, Section, SectionTitle, ease, useReduce } from "@/components/ui/primitives";
@@ -24,10 +24,62 @@ const accGroupId = (group: Service["group"]) => `servicios-acc-grupo-${group}`;
 /** El servicio abre una línea nueva: es el primero o su línea cambia respecto del anterior. */
 const startsGroup = (list: Service[], i: number) => i === 0 || list[i - 1].group !== list[i].group;
 
+/** Línea pedida en el hash, `#servicios?grupo=fortalecer` (el submenú de la barra). Borra `grupo` del hash. */
+function takeGroupFromHash() {
+  const { hash, pathname, search } = window.location;
+  const m = /^#servicios\?(.*)$/.exec(hash);
+  if (!m) return null;
+  const params = new URLSearchParams(m[1]);
+  const group = params.get("grupo");
+  params.delete("grupo");
+  const rest = params.toString();
+  // Se limpia para que un segundo clic en el mismo enlace vuelva a funcionar (como `#contacto?servicio=`).
+  window.history.replaceState(window.history.state, "", `${pathname}${search}#servicios${rest ? `?${rest}` : ""}`);
+  return group ?? "";
+}
+
 export function Servicios() {
   const { services, servicesIntro } = useContent();
-  // Solo la versión de escritorio usa este índice; el acordeón lleva su propio estado.
+  // Escritorio: índice de la pestaña activa. Celular: id del servicio abierto en el acordeón.
   const [active, setActive] = useState(0);
+  const [open, setOpen] = useState<string | null>(services[0].id);
+  const reduce = useReduce();
+  const reduceRef = useRef(reduce);
+  useEffect(() => {
+    reduceRef.current = reduce;
+  }, [reduce]);
+
+  // Submenú de la barra: lleva a Servicios con el primer servicio de la línea elegida ya seleccionado.
+  useEffect(() => {
+    const fromHash = (fromClick: boolean) => {
+      const group = takeGroupFromHash();
+      if (group === null) return;
+      const section = document.getElementById("servicios");
+      const i = services.findIndex((s) => s.group === group);
+      if (i < 0) {
+        section?.scrollIntoView({ block: "start" });
+        return;
+      }
+      const s = services[i];
+      setActive(i);
+      setOpen(s.id);
+      const desktop = window.matchMedia("(min-width: 1024px)").matches;
+      const go = () => {
+        // En celular se llega al rótulo de la línea; en escritorio, al inicio de la sección.
+        (desktop ? section : document.getElementById(accGroupId(s.group)))?.scrollIntoView({ block: "start" });
+        // Desde un clic, el foco va al servicio elegido: quien navega con teclado sigue desde ahí.
+        if (fromClick) document.getElementById(desktop ? tabId(s) : accButtonId(s))?.focus({ preventScroll: true });
+      };
+      // El desplazamiento espera a que el cambio se pinte: uno suave lanzado antes queda cortado por ese render.
+      // En celular espera además a que se cierre el servicio abierto de más arriba (0,55 s), que acorta la página.
+      if (desktop || reduceRef.current) requestAnimationFrame(() => requestAnimationFrame(go));
+      else window.setTimeout(go, 600);
+    };
+    const onHash = () => fromHash(true);
+    fromHash(false);
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, [services]);
 
   return (
     // overflow-clip en lugar de hidden: hidden vuelve la sección un contenedor de scroll y anula el sticky del panel.
@@ -41,7 +93,7 @@ export function Servicios() {
             </Reveal>
 
             <SituationTabs active={active} onSelect={setActive} />
-            <SituationAccordion />
+            <SituationAccordion open={open} setOpen={setOpen} />
           </div>
 
           <div className="hidden lg:block">
@@ -222,17 +274,17 @@ function ServiceBody({ service, staggerItems }: { service: Service; staggerItems
       </p>
 
       <h4 className="mt-7 text-[0.95rem] font-semibold text-oro-claro lg:mt-8">{servicesIntro.includesTitle}</h4>
-      {/* Chips, no botones: sin hover ni cursor. El texto puede partirse en dos líneas para no salirse a 320 px. */}
-      <ul className="mt-3 flex flex-wrap gap-2">
+      {/* Lista de texto con su ícono, sin píldora: no se toca, así que no debe parecer un botón. */}
+      <ul className="mt-3.5 grid gap-2.5">
         {service.includes.map((item, i) => (
           <motion.li
             key={item}
-            className="inline-flex max-w-full items-center gap-2 rounded-full border border-oro/25 bg-oro/[0.07] py-1.5 pr-4 pl-3 text-[0.92rem] leading-snug text-hueso/90"
+            className="flex items-start gap-2.5 text-[0.98rem] leading-snug text-hueso/90"
             initial={staggerItems ? { opacity: 0, y: 8 } : false}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, ease, delay: 0.14 + i * 0.05 }}
           >
-            <Icon name="sello" mode="static" className="size-4 text-oro-claro" />
+            <Icon name="sello" mode="static" className="mt-[0.1em] size-[1.1rem] shrink-0 text-oro-claro" />
             <span className="min-w-0">{item}</span>
           </motion.li>
         ))}
@@ -253,7 +305,7 @@ function ServiceBody({ service, staggerItems }: { service: Service; staggerItems
 
 /* ---------- Celular y tablet: acordeón ---------- */
 
-function SituationAccordion() {
+function SituationAccordion({ open, setOpen }: { open: string | null; setOpen: (id: string | null) => void }) {
   const { services, servicesIntro } = useContent();
   // Una lista por línea de servicio, en el orden de la página.
   const groups = services.reduce<Service[][]>((acc, s, i) => {
@@ -262,13 +314,13 @@ function SituationAccordion() {
     return acc;
   }, []);
   const reduce = useReduce();
-  const [open, setOpen] = useState<string | null>(services[0].id);
   const buttons = useRef<Record<string, HTMLButtonElement | null>>({});
 
   // Al cerrarse el bloque de arriba, el que se abrió puede quedar sobre el borde de la pantalla: se acerca con suavidad.
   const keepInView = (s: Service) => {
     const btn = buttons.current[s.id];
-    if (!btn) return;
+    // En escritorio el acordeón está oculto (mide cero): no hay nada que acercar.
+    if (!btn || !btn.getClientRects().length) return;
     const top = btn.getBoundingClientRect().top;
     // 72 px mide la barra de navegación ya compacta.
     if (top < 80) window.scrollTo({ top: window.scrollY + top - 96, behavior: reduce ? "auto" : "smooth" });

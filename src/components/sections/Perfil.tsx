@@ -9,12 +9,13 @@ import { PhotoBand } from "@/components/ui/PhotoBand";
 
 type Vars = CSSProperties & Record<`--${string}`, string>;
 
-// El hilo baja por la columna de los años en este tiempo; cada fila aparece cuando el hilo la alcanza.
+// El hilo baja por la columna de los años en este tiempo; el nudo de cada fila prende cuando el hilo la alcanza.
 const THREAD_S = 1.8;
 
 /**
- * Registro de trayectoria. En el HTML todo es visible: solo se "arma" (filas ocultas, hilo recogido) si al
- * hidratar el registro todavía está bajo la pantalla, así nadie ve desaparecer algo que ya estaba leyendo.
+ * Registro de trayectoria. Las filas se ven siempre: antes aparecían escalonadas y, al bajar rápido, quedaban
+ * vacías un instante (Aaron pidió que prendan de una, 12-11). Solo el hilo y sus nudos se animan: el hilo se
+ * recoge si al hidratar el registro todavía está bajo la pantalla, y baja al entrar.
  * El estado vive en un data-atributo y las transiciones son CSS: nada de estado de React por cuadro.
  */
 function Ledger() {
@@ -38,7 +39,7 @@ function Ledger() {
         el.dataset.phase = "lit";
         io.disconnect();
       },
-      { threshold: 0.35 },
+      { threshold: 0 },
     );
     io.observe(el);
     return () => io.disconnect();
@@ -54,14 +55,11 @@ function Ledger() {
         className="pointer-events-none absolute inset-y-0 left-[5.5rem] w-px origin-top bg-gradient-to-b from-oro-claro via-oro/55 to-oro/15 transition-transform duration-[1800ms] ease-[cubic-bezier(0.45,0.1,0.35,1)] group-data-[phase=armed]:scale-y-0 sm:left-[8rem]"
       />
       {profile.ledger.map((row: LedgerRow, i) => {
-        // Retraso de la fila: el momento en que el hilo llega a su altura.
+        // Retraso del nudo: el momento en que el hilo llega a su altura.
         const d = { "--d": `${0.12 + (THREAD_S * (i + 0.35)) / n}s` } as Vars;
         return (
           <li key={`${row.year}-${row.name}`} className="grid grid-cols-[5.5rem_minmax(0,1fr)] border-t border-hueso/10 sm:grid-cols-[8rem_minmax(0,1fr)]">
-            <span
-              className="py-6 pr-4 transition-[opacity,filter] duration-700 ease-expo [transition-delay:var(--d)] group-data-[phase=armed]:opacity-0 group-data-[phase=armed]:blur-[3px] sm:py-7"
-              style={d}
-            >
+            <span className="py-6 pr-4 sm:py-7">
               {/* "Desde" sobre el año en lo que sigue vigente: sube al relleno de la fila para no mover el año */}
               {row.yearNote && (
                 <span className="-mt-[1.1rem] mb-1.5 block text-[0.72rem] leading-none font-semibold tracking-[0.14em] text-oro-claro/80 uppercase">
@@ -91,13 +89,10 @@ function Ledger() {
               {/* Nudo donde el hilo toca la fila */}
               <span
                 aria-hidden="true"
-                className="absolute top-[calc(1.5rem+0.45em)] -left-[3.5px] size-[7px] rounded-full bg-oro-claro shadow-[0_0_10px_rgba(224,192,143,0.55)] transition-transform duration-500 ease-expo [transition-delay:var(--d)] group-data-[phase=armed]:scale-0 sm:top-[calc(1.75rem+0.5em)]"
+                className="absolute top-[calc(1.5rem+0.45em)] -left-[3.5px] size-[7px] rounded-full bg-oro-claro shadow-[0_0_10px_rgba(224,192,143,0.55)] transition-transform duration-150 ease-out [transition-delay:var(--d)] group-data-[phase=armed]:scale-0 sm:top-[calc(1.75rem+0.5em)]"
                 style={d}
               />
-              <div
-                className="transition-[opacity,transform,filter] duration-[900ms] ease-expo [transition-delay:var(--d)] group-data-[phase=armed]:-translate-x-3 group-data-[phase=armed]:opacity-0 group-data-[phase=armed]:blur-[4px]"
-                style={d}
-              >
+              <div>
                 <p className="text-[1.08rem] leading-snug font-semibold text-hueso sm:text-[1.15rem]">{row.name}</p>
                 {row.by && <p className="mt-1.5 text-[0.98rem] leading-relaxed text-gris">{row.by}</p>}
               </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import type { CSSProperties } from "react";
 import { motion } from "motion/react";
 import { ease, useReduce } from "./primitives";
 
@@ -15,6 +16,7 @@ export function PhotoBand({
   height,
   caption,
   position = "50% 50%",
+  desktopPosition,
   className = "",
 }: {
   src: string;
@@ -24,6 +26,8 @@ export function PhotoBand({
   /** Texto opcional en la esquina inferior; por defecto no lleva. */
   caption?: string;
   position?: string;
+  /** Encuadre desde 1024 px, si cambia respecto del de celular. */
+  desktopPosition?: string;
   className?: string;
 }) {
   const reduce = useReduce();
@@ -49,8 +53,14 @@ export function PhotoBand({
           height={height}
           loading="lazy"
           decoding="async"
-          className="size-full object-cover"
-          style={{ objectPosition: position, filter: "brightness(.86) saturate(.85) contrast(1.04)" }}
+          className="nx-photo size-full object-cover"
+          style={
+            {
+              "--nx-pos": position,
+              "--nx-pos-lg": desktopPosition ?? position,
+              filter: "brightness(.86) saturate(.85) contrast(1.04)",
+            } as CSSProperties
+          }
           variants={{ hidden: { scale: 1.08 }, shown: { scale: 1, transition: reduce ? { duration: 0 } : { duration: 2, ease } } }}
         />
         {/* Viñeta hacia el fondo de la página: la foto no flota como un recuadro */}

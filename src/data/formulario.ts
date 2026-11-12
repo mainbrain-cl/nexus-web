@@ -128,6 +128,9 @@ export type FormTexts = {
     pickSome: string;
     descripcion: (min: number) => string;
     nombre: string;
+    /** El correo quedó vacío. */
+    correoVacio: string;
+    /** El correo no tiene un formato válido. */
     correo: string;
     telefono: string;
     /** Respuestas del servidor */
@@ -252,6 +255,7 @@ const es: FormTexts = {
     pickSome: "Marque al menos una opción para continuar.",
     descripcion: (min) => `Describa brevemente su consulta (al menos ${min} caracteres).`,
     nombre: "Indique su nombre.",
+    correoVacio: "Indique su correo electrónico.",
     correo: "Revise su correo electrónico: no parece válido.",
     telefono: "Revise el teléfono: use solo números, espacios y el signo +.",
     invalido: "Algunos datos no se pudieron validar. Revíselos e intente de nuevo.",
@@ -379,6 +383,7 @@ const en: FormTexts = {
     pickSome: "Select at least one option to continue.",
     descripcion: (min) => `Briefly describe your inquiry (at least ${min} characters).`,
     nombre: "Please enter your name.",
+    correoVacio: "Please enter your email address.",
     correo: "Please check your email address: it does not appear to be valid.",
     telefono: "Please check the phone number: use only digits, spaces and the + sign.",
     invalido: "Some of the information could not be validated. Please review it and try again.",
@@ -506,6 +511,7 @@ const pt: FormTexts = {
     pickSome: "Marque pelo menos uma opção para continuar.",
     descripcion: (min) => `Descreva brevemente sua consulta (pelo menos ${min} caracteres).`,
     nombre: "Informe seu nome.",
+    correoVacio: "Informe seu e-mail.",
     correo: "Verifique seu e-mail: ele não parece válido.",
     telefono: "Verifique o telefone: use apenas números, espaços e o sinal +.",
     invalido: "Alguns dados não puderam ser validados. Revise-os e tente novamente.",

@@ -7,7 +7,7 @@ import { useReduce } from "@/components/ui/primitives";
 const ease = [0.16, 1, 0.3, 1] as const;
 
 /** Etiqueta sobre el nombre: una brasa que late y frases que suben una tras otra. */
-export function RotatingTag({ items, startDelay = 4600, every = 2600, className = "" }: {
+export function RotatingTag({ items, startDelay = 3000, every = 2600, className = "" }: {
   items: readonly string[];
   startDelay?: number;
   every?: number;

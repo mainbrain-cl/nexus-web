@@ -21,26 +21,23 @@ const VERDICT_ICON: Record<Verdict, IconName> = {
 export function Resultado() {
   const { photos, result } = useContent();
   return (
-    <Section id="resultado" tone="humo" labelledBy={TITLE_ID}>
+    <Section id="resultado" tone="ceniza" labelledBy={TITLE_ID}>
       <Container>
-        {/* Escritorio: la foto a la izquierda y, al lado, título, línea y los tres resultados.
+        {/* Escritorio: la foto a la izquierda y, al lado, título, línea y los tres resultados. La foto toma la altura
+            de esa columna, del título al último nivel, para que el bloque quede simétrico (Aaron, 12-11).
             Celular: título, línea, resultados y foto. */}
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:items-center lg:gap-x-[clamp(3rem,5.5vw,6rem)]">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,1fr)] lg:gap-x-[clamp(3rem,5.5vw,6rem)]">
           <div className="lg:order-2">
             <SectionTitle id={TITLE_ID} lines={result.title} accent={1} size="md" />
             <Reveal as="p" delay={0.15} className="mt-6 max-w-[42ch] text-[1.08rem] leading-relaxed text-gris">
               <Rich text={result.text} />
             </Reveal>
 
-            {/* Los tres niveles posibles de una conclusión: ícono relleno y nombre, nada más */}
-            <ul className="mt-9 grid gap-3">
+            {/* Los tres niveles posibles de una conclusión: ícono relleno y nombre, nada más. Lista de texto, sin
+                píldora: la píldora queda para lo que se toca. */}
+            <ul className="mt-9 grid gap-4">
               {result.levels.map((level, i) => (
-                <Reveal
-                  as="li"
-                  key={level.id}
-                  delay={0.2 + i * 0.12}
-                  className="flex items-center gap-4 rounded-full border border-oro/20 bg-oro/[0.06] py-2 pr-6 pl-2"
-                >
+                <Reveal as="li" key={level.id} delay={0.2 + i * 0.12} className="flex items-center gap-4">
                   <Icon name={VERDICT_ICON[level.id]} badge delay={0.3 + i * 0.12} className="size-11" />
                   <span className="text-[1.08rem] font-semibold text-hueso">{level.name}</span>
                 </Reveal>
@@ -48,7 +45,14 @@ export function Resultado() {
             </ul>
           </div>
 
-          <PhotoBand {...photos.informe} position="45% 45%" className="aspect-[4/3] w-full lg:order-1" />
+          {/* En escritorio la foto se recorta más angosta: el encuadre se corre a la derecha para no cortar las manos
+              ni el destacador. */}
+          <PhotoBand
+            {...photos.informe}
+            position="45% 45%"
+            desktopPosition="78% 50%"
+            className="aspect-[4/3] w-full lg:order-1 lg:aspect-auto"
+          />
         </div>
       </Container>
     </Section>

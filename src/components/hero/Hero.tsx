@@ -16,8 +16,10 @@ import { Embers } from "./Embers";
 import { RotatingTag } from "./RotatingTag";
 import { SmokeGL } from "./SmokeGL";
 
-const CHAR_STEP = 0.052; // s entre letra y letra al encenderse
-const LINE_START = [0.25, 0.52];
+// Entrada comprimida (revisión general, 12-11): título, nombre, rol y botones quedan en pantalla antes de ~1,5 s.
+// Antes el nombre llegaba a los 2,8 s y los botones a los 3,3 s. Los demás tiempos están en globals.css.
+const CHAR_STEP = 0.04; // s entre letra y letra al encenderse
+const LINE_START = [0.15, 0.38];
 
 type Vars = CSSProperties & Record<`--${string}`, string>;
 
@@ -134,7 +136,7 @@ export function Hero() {
     // El reloj del vaivén se detiene durante la pausa, para que al volver siga donde quedó y no salte.
     let t0 = performance.now();
     let pausedAt = 0;
-    const START = 4.2;
+    const START = 2.6;
     const RAMP = 3;
     const drift = (now: number) => {
       const t = (now - t0) / 1000 - START;
@@ -201,17 +203,17 @@ export function Hero() {
 
       {/* 3 · Brasas lejanas */}
       <motion.div className="pointer-events-none absolute inset-0 -z-20 will-change-transform" style={back}>
-        <Embers layer="back" burstDelay={reduce ? undefined : 420} className="size-full" />
+        <Embers layer="back" burstDelay={reduce ? undefined : 300} className="size-full" />
       </motion.div>
 
       {/* 4 · Título que se enciende y queda carbonizado */}
       <motion.div
-        className="pointer-events-none absolute inset-x-0 top-[15svh] -z-10 flex justify-center px-3 will-change-transform sm:top-[15svh]"
+        className="pointer-events-none absolute inset-x-0 top-[15svh] -z-10 flex justify-center px-3 will-change-transform lg:top-[13svh]"
         style={{ ...title, opacity: titleOpacity }}
       >
         <h1
           id="hero-title"
-          className="font-display text-center text-[17vw] leading-[0.86] uppercase italic [font-kerning:none] sm:text-[min(12.6vw,23svh)]"
+          className="font-display text-center text-[17vw] leading-[0.86] uppercase italic [font-kerning:none] sm:text-[min(12.6vw,23svh)] lg:text-[min(12.6vw,20svh)]"
           style={{ opacity: 0.88 }}
         >
           <span className="sr-only">{hero.titleLines.join(" ")}</span>
@@ -223,10 +225,12 @@ export function Hero() {
         </h1>
       </motion.div>
 
-      {/* 5 · Domingo, delante del título. El desvanecido inferior viene horneado en la imagen. */}
-      <div className="pointer-events-none absolute inset-0 flex justify-center pt-[23svh] sm:pt-[28.5svh]">
+      {/* 5 · Domingo, delante del título. El desvanecido inferior viene horneado en la imagen.
+          Celular: baja a 30svh para no tapar la segunda línea del título. Escritorio: baja a 40svh (y el título se
+          limita a 20svh de alto) para que la cabeza tape a lo sumo el pie de una letra, nunca la letra entera. */}
+      <div className="pointer-events-none absolute inset-0 flex justify-center pt-[30svh] sm:pt-[28.5svh] lg:pt-[40svh]">
         <motion.div
-          className="relative h-[68svh] min-h-[420px] will-change-transform sm:h-[72svh] sm:min-h-[460px]"
+          className="relative h-[68svh] min-h-[420px] will-change-transform sm:h-[72svh] sm:min-h-[460px] lg:h-[64svh]"
           style={{ ...person, opacity: personOpacity }}
         >
           <div className="in-person relative h-full">
@@ -269,7 +273,7 @@ export function Hero() {
 
       {/* 6 · Brasas cercanas, desenfocadas, por delante de todo */}
       <motion.div className="pointer-events-none absolute inset-0 z-10 will-change-transform" style={front}>
-        <Embers layer="front" burstDelay={reduce ? undefined : 2100} className="size-full" />
+        <Embers layer="front" burstDelay={reduce ? undefined : 1100} className="size-full" />
       </motion.div>
 
       {/* Sombra inferior para leer el texto sobre la foto */}
@@ -294,12 +298,12 @@ export function Hero() {
             <span aria-hidden="true">
               {/* El relleno superior deja ver la tilde de GAMÉ al final, y la máscara la oculta al inicio */}
               <span className="-mt-[0.22em] inline-block overflow-hidden px-[0.04em] pt-[0.22em] pb-[0.1em] align-bottom">
-                <span className="in-word inline-block" style={{ "--d": "2.75s" } as Vars}>
+                <span className="in-word inline-block" style={{ "--d": "0.85s" } as Vars}>
                   {hero.firstName}
                 </span>
               </span>{" "}
               <span className="-mt-[0.22em] inline-block overflow-hidden px-[0.04em] pt-[0.22em] pb-[0.1em] align-bottom">
-                <span className="in-word inline-block text-oro-claro" style={{ "--d": "2.88s" } as Vars}>
+                <span className="in-word inline-block text-oro-claro" style={{ "--d": "0.95s" } as Vars}>
                   {hero.lastName}
                 </span>
               </span>
@@ -318,7 +322,7 @@ export function Hero() {
           <a
             href={links.formulario}
             className="in-cta btn btn-oro h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[19rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
-            style={{ "--d": "3.25s" } as Vars}
+            style={{ "--d": "1.1s" } as Vars}
           >
             {hero.primaryCta}
             <Arrow className="btn-arrow size-[1.1em]" />
@@ -326,7 +330,7 @@ export function Hero() {
           <a
             href="#servicios"
             className="in-cta btn btn-linea h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[15rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
-            style={{ "--d": "3.37s" } as Vars}
+            style={{ "--d": "1.18s" } as Vars}
           >
             {hero.secondaryCta}
           </a>
@@ -339,7 +343,7 @@ export function Hero() {
         <ul
           aria-label={hero.sealsLabel}
           className="in-cta mx-auto flex max-w-[1440px] items-center px-5 sm:px-8 lg:px-[8.5vw] xl:px-[min(8.5vw,140px)]"
-          style={{ "--d": "3.6s" } as Vars}
+          style={{ "--d": "1.3s" } as Vars}
         >
           {profile.seals.map((seal, i) => (
             <li key={seal.name} className={i > 0 ? "-ml-1.5 lg:-ml-2" : ""}>

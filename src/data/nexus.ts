@@ -114,16 +114,27 @@ const photoFiles = {
 };
 type PhotoId = keyof typeof photoFiles;
 
-// Secciones con enlace en la barra y el pie.
-const navHrefs = { servicios: "#servicios", metodo: "#metodo", perfil: "#perfil", contacto: "#contacto" } as const;
+// Secciones con enlace en la barra y el pie, en el orden de la página. La barra no lleva Contacto: lo cubre el
+// botón "Solicitar asesoría" (revisión general, 12-11); el pie sí.
+const navHrefs = { servicios: "#servicios", perfil: "#perfil", metodo: "#metodo", contacto: "#contacto" } as const;
+type NavKey = keyof typeof navHrefs;
+const barNavKeys: NavKey[] = ["servicios", "perfil", "metodo"];
+
+/**
+ * Enlace a Servicios con una línea ya elegida, por ejemplo `#servicios?grupo=fortalecer`: la sección abre el
+ * primer servicio de esa línea (ver Servicios.tsx). Lo usa el submenú de la barra.
+ */
+export const serviceGroupHref = (group: ServiceGroupId) => `#servicios?grupo=${group}`;
 
 // ============================================================================================================
 // 2. Forma de los textos
 // ============================================================================================================
 
 type ServiceText = {
-  /** Texto del botón: nombra el servicio y el canal, corto para que quepa en un celular. */
+  /** Texto del botón: "Solicitar …" más el servicio, corto para que quepa en un celular. */
   cta: string;
+  /** Nombre corto, para el submenú de Servicios en la barra. */
+  short: string;
   /** La situación del visitante, en sus palabras: es la puerta de entrada al servicio. */
   situation: string;
   name: string;
@@ -144,7 +155,7 @@ export type Texts = {
   site: { title: string; description: string; tagline: string };
   /** Mensaje ya escrito del botón de WhatsApp. */
   whatsappText: string;
-  nav: { links: Record<keyof typeof navHrefs, string>; cta: string };
+  nav: { links: Record<NavKey, string>; cta: string };
   /** Selector de idioma: nombre del grupo para lectores de pantalla. */
   languageLabel: string;
   /** Textos que solo leen los lectores de pantalla o que no se ven en pantalla. */
@@ -153,6 +164,8 @@ export type Texts = {
     mainNav: string;
     openMenu: string;
     closeMenu: string;
+    /** Lista del submenú de Servicios (las tres líneas). */
+    servicesMenu: string;
     footerNav: string;
     footerContact: string;
     backHome: string;
@@ -195,7 +208,7 @@ export type Texts = {
     standardsLabel: string;
     stepsLabel: string;
     steps: Tuple<MethodStepText, 7>;
-    /** Nota del hilo de retorno, del paso 6 al 3. */
+    /** Nota del ciclo bajo el paso 6: una hipótesis que no resiste devuelve el trabajo a los datos. */
     loopText: string;
   };
   result: { title: Tuple<string, 2>; text: string; levels: Record<Verdict, string> };
@@ -223,6 +236,10 @@ export type Texts = {
   };
   photoAlts: Record<PhotoId, string>;
   footer: { motto: string; legal: string };
+  /** Página 404. */
+  notFound: { metaTitle: string; title: string; text: string; back: string };
+  /** Texto alternativo de la imagen al compartir (Open Graph). */
+  ogAlt: string;
 };
 
 // ============================================================================================================
@@ -239,14 +256,15 @@ const es: Texts = {
     tagline: "Método científico. Utilidad jurídica.",
   },
   whatsappText: "Hola Domingo, quiero solicitar una asesoría con NEXUS.",
-  // "Quién soy" en vez de "Perfil" (Aaron, 10-11).
-  nav: { links: { servicios: "Servicios", metodo: "Método", perfil: "Quién soy", contacto: "Contacto" }, cta: "Solicitar asesoría" },
+  // "Trayectoria" en vez de "Quién soy" (revisión general, 12-11).
+  nav: { links: { servicios: "Servicios", perfil: "Trayectoria", metodo: "Método", contacto: "Contacto" }, cta: "Solicitar asesoría" },
   languageLabel: "Idioma",
   a11y: {
     skipLink: "Saltar al contenido",
     mainNav: "Principal",
     openMenu: "Abrir menú",
     closeMenu: "Cerrar menú",
+    servicesMenu: "Líneas de servicio",
     footerNav: "Secciones del sitio",
     footerContact: "Contacto",
     backHome: "volver al inicio",
@@ -263,7 +281,8 @@ const es: Texts = {
   // Intersección: un solo bloque (Aaron, 10-11). Las tres competencias van en palabras de Domingo (12-11).
   intersection: {
     title: ["Tres competencias,", "un solo criterio"],
-    body: "Investigación de incendios, análisis técnico-científico y comprensión jurídica de la prueba pericial en una misma evaluación independiente. **Sirve a quien evalúa un informe y a quien quiere fortalecer el suyo.**",
+    // El diagrama ya nombra las tres competencias: el texto no las repite (revisión general, 12-11).
+    body: "Las tres en una misma evaluación independiente, **para quien necesita evaluar un informe y para quien quiere fortalecer el suyo.**",
     threads: ["Investigación de incendios", "Análisis técnico-científico", "Comprensión jurídica de la prueba pericial"],
     knot: "Una conclusión fundada",
     diagramLabel:
@@ -280,14 +299,16 @@ const es: Texts = {
   },
   services: {
     auditoria: {
-      cta: "Pedir auditoría",
+      cta: "Solicitar auditoría",
+      short: "Auditoría de informes",
       situation: "Recibí un informe pericial y necesito una opinión independiente",
       name: "Auditoría técnica de informes periciales",
       text: "Evaluación **independiente** de un informe pericial presentado en su caso, para decidir con fundamento.",
       includes: ["Evaluación conforme a NFPA 921", "Coherencia y trazabilidad del razonamiento", "Informe con observaciones fundadas"],
     },
     revision: {
-      cta: "Pedir revisión",
+      cta: "Solicitar revisión",
+      short: "Revisión de su informe",
       situation: "Soy investigador o empresa de investigación y quiero fortalecer mi informe antes de entregarlo",
       name: "Revisión independiente de su informe pericial",
       text: "Metodología, sustento técnico y conclusiones: una segunda mirada **técnica y jurídica**, confidencial, antes de entregar su informe.",
@@ -298,35 +319,40 @@ const es: Texts = {
       ],
     },
     litigacion: {
-      cta: "Pedir asesoría",
+      cta: "Solicitar asesoría",
+      short: "Consultoría para litigación",
       situation: "Hay un juicio en curso y la prueba técnica es decisiva",
       name: "Consultoría técnica para litigación",
       text: "Asesoría a abogados para **comprender y usar con solidez** la prueba técnica.",
       includes: ["Lectura técnica de informes periciales", "Puntos clave para la teoría del caso", "Preparación de audiencias con prueba pericial"],
     },
     controvertidas: {
-      cta: "Pedir análisis",
+      cta: "Solicitar análisis",
+      short: "Pericias controvertidas",
       situation: "Hay pericias que llegan a conclusiones distintas",
       name: "Revisión técnica de pericias controvertidas",
       text: "Análisis técnico de pericias **con conclusiones en discusión**, para ordenar el debate sobre bases verificables.",
       includes: ["Contraste entre datos y conclusiones", "Análisis de hipótesis alternativas", "Fundamentos técnicos para la discusión"],
     },
     investigacion: {
-      cta: "Pedir investigación",
+      cta: "Solicitar investigación",
+      short: "Investigación de incendios",
       situation: "Ocurrió un incendio y hay que determinar su origen y causa",
       name: "Investigación de incendios",
       text: "Determinación del **origen y la causa** del incendio, con un proceso documentado.",
       includes: ["Examen y registro del sitio", "Patrones de fuego y fuentes de ignición posibles", "Informe técnico pericial"],
     },
     prejudicial: {
-      cta: "Pedir evaluación",
+      cta: "Solicitar evaluación",
+      short: "Asesoría prejudicial",
       situation: "El caso aún no llega a juicio y quiero evaluarlo",
       name: "Asesoría prejudicial estratégica",
       text: "Evaluación técnica **antes de judicializar**: alcance de la evidencia y próximos pasos.",
       includes: ["Análisis preliminar de antecedentes", "Riesgos probatorios y peritajes necesarios", "Apoyo en negociación temprana"],
     },
     formacion: {
-      cta: "Consultar formación",
+      cta: "Solicitar formación",
+      short: "Formación especializada",
       situation: "Mi equipo necesita formarse en investigación de incendios",
       name: "Formación especializada",
       text: "Capacitaciones en **investigación de incendios**, análisis de evidencia e informes.",
@@ -418,6 +444,13 @@ const es: Texts = {
     motto: "Evidencia · Análisis · Contexto · Decisiones",
     legal: "Evaluación pericial independiente e investigación de incendios",
   },
+  notFound: {
+    metaTitle: "Página no encontrada | NEXUS",
+    title: "Esta página no existe",
+    text: "Puede que el enlace esté mal escrito o que la página se haya movido.",
+    back: "Volver al inicio",
+  },
+  ogAlt: "NEXUS: Domingo Soto Gamé y el título Fuego, ciencia y derecho",
 };
 
 // ---------- English ----------
@@ -434,13 +467,14 @@ const en: Texts = {
     tagline: "Scientific method. Legal value.",
   },
   whatsappText: "Hello Domingo, I would like to request a consultation with NEXUS.",
-  nav: { links: { servicios: "Services", metodo: "Method", perfil: "About", contacto: "Contact" }, cta: "Request a consultation" },
+  nav: { links: { servicios: "Services", perfil: "Background", metodo: "Method", contacto: "Contact" }, cta: "Request a consultation" },
   languageLabel: "Language",
   a11y: {
     skipLink: "Skip to content",
     mainNav: "Main",
     openMenu: "Open menu",
     closeMenu: "Close menu",
+    servicesMenu: "Service lines",
     footerNav: "Site sections",
     footerContact: "Contact",
     backHome: "back to top",
@@ -456,7 +490,7 @@ const en: Texts = {
   },
   intersection: {
     title: ["Three disciplines,", "one judgment"],
-    body: "Fire investigation, scientific and technical analysis, and a legal understanding of expert evidence, brought together in one independent evaluation. **For those assessing a report and for those who want to strengthen their own.**",
+    body: "All three in one independent evaluation, **for those who need to assess a report and for those who want to strengthen their own.**",
     threads: ["Fire investigation", "Scientific and technical analysis", "Legal understanding of expert evidence"],
     knot: "A sound conclusion",
     diagramLabel:
@@ -473,6 +507,7 @@ const en: Texts = {
   services: {
     auditoria: {
       cta: "Request an audit",
+      short: "Report audit",
       situation: "I received an expert report and need an independent opinion",
       name: "Technical audit of expert reports",
       text: "An **independent** evaluation of an expert report submitted in your case, so you can make well-founded decisions.",
@@ -480,6 +515,7 @@ const en: Texts = {
     },
     revision: {
       cta: "Request a review",
+      short: "Review of your report",
       situation: "I'm an investigator or investigation firm and want to strengthen my report before submitting it",
       name: "Independent review of your expert report",
       text: "Methodology, technical basis and conclusions: a confidential second look, **technical and legal**, before you submit your report.",
@@ -491,6 +527,7 @@ const en: Texts = {
     },
     litigacion: {
       cta: "Request support",
+      short: "Litigation consulting",
       situation: "A case is in litigation and the technical evidence is decisive",
       name: "Technical consulting for litigation",
       text: "Support for attorneys to **understand and use technical evidence** with confidence.",
@@ -498,6 +535,7 @@ const en: Texts = {
     },
     controvertidas: {
       cta: "Request an analysis",
+      short: "Disputed expert findings",
       situation: "Expert reports have reached different conclusions",
       name: "Technical review of disputed expert findings",
       text: "Technical analysis of expert findings **whose conclusions are under discussion**, to frame the debate on verifiable grounds.",
@@ -505,6 +543,7 @@ const en: Texts = {
     },
     investigacion: {
       cta: "Request an investigation",
+      short: "Fire investigation",
       situation: "A fire has occurred and its origin and cause must be determined",
       name: "Fire investigation",
       text: "Determination of the fire's **origin and cause**, through a documented process.",
@@ -512,13 +551,15 @@ const en: Texts = {
     },
     prejudicial: {
       cta: "Request an assessment",
+      short: "Pre-litigation advisory",
       situation: "The case hasn't gone to court yet and I want to assess it",
       name: "Strategic pre-litigation advisory",
       text: "A technical assessment **before going to court**: what the evidence can support and the next steps.",
       includes: ["Preliminary review of the available information", "Evidentiary risks and expert work needed", "Support in early negotiations"],
     },
     formacion: {
-      cta: "Ask about training",
+      cta: "Request training",
+      short: "Specialized training",
       situation: "My team needs training in fire investigation",
       name: "Specialized training",
       text: "Training in **fire investigation**, evidence analysis and report writing.",
@@ -616,6 +657,13 @@ const en: Texts = {
     motto: "Evidence · Analysis · Context · Decisions",
     legal: "Independent expert review and fire investigation",
   },
+  notFound: {
+    metaTitle: "Page not found | NEXUS",
+    title: "This page doesn't exist",
+    text: "The link may be mistyped, or the page may have moved.",
+    back: "Back to home",
+  },
+  ogAlt: "NEXUS: Domingo Soto Gamé and the title Fire, science and law",
 };
 
 // ---------- Português (Brasil) ----------
@@ -630,13 +678,14 @@ const pt: Texts = {
     tagline: "Método científico. Utilidade jurídica.",
   },
   whatsappText: "Olá, Domingo. Gostaria de solicitar uma assessoria da NEXUS.",
-  nav: { links: { servicios: "Serviços", metodo: "Método", perfil: "Quem sou", contacto: "Contato" }, cta: "Solicitar assessoria" },
+  nav: { links: { servicios: "Serviços", perfil: "Trajetória", metodo: "Método", contacto: "Contato" }, cta: "Solicitar assessoria" },
   languageLabel: "Idioma",
   a11y: {
     skipLink: "Pular para o conteúdo",
     mainNav: "Principal",
     openMenu: "Abrir menu",
     closeMenu: "Fechar menu",
+    servicesMenu: "Linhas de serviço",
     footerNav: "Seções do site",
     footerContact: "Contato",
     backHome: "voltar ao início",
@@ -652,7 +701,7 @@ const pt: Texts = {
   },
   intersection: {
     title: ["Três competências,", "um só critério"],
-    body: "Investigação de incêndios, análise técnico-científica e compreensão jurídica da prova pericial em uma mesma avaliação independente. **Atende quem avalia um laudo e quem quer fortalecer o seu.**",
+    body: "As três em uma mesma avaliação independente, **para quem precisa avaliar um laudo e para quem quer fortalecer o seu.**",
     threads: ["Investigação de incêndios", "Análise técnico-científica", "Compreensão jurídica da prova pericial"],
     knot: "Uma conclusão embasada",
     diagramLabel:
@@ -670,6 +719,7 @@ const pt: Texts = {
   services: {
     auditoria: {
       cta: "Solicitar auditoria",
+      short: "Auditoria de laudos",
       situation: "Recebi um laudo pericial e preciso de uma opinião independente",
       name: "Auditoria técnica de laudos periciais",
       text: "Avaliação **independente** de um laudo pericial apresentado no seu caso, para decidir com fundamento.",
@@ -677,6 +727,7 @@ const pt: Texts = {
     },
     revision: {
       cta: "Solicitar revisão",
+      short: "Revisão do seu laudo",
       situation: "Sou investigador ou empresa de investigação e quero fortalecer meu laudo antes de entregá-lo",
       name: "Revisão independente do seu laudo pericial",
       text: "Metodologia, fundamentação técnica e conclusões: um segundo olhar **técnico e jurídico**, confidencial, antes de entregar seu laudo.",
@@ -688,6 +739,7 @@ const pt: Texts = {
     },
     litigacion: {
       cta: "Solicitar assessoria",
+      short: "Consultoria para litígios",
       situation: "Há um processo judicial em andamento e a prova técnica é decisiva",
       name: "Consultoria técnica para litígios",
       text: "Assessoria a advogados para **compreender e usar com solidez** a prova técnica.",
@@ -696,6 +748,7 @@ const pt: Texts = {
     },
     controvertidas: {
       cta: "Solicitar análise",
+      short: "Perícias controvertidas",
       situation: "Há perícias que chegam a conclusões diferentes",
       name: "Revisão técnica de perícias controvertidas",
       text: "Análise técnica de perícias **com conclusões em discussão**, para organizar o debate sobre bases verificáveis.",
@@ -703,6 +756,7 @@ const pt: Texts = {
     },
     investigacion: {
       cta: "Solicitar investigação",
+      short: "Investigação de incêndios",
       situation: "Ocorreu um incêndio e é preciso determinar sua origem e causa",
       name: "Investigação de incêndios",
       text: "Determinação da **origem e da causa** do incêndio, com um processo documentado.",
@@ -711,13 +765,15 @@ const pt: Texts = {
     },
     prejudicial: {
       cta: "Solicitar avaliação",
+      short: "Assessoria pré-processual",
       situation: "O caso ainda não chegou à Justiça e quero avaliá-lo",
       name: "Assessoria pré-processual estratégica",
       text: "Avaliação técnica **antes de judicializar**: alcance das evidências e próximos passos.",
       includes: ["Análise preliminar das informações", "Riscos probatórios e perícias necessárias", "Apoio na negociação inicial"],
     },
     formacion: {
-      cta: "Consultar capacitação",
+      cta: "Solicitar capacitação",
+      short: "Capacitação especializada",
       situation: "Minha equipe precisa se capacitar em investigação de incêndios",
       name: "Capacitação especializada",
       text: "Capacitações em **investigação de incêndios**, análise de evidências e elaboração de laudos.",
@@ -805,6 +861,13 @@ const pt: Texts = {
     motto: "Evidência · Análise · Contexto · Decisões",
     legal: "Avaliação pericial independente e investigação de incêndios",
   },
+  notFound: {
+    metaTitle: "Página não encontrada | NEXUS",
+    title: "Esta página não existe",
+    text: "O link pode estar digitado errado ou a página pode ter mudado de endereço.",
+    back: "Voltar ao início",
+  },
+  ogAlt: "NEXUS: Domingo Soto Gamé e o título Fogo, ciência e direito",
 };
 
 export const texts: Record<Locale, Texts> = { es, en, pt };
@@ -820,7 +883,15 @@ function build(locale: Locale) {
     path: localeInfo[locale].path,
     site: { ...siteBase, ...t.site },
     links: { ...links, asesoria: whatsapp(t.whatsappText) },
-    navLinks: (Object.keys(navHrefs) as (keyof typeof navHrefs)[]).map((k) => ({ href: navHrefs[k], label: t.nav.links[k] })),
+    navLinks: barNavKeys.map((k) => ({ key: k, href: navHrefs[k], label: t.nav.links[k] })),
+    footerLinks: (Object.keys(navHrefs) as NavKey[]).map((k) => ({ key: k, href: navHrefs[k], label: t.nav.links[k] })),
+    /** Las tres líneas de servicio con sus servicios, para el submenú de la barra. */
+    serviceGroups: serviceGroupIds.map((id) => ({
+      id,
+      href: serviceGroupHref(id),
+      label: t.servicesIntro.groups[id],
+      services: serviceIds.filter((s) => serviceGroup[s] === id).map((s) => t.services[s].short),
+    })),
     navCta: t.nav.cta,
     languageLabel: t.languageLabel,
     a11y: t.a11y,
@@ -832,8 +903,8 @@ function build(locale: Locale) {
       ...t.method,
       standards: standardCodes.map((code, i) => ({ code, name: t.method.standards[i] })),
       steps: t.method.steps as MethodStepText[],
-      // Los pasos se cuentan desde 1: el hilo de retorno va del paso 6 al 3.
-      loop: { from: 6, to: 3, text: t.method.loopText },
+      // Los pasos se cuentan desde 1: la nota del ciclo va bajo el paso 6.
+      loop: { from: 6, text: t.method.loopText },
     },
     result: { ...t.result, levels: verdicts.map((id) => ({ id, name: t.result.levels[id] })) },
     profile: {
@@ -851,6 +922,8 @@ function build(locale: Locale) {
       (Object.keys(photoFiles) as PhotoId[]).map((id) => [id, { ...photoFiles[id], alt: t.photoAlts[id] }]),
     ) as Record<PhotoId, (typeof photoFiles)[PhotoId] & { alt: string }>,
     footer: t.footer,
+    notFound: t.notFound,
+    og: { image: `/og/${locale}.jpg`, width: 1200, height: 630, alt: t.ogAlt },
   };
 }
 

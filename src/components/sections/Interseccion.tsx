@@ -285,20 +285,20 @@ export function Interseccion() {
             <Nudo />
           </div>
 
-          {/* A quiénes atiende: etiquetas, no botones (sin hover ni cursor de enlace). */}
+          {/* A quiénes atiende: lista de texto con su ícono, sin píldora (la píldora queda para lo que se toca). */}
           <div className="mt-12 lg:col-start-1 lg:row-start-4 lg:mt-10">
             <Reveal as="p" delay={0.1} id={AUDIENCES_ID} className="text-[0.95rem] font-medium text-hueso/80">
               {audiencesTitle}
             </Reveal>
-            <ul aria-labelledby={AUDIENCES_ID} className="mt-4 flex flex-wrap gap-2.5">
+            <ul aria-labelledby={AUDIENCES_ID} className="mt-4 grid gap-x-8 gap-y-3 sm:grid-cols-2">
               {audiences.map((a, i) => (
                 <Reveal
                   as="li"
                   key={a}
                   delay={0.18 + 0.07 * i}
-                  className="inline-flex max-w-full items-center gap-2 rounded-full border border-oro/25 bg-oro/[0.07] px-3.5 py-2 text-[0.9rem] leading-tight text-hueso/90 sm:px-4 sm:text-[0.95rem]"
+                  className="flex items-start gap-2.5 text-[0.98rem] leading-snug text-hueso/90 sm:text-[1.02rem]"
                 >
-                  <Icon name={AUDIENCE_ICONS[i]} mode="static" className="size-4 text-oro-claro" />
+                  <Icon name={AUDIENCE_ICONS[i]} mode="static" className="mt-[0.1em] size-[1.1rem] shrink-0 text-oro-claro" />
                   <span>{a}</span>
                 </Reveal>
               ))}
