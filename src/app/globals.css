@@ -453,3 +453,60 @@
   }
 }
 
+
+/* ---------- Portada en celular y tablet (hasta 1023 px) ---------- */
+
+/* La portada va en flujo vertical: sellos, título, Domingo y texto, sin capas que se monten (Aaron, 12-11).
+   La escena (nx-hero-escena) es el alto que queda entre el título y el texto. La foto se calcula para que la cara
+   completa (del pelo al mentón, el 31 % superior de la imagen) quepa ahí con aire arriba y abajo; el pecho sigue
+   por detrás del texto, bajo un fondo oscuro. En pantallas altas la foto se limita para no crecer de más. */
+@media (max-width: 1023.98px) {
+  .nx-hero-escena {
+    --nx-aire-arriba: 0.5rem;
+    --nx-aire-abajo: 1.75rem;
+    /* Alto de la cara: lo que deja la escena o, si la foto llegó a su tope, el 31 % de ese tope. */
+    --nx-cara: min(100% - var(--nx-aire-arriba) - var(--nx-aire-abajo), 46.5vw, 24.18svh);
+  }
+
+  .nx-hero-figura {
+    position: absolute;
+    inset-inline: 0;
+    top: var(--nx-aire-arriba);
+    display: flex;
+    justify-content: center;
+    height: calc(var(--nx-cara) / 0.31);
+  }
+
+  /* El pecho se funde a oscuro antes del texto: empieza bajo el mentón y llega a casi negro donde empieza el
+     texto. Con aire de sobra (pantallas altas) el fundido es más largo, hasta 5rem. */
+  .nx-hero-escena::after {
+    content: "";
+    position: absolute;
+    inset-inline: -1rem;
+    bottom: 0;
+    height: min(5rem, 100% - var(--nx-aire-arriba) - var(--nx-cara) - 0.25rem);
+    background: linear-gradient(180deg, rgba(18, 15, 13, 0), rgba(18, 15, 13, 0.55) 55%, rgba(18, 15, 13, 0.97));
+  }
+
+  /* Fondo oscuro parejo bajo el nombre, el rol y los botones: el texto nunca se lee sobre parches ni bordados.
+     Abajo, bajo los botones, se aclara un poco para que asome el resplandor de brasas del suelo. */
+  .nx-hero-velo {
+    position: absolute;
+    inset: 0 -1rem;
+    z-index: -1;
+    background: linear-gradient(180deg, rgba(18, 15, 13, 0.97), rgba(18, 15, 13, 0.97) 55%, rgba(18, 15, 13, 0.82));
+  }
+
+  /* Los sellos van arriba en el flujo: entran antes, con el título, y no al final como en escritorio. */
+  .nx-hero-sellos {
+    --d: 0.3s !important;
+  }
+
+  /* La etiqueta rotativa va sobre el nombre solo si la pantalla tiene alto de sobra; en las bajas
+     (navegadores dentro de WhatsApp o Instagram, iPhone SE, Android chico) se oculta para no achicar la cara. */
+  @media (max-height: 739.98px) {
+    .nx-hero-tag {
+      display: none;
+    }
+  }
+}

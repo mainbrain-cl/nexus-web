@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test:title": "node scripts/check-title.mjs"
+    "test:title": "node scripts/check-title.mjs",
+    "test:portada": "node scripts/check-portada-movil.mjs"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
