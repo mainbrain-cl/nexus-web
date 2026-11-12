@@ -107,7 +107,8 @@ for (const locale of locales) {
 
       // Domingo a la derecha: silueta con resplandor de fuego detrás y la foto encima.
       const photo = (extra) =>
-        el("img", { position: "absolute", right: "56px", top: "44px", height: "640px", width: "auto", ...extra });
+        // Zona segura: WhatsApp y otros recortan los costados (~130 px por lado), así que nada importante va en los bordes.
+        el("img", { position: "absolute", right: "150px", top: "60px", height: "600px", width: "auto", ...extra });
       const rim = photo({ filter: "brightness(0) drop-shadow(0 6px 14px rgba(255,118,40,.55))", opacity: "0.45" });
       const img = photo({ filter: "brightness(.9) saturate(.92)" });
       rim.src = img.src = "/hero/domingo.webp";
@@ -122,10 +123,10 @@ for (const locale of locales) {
 
       const col = el("div", {
         position: "absolute",
-        left: "72px",
+        left: "150px",
         top: "56px",
         bottom: "60px",
-        width: "700px",
+        width: "560px",
         display: "flex",
         flexDirection: "column",
       });
@@ -199,7 +200,7 @@ for (const locale of locales) {
       // El título se achica si una línea no cabe a la izquierda de la foto.
       const lines = [...title.children];
       let size = 118;
-      while (size > 70 && Math.max(...lines.map((l) => l.getBoundingClientRect().width)) > 640) {
+      while (size > 70 && Math.max(...lines.map((l) => l.getBoundingClientRect().width)) > 540) {
         size -= 2;
         title.style.fontSize = `${size}px`;
       }

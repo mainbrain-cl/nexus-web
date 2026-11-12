@@ -923,7 +923,7 @@ function build(locale: Locale) {
     ) as Record<PhotoId, (typeof photoFiles)[PhotoId] & { alt: string }>,
     footer: t.footer,
     notFound: t.notFound,
-    og: { image: `/og/${locale}.jpg`, width: 1200, height: 630, alt: t.ogAlt },
+    og: { image: `/og/${locale}-2.jpg`, width: 1200, height: 630, alt: t.ogAlt },
   };
 }
 
