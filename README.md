@@ -25,6 +25,12 @@ npm run build       # build de producción (la página queda prerenderizada)
 npm run test:title  # tras el build: levanta next start y verifica que el título de la hero no se corte (/, /en/ y /pt/)
 ```
 
+## Íconos, imagen al compartir y 404
+
+- **Favicon:** la X dorada del logo sobre ceniza, en `src/app/icon.svg`. `node scripts/iconos.mjs` genera desde ese SVG `src/app/favicon.ico` (16 y 32 px) y `src/app/apple-icon.png` (180 px).
+- **Imagen al compartir (Open Graph y X/Twitter):** una por idioma en `public/og/<idioma>.jpg` (1200×630), con el logo, la foto de Domingo, el título y el rol del idioma. Se dibujan con las fuentes y la textura del sitio: `npm run build && node scripts/og.mjs` (o `node scripts/og.mjs http://localhost:3000` con `next dev` abierto). Hay que regenerarlas si cambian el título, el rol o la foto de la hero.
+- **404:** `src/app/global-not-found.tsx` (con `experimental.globalNotFound` en `next.config.ts`, porque hay dos layouts raíz). Toma el idioma de la ruta pedida (`/en/xyz` sale en inglés).
+
 ## Despliegue
 
 Vercel detecta Next.js sin configuración extra. Si el dominio no es `nexuschile.net`, define la variable `NEXT_PUBLIC_SITE_URL`.
@@ -71,6 +77,10 @@ Para activarlo:
 3. Con el remitente de prueba `onboarding@resend.dev`, Resend solo entrega al correo dueño de la cuenta. Para enviar a `FORM_TO` desde el dominio propio: verificar `nexuschile.net` en Resend (Domains, registros DNS SPF y DKIM) y definir `FORM_FROM`, por ejemplo `NEXUS Web <web@nexuschile.net>`.
 
 El correo llega en español, con el asunto `Consulta web: <quién solicita> · <servicio>`, en HTML y texto plano, y con `reply_to` apuntando al visitante: Domingo responde directo desde su correo. La consulta no se guarda en ningún lado.
+
+### Abrir Servicios con una línea ya elegida
+
+- Enlace: `#servicios?grupo=<línea>` (helper `serviceGroupHref(id)` en `src/data/nexus.ts`), con `evaluar`, `fortalecer` o `investigar`. Servicios selecciona el primer servicio de esa línea (pestaña en escritorio, acordeón en celular) y limpia el hash. Lo usa el submenú de la barra.
 
 ### Abrir el formulario con un servicio ya elegido
 

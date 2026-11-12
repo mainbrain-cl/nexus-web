@@ -16,7 +16,7 @@ colors:
 typography:
   display:
     fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "min(12.6vw, 23svh)"
+    fontSize: "min(12.6vw, 20svh)"
     fontWeight: 800
     lineHeight: 0.86
     letterSpacing: "normal"
@@ -133,7 +133,7 @@ Una paleta de humo cálido con un solo acento metálico y una sola luz encendida
 
 ### Neutral
 - **Ceniza** (ceniza): el suelo de la página, del html y del menú móvil.
-- **Humo** (humo): el fondo alterno de sección (Servicios, Resultado) y de las placas de norma. Pausa la lectura sin dibujar bordes.
+- **Humo** (humo): el fondo alterno de sección (Servicios, Método y Contacto) y de las placas de norma. Pausa la lectura sin dibujar bordes.
 - **Carbón** (carbon): la tinta de texto sobre la hoja.
 - **Hueso** (hueso): el texto principal sobre lo oscuro y el papel de la hoja.
 - **Gris Ceniza** (gris): texto secundario, párrafos de apoyo y rótulos de canal.
@@ -154,7 +154,7 @@ Una paleta de humo cálido con un solo acento metálico y una sola luz encendida
 **Character:** La cursiva condensada en mayúsculas tiene la urgencia de un titular de emergencia; la Archivo ancha y recta pesa como una placa grabada; la Schibsted argumenta con la calma de un escrito jurídico.
 
 ### Hierarchy
-- **Display** (800 cursiva, 17vw en móvil y min(12.6vw, 23svh) desde sm, interlineado 0.86, mayúsculas, sin kerning): el título carbonizado de la hero y el título reencendido de Contacto (clamp(3.4rem, 10vw, 9rem)). Solo estos dos llevan la textura de ceniza y la ignición.
+- **Display** (800 cursiva, 17vw en móvil, min(12.6vw, 23svh) desde sm y min(12.6vw, 20svh) desde lg, interlineado 0.86, mayúsculas, sin kerning): el título carbonizado de la hero y el título reencendido de Contacto (clamp(3.4rem, 10vw, 9rem)). Solo estos dos llevan la textura de ceniza y la ignición.
 - **Headline** (800 cursiva, clamp(2.9rem, 6.4vw, 5.75rem) o clamp(2.3rem, 4.6vw, 4rem) en tamaño medio, interlineado 0.9, mayúsculas): títulos de sección en hueso, una línea acentuada en oro claro, cada línea sube desde su máscara. También los nombres de servicio y los pasos del método, a escala de 1.75 a 2.75rem.
 - **Thesis** (Schibsted 600, clamp(1.9rem, 3.6vw, 3.1rem), interlineado 1.08, tracking -0.025em, máx. 22ch): el titular de Intersección y solo él.
 - **Name** (Archivo 800 al 115 %, mayúsculas, tracking 0.01em): el nombre de Domingo en la hero y en Perfil, los códigos NFPA de las placas y las entradas del registro.
@@ -172,7 +172,9 @@ Un contenedor central de 1240 px con márgenes laterales de 20, 32 y 48 px (móv
 
 En escritorio las secciones se arman en rejillas asimétricas de dos columnas (1.1fr contra 1fr, 0.72fr contra 1fr, 0.75fr contra 2fr) con separaciones en clamp de 3 a 6.5rem; en móvil todo cae a una columna en el orden del DOM. Servicios es maestro-detalle en escritorio y acordeón en móvil. Las listas se separan con hilos, no con tarjetas: a quién sirve es una fila de cuatro columnas con divisores dorados verticales que en móvil pasan a ser horizontales.
 
-La hero ocupa la primera pantalla: título en dos líneas al ~88 % del ancho desde el 15 % superior, Domingo centrado al ~85 % del alto delante del título, y su nombre, el hilo, el subtítulo y los dos botones sobre el torso.
+La hero ocupa la primera pantalla: título en dos líneas al ~88 % del ancho desde el 15 % superior (13 % en escritorio), Domingo centrado delante del título y su nombre, el hilo, el subtítulo y los dos botones sobre el torso. La cabeza de Domingo nunca tapa una letra entera: en celular la foto empieza bajo la segunda línea (30svh) y en escritorio (40svh) tapa a lo sumo el pie de la letra central. La entrada completa (título, nombre, rol y botones) queda en pantalla antes de ~1,5 s.
+
+El orden de la página: Hero, Intersección, Servicios, Perfil, Método, Resultado y Contacto, con fondos alternados desde Servicios (humo, ceniza, humo, ceniza, humo).
 
 ### Named Rules
 **The Physical Pixel Rule.** Todo desplazamiento de parallax se redondea al píxel físico (Math.round(v × devicePixelRatio) / devicePixelRatio). Mover una capa en fracciones de píxel obliga a repintarla entera en cada cuadro; medido en pantalla 2x a 120 Hz, el parallax bajó de ~190 % a ~105 % de CPU.
@@ -191,9 +193,11 @@ La profundidad viene de capas, no de sombras. La hero apila seis planos con para
 
 ## Shapes
 
-Dos formas y nada entre ellas: la píldora completa (999 px) para todo lo que se toca (botones, enlaces de la barra, etiqueta rotatoria, anillo de foco) y el ángulo recto para todo lo que se lee (placas, hoja, secciones). Los nodos del hilo son círculos de 7 a 13 px. El foco, una píldora de 2 px en oro claro, se ajusta a un rectángulo suave (6 px) solo en celdas anchas. La hoja se inclina entre -0.4° y -1.5° según el ancho, y el timbre a 2.5°.
+Dos formas y nada entre ellas: la píldora completa (999 px) para todo lo que se toca (botones, enlaces de la barra, banderas, anillo de foco; la etiqueta rotatoria de la hero es la única excepción) y el ángulo recto para todo lo que se lee (placas, hoja, secciones). Los nodos del hilo son círculos de 7 a 13 px. El foco, una píldora de 2 px en oro claro, se ajusta a un rectángulo suave (6 px) solo en celdas anchas. La hoja se inclina entre -0.4° y -1.5° según el ancho, y el timbre a 2.5°.
 
 ### Named Rules
+**The Touch Pill Rule.** Una píldora con borde se lee como botón. Lo que no se toca (los niveles de Resultado, los públicos de "Trabajamos con", los puntos de "Qué incluye") va como lista de texto con su ícono, sin borde ni fondo.
+
 **The Thread Rule.** El hilo dorado de 1 px es el único conector de la página. Une, separa y señala; ninguna flecha, línea de puntos o borde grueso cumple ese oficio. Se dibuja de izquierda a derecha al entrar y se desvanece hacia la punta.
 
 ## Components
@@ -210,14 +214,15 @@ Brillo contenido: el oro se enciende al tocarlo, sin saltos.
 - **Placa de norma:** fondo humo, borde de 1 px en hueso al 9 %, ángulo recto, un canto dorado de 1 px arriba y un hilo corto de 40 px entre el nombre y su explicación. Es la única caja con borde de la página.
 
 ### Navigation
-- **Escritorio:** NEXUS a la izquierda; enlaces en Schibsted 500 a 0.97rem en hueso al 90 %, con una píldora translúcida que se desliza entre ellos al pasar el puntero; el botón dorado a la derecha. Al bajar, la barra toma un velo ceniza con desenfoque y un hilo dorado inferior.
-- **Móvil:** botón circular de 48 px; el menú se abre como un círculo que crece desde él, con los enlaces en la voz display a 3.6rem, un resplandor de brasa abajo y el botón dorado a todo el ancho.
+- **Escritorio:** NEXUS a la izquierda; Servicios (con submenú), Trayectoria y Método en Schibsted 500 a 0.97rem en hueso al 90 %, con una píldora translúcida que se desliza entre ellos al pasar el puntero; banderas con 44 px de toque; el botón dorado a la derecha. Al bajar, la barra toma un velo ceniza con desenfoque y un hilo dorado inferior.
+- **Submenú de Servicios:** botón de divulgación que se abre al pasar el mouse o con clic y teclado. Panel de vidrio oscuro (ceniza al 85 % con desenfoque, borde hueso al 13 %, radio 1.6rem) bajo el botón, con las tres líneas de servicio: el nombre de la línea y, debajo en gris, sus servicios. Cada línea lleva a Servicios con su primer servicio elegido (`#servicios?grupo=…`).
+- **Móvil:** botón circular de 48 px; el menú se abre como un círculo que crece desde él, con los enlaces en la voz display (hasta 3.6rem), las tres líneas de servicio como subenlaces bajo Servicios, un resplandor de brasa abajo, el botón dorado a todo el ancho, y correo y teléfono como enlaces. El foco queda dentro del menú mientras está abierto.
 
 ### Título carbonizado (firma)
 Cada letra tiene dos capas: la encendida (#ffe2b0 con resplandor naranja) y la carbonizada (textura de ceniza periódica sobre gris que se enfría hacia brasa apagada). La encendida brilla y se apaga mientras la carbonizada aparece debajo. Solo en la hero y en Contacto.
 
 ### Nudo y recorrido del método (firma)
-Tres hilos se dibujan hasta la X dorada en Intersección. En Método, los siete pasos del método científico de NFPA 921 van en una columna vertical (en escritorio, a la derecha de la foto y las normas, que quedan fijas). Una línea dorada guiada por el scroll baja de paso en paso y enciende cada nodo con un resplandor de brasa; un hilo de retorno de 1 px sale del paso 6 (poner a prueba) y vuelve al 3 (recopilar datos): el ciclo de la norma.
+Tres hilos se dibujan hasta la X dorada en Intersección. En Método, los siete pasos del método científico de NFPA 921 van en una columna vertical (en escritorio, a la derecha de la foto y las normas, que quedan fijas). Una línea dorada guiada por el scroll baja de paso en paso y enciende cada nodo. El ciclo de la norma (si una hipótesis no resiste, se vuelve a los datos) va como nota con su ícono bajo el paso 6; el hilo de retorno que lo dibujaba se quitó el 12-11.
 
 ### Hoja del informe (firma)
 Papel hueso con grano fino, luz suave arriba a la izquierda y bordes apenas tostados. Membrete con NEXUS, folio en rótulo, timbre sepia en doble borde de 3 px. Las marcas se escriben solas en tres tintas: subrayado en oro tostado (sustentada), subrayado punteado en ámbar (requiere respaldo) y tachado en brasa (sin sustento suficiente), cada una con su glifo trazado a mano.

@@ -7,6 +7,11 @@ const nextConfig: NextConfig = {
   images: { unoptimized: true },
   devIndicators: false,
   poweredByHeader: false,
+  // Página 404 propia para todo el sitio (app/global-not-found.tsx): hay dos layouts raíz, (es) y [lang],
+  // así que no hay un layout único desde el cual armarla con not-found.tsx.
+  experimental: {
+    globalNotFound: true,
+  },
   // Cabeceras de seguridad. La CSP lleva solo `frame-ancestors` (nadie puede incrustar el sitio en un iframe):
   // una CSP completa rompería Motion, WebGL o Turnstile.
   async headers() {
