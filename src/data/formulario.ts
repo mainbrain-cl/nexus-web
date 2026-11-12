@@ -165,7 +165,7 @@ const es: FormTexts = {
       options: [
         { id: "abogado", label: "Abogado o estudio jurídico" },
         { id: "aseguradora", label: "Compañía de seguros o empresa liquidadora" },
-        { id: "investigador", label: "Investigador de incendios o perito" },
+        { id: "investigador", label: "Investigador, perito o empresa de investigación" },
         { id: "empresa", label: "Empresa u organización" },
         { id: "particular", label: "Particular" },
         { id: "otro", label: "Otro" },
@@ -179,8 +179,8 @@ const es: FormTexts = {
         { id: "auditoria", label: "Auditoría técnica de un informe pericial" },
         {
           id: "revision-propia",
-          label: "Revisión independiente de un informe propio antes de su entrega",
-          hint: "Nuevo · pensado para investigadores",
+          label: "Revisión independiente de su informe pericial",
+          hint: "Pensado para investigadores y empresas de investigación",
         },
         { id: "litigacion", label: "Asesoría técnica para un procedimiento judicial" },
         { id: "controvertidas", label: "Revisión de pericias controvertidas" },
@@ -292,7 +292,7 @@ const en: FormTexts = {
       options: [
         { id: "abogado", label: "Attorney or law firm" },
         { id: "aseguradora", label: "Insurance company or claims adjusting firm" },
-        { id: "investigador", label: "Fire investigator or expert" },
+        { id: "investigador", label: "Investigator, expert or investigation firm" },
         { id: "empresa", label: "Company or organization" },
         { id: "particular", label: "Individual" },
         { id: "otro", label: "Other" },
@@ -306,8 +306,8 @@ const en: FormTexts = {
         { id: "auditoria", label: "Technical audit of an expert report" },
         {
           id: "revision-propia",
-          label: "Independent review of your own report before submission",
-          hint: "New · designed for investigators",
+          label: "Independent review of your expert report",
+          hint: "Designed for investigators and investigation firms",
         },
         { id: "litigacion", label: "Technical support in court proceedings" },
         { id: "controvertidas", label: "Review of disputed expert findings" },
@@ -419,7 +419,7 @@ const pt: FormTexts = {
       options: [
         { id: "abogado", label: "Advogado ou escritório de advocacia" },
         { id: "aseguradora", label: "Seguradora ou empresa de regulação de sinistros" },
-        { id: "investigador", label: "Investigador de incêndios ou perito" },
+        { id: "investigador", label: "Investigador, perito ou empresa de investigação" },
         { id: "empresa", label: "Empresa ou organização" },
         { id: "particular", label: "Pessoa física" },
         { id: "otro", label: "Outro" },
@@ -433,8 +433,8 @@ const pt: FormTexts = {
         { id: "auditoria", label: "Auditoria técnica de um laudo pericial" },
         {
           id: "revision-propia",
-          label: "Revisão independente de um laudo próprio antes da entrega",
-          hint: "Novo · pensado para investigadores",
+          label: "Revisão independente do seu laudo pericial",
+          hint: "Pensado para investigadores e empresas de investigação",
         },
         { id: "litigacion", label: "Assessoria técnica para um processo judicial" },
         { id: "controvertidas", label: "Revisão de perícias controvertidas" },

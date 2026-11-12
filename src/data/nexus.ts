@@ -55,18 +55,32 @@ const siteBase = {
 
 // Servicios: el orden de la página. Los ids abren el formulario con el servicio elegido (ver formulario.ts).
 // "Formación especializada" viene del brochure; Aaron confirmó incluirla el 10-11.
-// "Revisión independiente de informe pericial" la pidió Domingo el 12-11: es para quien escribe un informe.
+// "Revisión independiente de su informe pericial" la pidió Domingo el 12-11: es para quien escribe un informe.
 // La Auditoría, en cambio, es para quien recibe uno.
 export const serviceIds = [
   "auditoria",
+  "controvertidas",
   "revision",
   "litigacion",
-  "controvertidas",
-  "investigacion",
   "prejudicial",
+  "investigacion",
   "formacion",
 ] as const;
 export type ServiceCardId = (typeof serviceIds)[number];
+
+// Las tres líneas de servicio (Aaron, 12-11), en el orden de la página. Cada servicio va en una sola, y los de
+// una misma línea quedan seguidos en `serviceIds`.
+export const serviceGroupIds = ["evaluar", "fortalecer", "investigar"] as const;
+export type ServiceGroupId = (typeof serviceGroupIds)[number];
+const serviceGroup: Record<ServiceCardId, ServiceGroupId> = {
+  auditoria: "evaluar",
+  controvertidas: "evaluar",
+  revision: "fortalecer",
+  litigacion: "fortalecer",
+  prejudicial: "fortalecer",
+  investigacion: "investigar",
+  formacion: "investigar",
+};
 
 const standardCodes = ["NFPA 921", "NFPA 1033"] as const;
 
@@ -165,7 +179,13 @@ export type Texts = {
     audiencesTitle: string;
     audiences: Tuple<string, 4>;
   };
-  servicesIntro: { title: Tuple<string, 2>; text: string; includesTitle: string };
+  servicesIntro: {
+    title: Tuple<string, 2>;
+    text: string;
+    includesTitle: string;
+    /** Rótulo de cada línea de servicio. */
+    groups: Record<ServiceGroupId, string>;
+  };
   services: Record<ServiceCardId, ServiceText>;
   method: {
     title: Tuple<string, 2>;
@@ -213,9 +233,9 @@ export type Texts = {
 
 const es: Texts = {
   site: {
-    title: "NEXUS | Auditoría forense e investigación de incendios",
+    title: "NEXUS | Evaluación pericial independiente en incendios",
     description:
-      "Evaluación independiente de informes periciales e investigación de incendios según NFPA 921, con mirada técnica y jurídica. Domingo Soto Gamé, abogado e investigador de incendios, IAAI-FIT. Valdivia, Chile.",
+      "Evaluación independiente que integra investigación de incendios, análisis técnico-científico y comprensión jurídica de la prueba pericial, para evaluar un informe o fortalecer el suyo. Domingo Soto Gamé, abogado e investigador de incendios, IAAI-FIT. Valdivia, Chile.",
     tagline: "Método científico. Utilidad jurídica.",
   },
   whatsappText: "Hola Domingo, quiero solicitar una asesoría con NEXUS.",
@@ -232,9 +252,9 @@ const es: Texts = {
     backHome: "volver al inicio",
   },
   hero: {
-    titleLines: ["Investigación", "de incendios"],
-    roleLines: ["Auditoría forense e", "investigación de incendios"],
-    tags: ["Abogado desde 1997", "IAAI-FIT", "Método NFPA 921", "IAAI · Capítulo 82 Chile"],
+    titleLines: ["Fuego, ciencia", "y derecho"],
+    roleLines: ["Evaluación pericial independiente", "e investigación de incendios"],
+    tags: ["Abogado desde 1997", "IAAI-FIT", "Método NFPA 921", "Investigador de incendios desde 2012"],
     primaryCta: "Solicitar asesoría",
     secondaryCta: "Ver servicios",
     photoAlt: "Domingo Soto Gamé con uniforme de la International Association of Arson Investigators",
@@ -253,9 +273,10 @@ const es: Texts = {
     audiences: ["Aseguradoras y liquidadores", "Abogados y estudios jurídicos", "Investigadores y empresas de investigación", "Empresas"],
   },
   servicesIntro: {
-    title: ["¿En qué punto", "está su caso?"],
-    text: "Elija la situación más parecida a la suya.",
+    title: ["¿Qué necesita", "resolver?"],
+    text: "Evaluar un informe, fortalecer el suyo o investigar un incendio. Elija la situación más parecida a la suya.",
     includesTitle: "Qué incluye",
+    groups: { evaluar: "Evaluar un informe", fortalecer: "Fortalecer su informe o su caso", investigar: "Investigar y formar" },
   },
   services: {
     auditoria: {
@@ -267,8 +288,8 @@ const es: Texts = {
     },
     revision: {
       cta: "Pedir revisión",
-      situation: "Soy investigador y quiero reforzar mi informe antes de entregarlo",
-      name: "Revisión independiente antes de la entrega",
+      situation: "Soy investigador o empresa de investigación y quiero fortalecer mi informe antes de entregarlo",
+      name: "Revisión independiente de su informe pericial",
       text: "Metodología, sustento técnico y conclusiones: una segunda mirada **técnica y jurídica**, confidencial, antes de entregar su informe.",
       includes: [
         "Metodología y sustento técnico según NFPA 921",
@@ -278,7 +299,7 @@ const es: Texts = {
     },
     litigacion: {
       cta: "Pedir asesoría",
-      situation: "Estoy en juicio y la prueba técnica es decisiva",
+      situation: "Hay un juicio en curso y la prueba técnica es decisiva",
       name: "Consultoría técnica para litigación",
       text: "Asesoría a abogados para **comprender y usar con solidez** la prueba técnica.",
       includes: ["Lectura técnica de informes periciales", "Puntos clave para la teoría del caso", "Preparación de audiencias con prueba pericial"],
@@ -295,11 +316,11 @@ const es: Texts = {
       situation: "Ocurrió un incendio y hay que determinar su origen y causa",
       name: "Investigación de incendios",
       text: "Determinación del **origen y la causa** del incendio, con un proceso documentado.",
-      includes: ["Examen y registro del sitio", "Patrones de fuego y fuentes posibles", "Informe técnico pericial"],
+      includes: ["Examen y registro del sitio", "Patrones de fuego y fuentes de ignición posibles", "Informe técnico pericial"],
     },
     prejudicial: {
       cta: "Pedir evaluación",
-      situation: "Todavía no judicializo y quiero evaluar el caso",
+      situation: "El caso aún no llega a juicio y quiero evaluarlo",
       name: "Asesoría prejudicial estratégica",
       text: "Evaluación técnica **antes de judicializar**: alcance de la evidencia y próximos pasos.",
       includes: ["Análisis preliminar de antecedentes", "Riesgos probatorios y peritajes necesarios", "Apoyo en negociación temprana"],
@@ -309,14 +330,14 @@ const es: Texts = {
       situation: "Mi equipo necesita formarse en investigación de incendios",
       name: "Formación especializada",
       text: "Capacitaciones en **investigación de incendios**, análisis de evidencia e informes.",
-      includes: ["Investigación de incendios", "Análisis de evidencia", "Elaboración de informes"],
+      includes: ["Investigación de incendios según NFPA 921", "Análisis de evidencia", "El informe como prueba pericial"],
     },
   },
   // Los siete pasos del método científico de NFPA 921 (edición 2024), con los nombres que dio Domingo (12-11).
   // Las frases resumen la norma sin agregarle requisitos.
   method: {
     title: ["Cada conclusión,", "atada a su evidencia"],
-    text: "La investigación sigue el **método científico de NFPA 921**: siete pasos, y ninguna hipótesis se adopta sin ponerla a prueba contra los hechos.",
+    text: "Todo trabajo de NEXUS, sea investigar o revisar un informe, sigue el **método científico de NFPA 921**: siete pasos, y ninguna hipótesis se adopta sin ponerla a prueba contra los hechos.",
     standards: ["Investigación de incendios", "Competencia del investigador"],
     standardsLabel: "Normas de referencia",
     stepsLabel: "Los siete pasos del método científico según NFPA 921",
@@ -340,15 +361,15 @@ const es: Texts = {
     loopText: "Si una hipótesis no resiste, se descarta y se desarrollan otras. Eso puede requerir nuevos datos o un nuevo análisis de los existentes.",
   },
   result: {
-    title: ["Qué está sólido", "y qué reforzar"],
-    text: "Cada conclusión del informe queda en **uno de estos tres niveles**, con su fundamento y lo que falta para respaldarla.",
+    title: ["Qué está sólido", "y qué fortalecer"],
+    text: "Cuando evaluamos o revisamos un informe, cada conclusión queda en **uno de estos tres niveles**, con su fundamento y lo que falta para respaldarla.",
     levels: { sustentada: "Sustentada", respaldo: "Requiere respaldo", insuficiente: "Sin sustento suficiente" },
   },
   // Perfil: bio de una frase; las credenciales van como sellos; la trayectoria es la lista de Domingo (12-11),
   // con sus palabras.
   profile: {
     role: "Dirección técnica · Abogado · Investigador de incendios · IAAI-FIT",
-    bio: "Abogado desde 1997 e investigador de incendios desde 2012. Une la **investigación técnica** con la **comprensión jurídica de la prueba pericial**.",
+    bio: "Abogado desde 1997 e investigador de incendios desde 2012. Integra **investigación de incendios**, **análisis técnico-científico** y **comprensión jurídica de la prueba pericial**.",
     portraitAlt:
       "Retrato de Domingo Soto Gamé con la camisa de la International Association of Arson Investigators y el parche de Fire Investigator Technician (IAAI-FIT)",
     sealsLabel: "Credenciales",
@@ -395,7 +416,7 @@ const es: Texts = {
   },
   footer: {
     motto: "Evidencia · Análisis · Contexto · Decisiones",
-    legal: "Auditoría forense y consultoría experta en investigación de incendios",
+    legal: "Evaluación pericial independiente e investigación de incendios",
   },
 };
 
@@ -405,10 +426,11 @@ const es: Texts = {
 
 const en: Texts = {
   site: {
-    // REVISAR: "Auditoría forense" va como "forensic review": en EE. UU. "forensic audit" suena a auditoría contable.
-    title: "NEXUS | Forensic review and fire investigation",
+    // REVISAR: "Evaluación pericial" va como "expert review", el término usual en EE. UU. para la evaluación del
+    // trabajo de un perito.
+    title: "NEXUS | Independent expert review in fire cases",
     description:
-      "Independent evaluation of expert reports and fire investigation under NFPA 921, from both a technical and a legal perspective. Domingo Soto Gamé, attorney (Chile) and fire investigator, IAAI-FIT. Valdivia, Chile.",
+      "Independent evaluation that brings together fire investigation, scientific and technical analysis, and a legal understanding of expert evidence, to assess a report or strengthen your own. Domingo Soto Gamé, attorney (Chile) and fire investigator, IAAI-FIT. Valdivia, Chile.",
     tagline: "Scientific method. Legal value.",
   },
   whatsappText: "Hello Domingo, I would like to request a consultation with NEXUS.",
@@ -424,9 +446,9 @@ const en: Texts = {
     backHome: "back to top",
   },
   hero: {
-    titleLines: ["Fire", "Investigation"],
-    roleLines: ["Forensic review and", "fire investigation"],
-    tags: ["Chilean attorney since 1997", "IAAI-FIT", "NFPA 921 method", "IAAI · Chapter 82 Chile"],
+    titleLines: ["Fire, science", "and law"],
+    roleLines: ["Independent expert review", "and fire investigation"],
+    tags: ["Chilean attorney since 1997", "IAAI-FIT", "NFPA 921 method", "Fire investigator since 2012"],
     primaryCta: "Request a consultation",
     secondaryCta: "View services",
     photoAlt: "Domingo Soto Gamé in the uniform of the International Association of Arson Investigators",
@@ -443,9 +465,10 @@ const en: Texts = {
     audiences: ["Insurers and claims adjusters", "Attorneys and law firms", "Investigators and investigation firms", "Companies"],
   },
   servicesIntro: {
-    title: ["Where does", "your case stand?"],
-    text: "Choose the situation closest to yours.",
+    title: ["What do you", "need to resolve?"],
+    text: "Assess a report, strengthen your own, or investigate a fire. Choose the situation closest to yours.",
     includesTitle: "What it includes",
+    groups: { evaluar: "Assess a report", fortalecer: "Strengthen your report or your case", investigar: "Investigate and train" },
   },
   services: {
     auditoria: {
@@ -457,8 +480,8 @@ const en: Texts = {
     },
     revision: {
       cta: "Request a review",
-      situation: "I'm an investigator and want to strengthen my report before submitting it",
-      name: "Independent review before submission",
+      situation: "I'm an investigator or investigation firm and want to strengthen my report before submitting it",
+      name: "Independent review of your expert report",
       text: "Methodology, technical basis and conclusions: a confidential second look, **technical and legal**, before you submit your report.",
       includes: [
         "Methodology and technical basis under NFPA 921",
@@ -468,7 +491,7 @@ const en: Texts = {
     },
     litigacion: {
       cta: "Request support",
-      situation: "I'm in litigation and the technical evidence is decisive",
+      situation: "A case is in litigation and the technical evidence is decisive",
       name: "Technical consulting for litigation",
       text: "Support for attorneys to **understand and use technical evidence** with confidence.",
       includes: ["Technical reading of expert reports", "Key points for the theory of the case", "Preparing for hearings with expert evidence"],
@@ -485,11 +508,11 @@ const en: Texts = {
       situation: "A fire has occurred and its origin and cause must be determined",
       name: "Fire investigation",
       text: "Determination of the fire's **origin and cause**, through a documented process.",
-      includes: ["Scene examination and documentation", "Fire patterns and potential sources", "Fire investigation report"],
+      includes: ["Scene examination and documentation", "Fire patterns and potential ignition sources", "Fire investigation report"],
     },
     prejudicial: {
       cta: "Request an assessment",
-      situation: "I haven't gone to court yet and want to assess the case",
+      situation: "The case hasn't gone to court yet and I want to assess it",
       name: "Strategic pre-litigation advisory",
       text: "A technical assessment **before going to court**: what the evidence can support and the next steps.",
       includes: ["Preliminary review of the available information", "Evidentiary risks and expert work needed", "Support in early negotiations"],
@@ -499,13 +522,13 @@ const en: Texts = {
       situation: "My team needs training in fire investigation",
       name: "Specialized training",
       text: "Training in **fire investigation**, evidence analysis and report writing.",
-      includes: ["Fire investigation", "Evidence analysis", "Report writing"],
+      includes: ["Fire investigation under NFPA 921", "Evidence analysis", "The report as expert evidence"],
     },
   },
   // Nombres oficiales de los pasos del método científico en NFPA 921 (capítulo 4).
   method: {
     title: ["Every conclusion,", "tied to its evidence"],
-    text: "The investigation follows the **scientific method of NFPA 921**: seven steps, and no hypothesis is adopted until it has been tested against the facts.",
+    text: "All NEXUS work, whether investigating a fire or reviewing a report, follows the **scientific method of NFPA 921**: seven steps, and no hypothesis is adopted until it has been tested against the facts.",
     standards: ["Fire and explosion investigations", "Fire investigator qualifications"],
     standardsLabel: "Reference standards",
     stepsLabel: "The seven steps of the scientific method under NFPA 921",
@@ -529,13 +552,13 @@ const en: Texts = {
       "If a hypothesis does not withstand testing, it is discarded and others are developed. This may require new data or a fresh analysis of the existing data.",
   },
   result: {
-    title: ["What is solid,", "what to reinforce"],
-    text: "Each conclusion in the report is placed in **one of these three levels**, with its basis and what is needed to support it.",
+    title: ["What is solid,", "what to strengthen"],
+    text: "When we assess or review a report, each conclusion is placed in **one of these three levels**, with its basis and what is needed to support it.",
     levels: { sustentada: "Supported", respaldo: "Needs support", insuficiente: "Not sufficiently supported" },
   },
   profile: {
     role: "Technical director · Attorney (Chile) · Fire investigator · IAAI-FIT",
-    bio: "An attorney in Chile since 1997 and a fire investigator since 2012, he brings together **technical investigation** and a **legal understanding of expert evidence**.",
+    bio: "An attorney in Chile since 1997 and a fire investigator since 2012, he brings together **fire investigation**, **scientific and technical analysis** and a **legal understanding of expert evidence**.",
     portraitAlt:
       "Portrait of Domingo Soto Gamé wearing the International Association of Arson Investigators shirt and the Fire Investigator Technician (IAAI-FIT) patch",
     sealsLabel: "Credentials",
@@ -591,7 +614,7 @@ const en: Texts = {
   },
   footer: {
     motto: "Evidence · Analysis · Context · Decisions",
-    legal: "Forensic review and expert consulting in fire investigation",
+    legal: "Independent expert review and fire investigation",
   },
 };
 
@@ -601,10 +624,9 @@ const en: Texts = {
 
 const pt: Texts = {
   site: {
-    // REVISAR: "Auditoria forense" se mantiene por ser la marca; en Brasil también se asocia a lo contable.
-    title: "NEXUS | Auditoria forense e investigação de incêndios",
+    title: "NEXUS | Avaliação pericial independente em incêndios",
     description:
-      "Avaliação independente de laudos periciais e investigação de incêndios segundo a NFPA 921, com olhar técnico e jurídico. Domingo Soto Gamé, advogado (Chile) e investigador de incêndios, IAAI-FIT. Valdivia, Chile.",
+      "Avaliação independente que integra investigação de incêndios, análise técnico-científica e compreensão jurídica da prova pericial, para avaliar um laudo ou fortalecer o seu. Domingo Soto Gamé, advogado (Chile) e investigador de incêndios, IAAI-FIT. Valdivia, Chile.",
     tagline: "Método científico. Utilidade jurídica.",
   },
   whatsappText: "Olá, Domingo. Gostaria de solicitar uma assessoria da NEXUS.",
@@ -620,9 +642,9 @@ const pt: Texts = {
     backHome: "voltar ao início",
   },
   hero: {
-    titleLines: ["Investigação", "de incêndios"],
-    roleLines: ["Auditoria forense e", "investigação de incêndios"],
-    tags: ["Advogado no Chile desde 1997", "IAAI-FIT", "Método NFPA 921", "IAAI · Capítulo 82 Chile"],
+    titleLines: ["Fogo, ciência", "e direito"],
+    roleLines: ["Avaliação pericial independente", "e investigação de incêndios"],
+    tags: ["Advogado no Chile desde 1997", "IAAI-FIT", "Método NFPA 921", "Investigador de incêndios desde 2012"],
     primaryCta: "Solicitar assessoria",
     secondaryCta: "Ver serviços",
     photoAlt: "Domingo Soto Gamé com o uniforme da International Association of Arson Investigators",
@@ -640,9 +662,10 @@ const pt: Texts = {
     audiences: ["Seguradoras e reguladores de sinistros", "Advogados e escritórios de advocacia", "Investigadores e empresas de investigação", "Empresas"],
   },
   servicesIntro: {
-    title: ["Em que ponto", "está o seu caso?"],
-    text: "Escolha a situação mais parecida com a sua.",
+    title: ["O que você", "precisa resolver?"],
+    text: "Avaliar um laudo, fortalecer o seu ou investigar um incêndio. Escolha a situação mais parecida com a sua.",
     includesTitle: "O que inclui",
+    groups: { evaluar: "Avaliar um laudo", fortalecer: "Fortalecer seu laudo ou seu caso", investigar: "Investigar e capacitar" },
   },
   services: {
     auditoria: {
@@ -654,8 +677,8 @@ const pt: Texts = {
     },
     revision: {
       cta: "Solicitar revisão",
-      situation: "Sou investigador e quero reforçar meu laudo antes de entregá-lo",
-      name: "Revisão independente antes da entrega",
+      situation: "Sou investigador ou empresa de investigação e quero fortalecer meu laudo antes de entregá-lo",
+      name: "Revisão independente do seu laudo pericial",
       text: "Metodologia, fundamentação técnica e conclusões: um segundo olhar **técnico e jurídico**, confidencial, antes de entregar seu laudo.",
       includes: [
         "Metodologia e fundamentação técnica segundo a NFPA 921",
@@ -665,7 +688,7 @@ const pt: Texts = {
     },
     litigacion: {
       cta: "Solicitar assessoria",
-      situation: "Estou em um processo judicial e a prova técnica é decisiva",
+      situation: "Há um processo judicial em andamento e a prova técnica é decisiva",
       name: "Consultoria técnica para litígios",
       text: "Assessoria a advogados para **compreender e usar com solidez** a prova técnica.",
       // REVISAR: "teoría del caso" como "estratégia do caso" (en Brasil "teoria do caso" es poco usual).
@@ -684,11 +707,11 @@ const pt: Texts = {
       name: "Investigação de incêndios",
       text: "Determinação da **origem e da causa** do incêndio, com um processo documentado.",
       // REVISAR: "patrones de fuego" como "padrões de queima" (otras traducciones de NFPA 921 usan "padrões de fogo").
-      includes: ["Exame e registro do local", "Padrões de queima e fontes possíveis", "Laudo técnico pericial"],
+      includes: ["Exame e registro do local", "Padrões de queima e possíveis fontes de ignição", "Laudo técnico pericial"],
     },
     prejudicial: {
       cta: "Solicitar avaliação",
-      situation: "Ainda não judicializei e quero avaliar o caso",
+      situation: "O caso ainda não chegou à Justiça e quero avaliá-lo",
       name: "Assessoria pré-processual estratégica",
       text: "Avaliação técnica **antes de judicializar**: alcance das evidências e próximos passos.",
       includes: ["Análise preliminar das informações", "Riscos probatórios e perícias necessárias", "Apoio na negociação inicial"],
@@ -698,12 +721,12 @@ const pt: Texts = {
       situation: "Minha equipe precisa se capacitar em investigação de incêndios",
       name: "Capacitação especializada",
       text: "Capacitações em **investigação de incêndios**, análise de evidências e elaboração de laudos.",
-      includes: ["Investigação de incêndios", "Análise de evidências", "Elaboração de laudos"],
+      includes: ["Investigação de incêndios segundo a NFPA 921", "Análise de evidências", "O laudo como prova pericial"],
     },
   },
   method: {
     title: ["Cada conclusão,", "ligada à evidência"],
-    text: "A investigação segue o **método científico da NFPA 921**: sete etapas, e nenhuma hipótese é adotada sem ser testada contra os fatos.",
+    text: "Todo trabalho da NEXUS, seja investigar um incêndio ou revisar um laudo, segue o **método científico da NFPA 921**: sete etapas, e nenhuma hipótese é adotada sem ser testada contra os fatos.",
     standards: ["Investigação de incêndios", "Qualificação do investigador"],
     standardsLabel: "Normas de referência",
     stepsLabel: "As sete etapas do método científico segundo a NFPA 921",
@@ -727,13 +750,13 @@ const pt: Texts = {
       "Se uma hipótese não resiste, ela é descartada e outras são desenvolvidas. Isso pode exigir novos dados ou uma nova análise dos dados existentes.",
   },
   result: {
-    title: ["O que está sólido", "e o que reforçar"],
-    text: "Cada conclusão do laudo fica em **um destes três níveis**, com seu fundamento e o que falta para sustentá-la.",
+    title: ["O que está sólido", "e o que fortalecer"],
+    text: "Quando avaliamos ou revisamos um laudo, cada conclusão fica em **um destes três níveis**, com seu fundamento e o que falta para sustentá-la.",
     levels: { sustentada: "Sustentada", respaldo: "Requer respaldo", insuficiente: "Sem sustentação suficiente" },
   },
   profile: {
     role: "Direção técnica · Advogado (Chile) · Investigador de incêndios · IAAI-FIT",
-    bio: "Advogado no Chile desde 1997 e investigador de incêndios desde 2012. Une a **investigação técnica** à **compreensão jurídica da prova pericial**.",
+    bio: "Advogado no Chile desde 1997 e investigador de incêndios desde 2012. Integra **investigação de incêndios**, **análise técnico-científica** e **compreensão jurídica da prova pericial**.",
     portraitAlt:
       "Retrato de Domingo Soto Gamé com a camisa da International Association of Arson Investigators e o distintivo de Fire Investigator Technician (IAAI-FIT)",
     sealsLabel: "Credenciais",
@@ -780,7 +803,7 @@ const pt: Texts = {
   },
   footer: {
     motto: "Evidência · Análise · Contexto · Decisões",
-    legal: "Auditoria forense e consultoria especializada em investigação de incêndios",
+    legal: "Avaliação pericial independente e investigação de incêndios",
   },
 };
 
@@ -804,7 +827,7 @@ function build(locale: Locale) {
     hero: { ...t.hero, name: contact.name, firstName: contact.firstName, lastName: contact.lastName },
     intersection: t.intersection,
     servicesIntro: t.servicesIntro,
-    services: serviceIds.map((id) => ({ id, ...t.services[id] })),
+    services: serviceIds.map((id) => ({ id, group: serviceGroup[id], ...t.services[id] })),
     method: {
       ...t.method,
       standards: standardCodes.map((code, i) => ({ code, name: t.method.standards[i] })),
