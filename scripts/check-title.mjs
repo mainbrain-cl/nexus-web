@@ -6,26 +6,32 @@
 //
 // Uso: npm run build && npm run test:title
 
-import { createServer } from "node:http";
-import { readFile, stat } from "node:fs/promises";
-import { extname, join, resolve } from "node:path";
+import { spawn } from "node:child_process";
+import { createServer } from "node:net";
 import { chromium } from "playwright";
 
-const OUT = resolve("out");
-const TYPES = { ".html": "text/html", ".js": "text/javascript", ".css": "text/css", ".webp": "image/webp", ".png": "image/png", ".woff2": "font/woff2", ".txt": "text/plain", ".svg": "image/svg+xml" };
-
-const server = createServer(async (req, res) => {
-  let path = join(OUT, decodeURIComponent(new URL(req.url, "http://x").pathname));
-  try {
-    if ((await stat(path)).isDirectory()) path = join(path, "index.html");
-    res.writeHead(200, { "content-type": TYPES[extname(path)] ?? "application/octet-stream" });
-    res.end(await readFile(path));
-  } catch {
-    res.writeHead(404).end();
-  }
+// Sirve el build de producción con `next start` en un puerto libre (el sitio ya no se exporta a out/,
+// porque el formulario de contacto necesita la ruta /api/contacto).
+const port = await new Promise((ok) => {
+  const s = createServer().listen(0, "127.0.0.1", () => {
+    const p = s.address().port;
+    s.close(() => ok(p));
+  });
 });
-await new Promise((r) => server.listen(0, "127.0.0.1", r));
-const url = `http://127.0.0.1:${server.address().port}/`;
+const next = spawn(process.execPath, ["node_modules/next/dist/bin/next", "start", "-p", String(port), "-H", "127.0.0.1"], {
+  stdio: ["ignore", "ignore", "inherit"],
+});
+const stopNext = () => next.exitCode === null && next.kill();
+process.on("exit", stopNext);
+const url = `http://127.0.0.1:${port}/`;
+for (let i = 0; ; i++) {
+  if (next.exitCode !== null) throw new Error("next start terminó antes de responder. ¿Corriste npm run build?");
+  try {
+    if ((await fetch(url)).ok) break;
+  } catch {}
+  if (i > 120) throw new Error("next start no respondió a tiempo");
+  await new Promise((r) => setTimeout(r, 500));
+}
 
 const CASES = [
   { width: 390, height: 844, dpr: 3 },
@@ -90,7 +96,7 @@ for (const c of CASES) {
 }
 
 await browser.close();
-server.close();
+stopNext();
 if (failed) {
   console.error(`\n${failed} pantalla(s) con letras cortadas en el título.`);
   process.exit(1);
