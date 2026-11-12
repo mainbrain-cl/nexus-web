@@ -14,16 +14,18 @@ Next.js + TypeScript con exportación estática, Tailwind CSS v4 y Motion. Es la
 
 ## Users
 
-- Abogados litigantes y estudios jurídicos que necesitan entender, usar o cuestionar un informe pericial de incendio.
-- Compañías aseguradoras que evalúan siniestros por incendio.
-- Investigadores de incendios y peritos que quieren una revisión independiente de su trabajo.
+> Tono (Domingo, 12-11): NEXUS no fiscaliza a sus pares ni busca errores para desacreditarlos. Ofrece una evaluación independiente que integra investigación de incendios, análisis técnico-científico y comprensión jurídica de la prueba pericial; sirve a quien evalúa un informe y a quien quiere fortalecer el suyo. Orden de públicos: aseguradoras y liquidadores; abogados y estudios jurídicos; investigadores y empresas de investigación; empresas.
+
+- Aseguradoras multinacionales y liquidadores que evalúan siniestros por incendio.
+- Abogados litigantes y estudios jurídicos de alto perfil que necesitan comprender y usar con solidez un informe pericial de incendio.
+- Investigadores y empresas de investigación (por ejemplo, NEFCO en EE. UU.) que quieren reforzar su informe, desde la perspectiva jurídica, antes de entregarlo.
 - Empresas y organizaciones que requieren una evaluación técnica independiente.
 
 Llegan con un caso concreto y un informe en la mano, o antes de judicializar. Evalúan la credibilidad del experto antes de contactarlo *(inferido)*.
 
 ## Product Purpose
 
-NEXUS es una firma de auditoría forense y consultoría experta en investigación de incendios, con base en Valdivia, Chile. Investiga incendios (origen y causa), audita informes periciales ajenos y asesora técnicamente en litigios. El sitio debe lograr que el visitante solicite una asesoría.
+NEXUS es una firma de auditoría forense y consultoría experta en investigación de incendios, con base en Valdivia, Chile. Investiga incendios (origen y causa), evalúa de forma independiente informes periciales (de quien los recibe y de quien los escribe) y asesora técnicamente en litigios. El sitio debe lograr que el visitante solicite una asesoría.
 
 ## Positioning
 

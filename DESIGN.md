@@ -125,7 +125,7 @@ Una paleta de humo cálido con un solo acento metálico y una sola luz encendida
 - **Oro Tostado** (oro-oscuro): el lado en sombra del oro: el fondo del degradado del botón, la X del membrete y la tinta de "sustentada" en la hoja.
 
 ### Secondary
-- **Brasa** (brasa): la única luz saturada. Chispas de la hero, el punto vivo de la etiqueta rotatoria, el nodo activo de Servicios y Método, el resplandor del menú móvil y el tachado de "no se sostiene". Nunca rellena una superficie ni un botón.
+- **Brasa** (brasa): la única luz saturada. Chispas de la hero, el punto vivo de la etiqueta rotatoria, el nodo activo de Servicios y Método, el resplandor del menú móvil y el tachado de "sin sustento suficiente". Nunca rellena una superficie ni un botón.
 
 ### Tertiary (solo tinta de la hoja)
 - **Ámbar de Revisión** (ambar-revision): la tinta de "requiere respaldo" en la hoja.
@@ -217,10 +217,10 @@ Brillo contenido: el oro se enciende al tocarlo, sin saltos.
 Cada letra tiene dos capas: la encendida (#ffe2b0 con resplandor naranja) y la carbonizada (textura de ceniza periódica sobre gris que se enfría hacia brasa apagada). La encendida brilla y se apaga mientras la carbonizada aparece debajo. Solo en la hero y en Contacto.
 
 ### Nudo y recorrido del método (firma)
-Tres hilos se dibujan hasta la X dorada en Intersección. En Método, una línea dorada guiada por el scroll recorre Datos, Análisis, Hipótesis y Conclusión y enciende cada nodo con un resplandor de brasa.
+Tres hilos se dibujan hasta la X dorada en Intersección. En Método, los siete pasos del método científico de NFPA 921 van en una columna vertical (en escritorio, a la derecha de la foto y las normas, que quedan fijas). Una línea dorada guiada por el scroll baja de paso en paso y enciende cada nodo con un resplandor de brasa; un hilo de retorno de 1 px sale del paso 6 (poner a prueba) y vuelve al 3 (recopilar datos): el ciclo de la norma.
 
 ### Hoja del informe (firma)
-Papel hueso con grano fino, luz suave arriba a la izquierda y bordes apenas tostados. Membrete con NEXUS, folio en rótulo, timbre sepia en doble borde de 3 px. Las marcas se escriben solas en tres tintas: subrayado en oro tostado (sustentada), subrayado punteado en ámbar (requiere respaldo) y tachado en brasa (no se sostiene), cada una con su glifo trazado a mano.
+Papel hueso con grano fino, luz suave arriba a la izquierda y bordes apenas tostados. Membrete con NEXUS, folio en rótulo, timbre sepia en doble borde de 3 px. Las marcas se escriben solas en tres tintas: subrayado en oro tostado (sustentada), subrayado punteado en ámbar (requiere respaldo) y tachado en brasa (sin sustento suficiente), cada una con su glifo trazado a mano.
 
 ## Do's and Don'ts
 
