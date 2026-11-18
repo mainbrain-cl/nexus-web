@@ -177,6 +177,15 @@ export function Metodo() {
             <Pasos />
           </div>
         </div>
+
+        {/* Cierre de la sección (18-11): escenas con los marcadores de evidencia 1 a 4, en orden. Sin texto: adorna.
+            Cuatro en fila en escritorio; en celular y tablet, de a dos. */}
+        <div className="mt-[clamp(3rem,7vw,6rem)] grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-5">
+          <PhotoBand {...photos.escena} position="30% 70%" className="aspect-[4/3]" />
+          <PhotoBand {...photos.marcador} position="55% 60%" className="aspect-[4/3]" />
+          <PhotoBand {...photos.marcador3} position="65% 55%" className="aspect-[4/3]" />
+          <PhotoBand {...photos.tablero} position="62% 55%" className="aspect-[4/3]" />
+        </div>
       </Container>
     </Section>
   );

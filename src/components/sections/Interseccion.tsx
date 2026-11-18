@@ -306,7 +306,8 @@ export function Interseccion() {
           </div>
         </div>
 
-        {/* La foto de terreno cierra el bloque: el cruce de disciplinas ocurre en el sitio del incendio. */}
+        {/* La foto de terreno cierra el bloque: el cruce de disciplinas ocurre en el sitio del incendio.
+            Versión del 18-11 con el logo de NEXUS en el casco, como pidió Domingo. */}
         <PhotoBand
           {...photos.terreno}
           position="62% 45%"

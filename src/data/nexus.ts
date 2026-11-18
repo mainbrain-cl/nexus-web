@@ -103,14 +103,23 @@ const ledgerMeta: Tuple<{ year: string; since?: boolean; logo?: string }, 8> = [
   { year: "", logo: "/logos/iaai-fit.webp" },
 ];
 
-// Fotos entregadas por Aaron el 10-11; aparentan ser generadas con IA. Aaron pidió usarlas todas y sin el rótulo
-// "Imagen referencial". Las dos en que aparece Domingo requieren su aprobación antes de publicar el sitio.
-// Domingo no quiere fotos reales de Bomberos (12-11).
+// Escenas generadas con IA, entregadas por Aaron (10-11 y 18-11), sin el rótulo "Imagen referencial". Domingo aparece
+// en la portada, en el retrato de Perfil y en una sola escena, la de terreno con el casco de NEXUS, que a él le gustó.
+// La de la reunión se quitó porque no se parecía a él (18-11). Las tres de incendio son fotos reales que envió Domingo
+// (17-11), pasadas por IA casi sin cambios: el lugar se reconoce y en una salen bomberos. Aaron decidió usarlas así (18-11).
 const photoFiles = {
-  terreno: { src: "/fotos/terreno.webp", width: 1672, height: 941 },
-  reunion: { src: "/fotos/reunion.webp", width: 1672, height: 941 },
+  terreno: { src: "/fotos/terreno.webp", width: 1671, height: 941 },
   evidencia: { src: "/fotos/evidencia.webp", width: 1672, height: 941 },
   informe: { src: "/fotos/informe.webp", width: 1672, height: 941 },
+  // Franja al cierre de Método (18-11): escenas generadas, sin personas, con los marcadores 1 a 4 en orden.
+  escena: { src: "/fotos/escena.webp", width: 1671, height: 941 },
+  marcador: { src: "/fotos/marcador.webp", width: 1672, height: 941 },
+  marcador3: { src: "/fotos/marcador3.webp", width: 1670, height: 941 },
+  tablero: { src: "/fotos/tablero.webp", width: 1671, height: 941 },
+  // Cierre de Perfil (18-11): fotos reales de Domingo pasadas por IA, en vertical. Aaron las usa tal cual.
+  incendio1: { src: "/fotos/incendio-1.webp", width: 1086, height: 1448 },
+  incendio2: { src: "/fotos/incendio-2.webp", width: 1086, height: 1448 },
+  incendio3: { src: "/fotos/incendio-3.webp", width: 1086, height: 1448 },
 };
 type PhotoId = keyof typeof photoFiles;
 
@@ -353,10 +362,10 @@ const es: Texts = {
     formacion: {
       cta: "Solicitar formación",
       short: "Formación especializada",
-      situation: "Mi equipo necesita formarse en investigación de incendios",
+      situation: "Somos investigadores con experiencia y queremos llevar nuestro trabajo a otro nivel",
       name: "Formación especializada",
-      text: "Capacitaciones en **investigación de incendios**, análisis de evidencia e informes.",
-      includes: ["Investigación de incendios según NFPA 921", "Análisis de evidencia", "El informe como prueba pericial"],
+      text: "Perfeccionamiento para **investigadores y equipos ya formados**: método, evidencia e informes, desde la experiencia de casos reales.",
+      includes: ["Aplicación rigurosa de NFPA 921", "Análisis crítico de evidencia", "El informe como prueba pericial"],
     },
   },
   // Los siete pasos del método científico de NFPA 921 (edición 2024), con los nombres que dio Domingo (12-11).
@@ -369,7 +378,7 @@ const es: Texts = {
     stepsLabel: "Los siete pasos del método científico según NFPA 921",
     steps: [
       { name: "Reconocer la necesidad", text: "Ocurrió un incendio y **su causa debe determinarse**." },
-      { name: "Definir el problema", text: "Se precisa **qué debe resolverse** y cómo abordarlo: origen, causa o responsabilidad." },
+      { name: "Definir el problema", text: "Se precisa **qué debe resolverse** y cómo abordarlo: el origen y la causa del incendio." },
       { name: "Recopilar datos", text: "Se reúnen **hechos verificables**: observación del sitio, registros, testimonios y ensayos." },
       { name: "Analizar los datos", text: "Los datos se interpretan **con fundamento científico**, a partir de conocimiento, formación y experiencia." },
       { name: "Desarrollar hipótesis", text: "A partir del análisis se formulan **hipótesis que expliquen** lo observado." },
@@ -434,8 +443,14 @@ const es: Texts = {
   },
   photoAlts: {
     terreno:
-      "Domingo Soto Gamé, con casco IAAI, lentes, respirador y guantes, inspecciona con una linterna un muro calcinado en una vivienda quemada, con una tabla de notas en la mano",
-    reunion: "Domingo Soto Gamé explica un informe con fotografías a un abogado en una oficina",
+      "Domingo Soto Gamé, con casco de NEXUS, lentes, respirador y guantes, inspecciona con una linterna un muro calcinado en una vivienda quemada, con una tabla de notas en la mano",
+    escena: "Casco de NEXUS, respirador, guantes y linterna sobre una mesa en una habitación incendiada, junto al marcador de evidencia número 1",
+    marcador: "Marcador de evidencia número 2 y una escala junto a un cable quemado al pie de un muro calcinado",
+    marcador3: "Marcador de evidencia número 3 en el piso de una habitación calcinada, junto a un mueble quemado",
+    tablero: "Tablero eléctrico calcinado y abierto, con el marcador de evidencia número 4 y una escala al pie",
+    incendio1: "Casa de dos pisos envuelta en llamas de noche, con una columna de humo sobre los cables de la calle",
+    incendio2: "Incendio nocturno de una casa antigua, con mangueras de bomberos sobre la calle mojada",
+    incendio3: "Bomberos con una escalera frente a una casa en llamas, de noche",
     evidencia:
       "Muro con un patrón de quemadura en forma de V sobre una caja eléctrica dañada, junto a una cinta métrica y un marcador de evidencia numerado",
     informe: "Manos revisando un informe pericial impreso con un destacador, junto a una lámpara de escritorio",
@@ -560,10 +575,10 @@ const en: Texts = {
     formacion: {
       cta: "Request training",
       short: "Specialized training",
-      situation: "My team needs training in fire investigation",
+      situation: "We're experienced investigators and want to take our work to the next level",
       name: "Specialized training",
-      text: "Training in **fire investigation**, evidence analysis and report writing.",
-      includes: ["Fire investigation under NFPA 921", "Evidence analysis", "The report as expert evidence"],
+      text: "Advanced training for **experienced investigators and teams**: method, evidence and reports, drawing on real casework.",
+      includes: ["Rigorous application of NFPA 921", "Critical evidence analysis", "The report as expert evidence"],
     },
   },
   // Nombres oficiales de los pasos del método científico en NFPA 921 (capítulo 4).
@@ -575,7 +590,7 @@ const en: Texts = {
     stepsLabel: "The seven steps of the scientific method under NFPA 921",
     steps: [
       { name: "Recognize the Need", text: "A fire has occurred and **its cause must be determined**." },
-      { name: "Define the Problem", text: "The investigator establishes **what must be resolved** and how to approach it: origin, cause or responsibility." },
+      { name: "Define the Problem", text: "The investigator establishes **what must be resolved** and how to approach it: the origin and cause of the fire." },
       { name: "Collect Data", text: "**Verifiable facts** are gathered: scene observation, records, witness statements and testing." },
       { name: "Analyze the Data", text: "The data are interpreted **on a scientific basis**, drawing on knowledge, training and experience." },
       { name: "Develop Hypotheses", text: "Based on the analysis, **hypotheses that explain** the observations are formulated." },
@@ -647,8 +662,14 @@ const en: Texts = {
   },
   photoAlts: {
     terreno:
-      "Domingo Soto Gamé, wearing an IAAI hard hat, safety glasses, a respirator and gloves, uses a flashlight to inspect a charred wall in a burned house, clipboard in hand",
-    reunion: "Domingo Soto Gamé walks an attorney through a report with photographs in an office",
+      "Domingo Soto Gamé, wearing a NEXUS hard hat, safety glasses, a respirator and gloves, uses a flashlight to inspect a charred wall in a burned house, clipboard in hand",
+    escena: "A NEXUS hard hat, respirator, gloves and flashlight on a table in a burned room, next to evidence marker number 1",
+    marcador: "Evidence marker number 2 and a scale next to a burned cable at the base of a charred wall",
+    marcador3: "Evidence marker number 3 on the floor of a charred room, next to burned shelving",
+    tablero: "An open, charred electrical panel with evidence marker number 4 and a scale below it",
+    incendio1: "A two-story house engulfed in flames at night, with a column of smoke above the street wires",
+    incendio2: "A night fire in an old house, with fire hoses across the wet street",
+    incendio3: "Firefighters carrying a ladder in front of a burning house at night",
     evidencia:
       "Wall with a V-shaped burn pattern above a damaged electrical box, next to a measuring tape and a numbered evidence marker",
     informe: "Hands reviewing a printed expert report with a highlighter, next to a desk lamp",
@@ -774,10 +795,10 @@ const pt: Texts = {
     formacion: {
       cta: "Solicitar capacitação",
       short: "Capacitação especializada",
-      situation: "Minha equipe precisa se capacitar em investigação de incêndios",
+      situation: "Somos investigadores com experiência e queremos levar nosso trabalho a um novo patamar",
       name: "Capacitação especializada",
-      text: "Capacitações em **investigação de incêndios**, análise de evidências e elaboração de laudos.",
-      includes: ["Investigação de incêndios segundo a NFPA 921", "Análise de evidências", "O laudo como prova pericial"],
+      text: "Aperfeiçoamento para **investigadores e equipes já formados**: método, evidências e laudos, a partir da experiência em casos reais.",
+      includes: ["Aplicação rigorosa da NFPA 921", "Análise crítica de evidências", "O laudo como prova pericial"],
     },
   },
   method: {
@@ -788,7 +809,7 @@ const pt: Texts = {
     stepsLabel: "As sete etapas do método científico segundo a NFPA 921",
     steps: [
       { name: "Reconhecer a necessidade", text: "Ocorreu um incêndio e **sua causa precisa ser determinada**." },
-      { name: "Definir o problema", text: "Define-se **o que deve ser resolvido** e como abordá-lo: origem, causa ou responsabilidade." },
+      { name: "Definir o problema", text: "Define-se **o que deve ser resolvido** e como abordá-lo: a origem e a causa do incêndio." },
       { name: "Coletar dados", text: "Reúnem-se **fatos verificáveis**: observação do local, registros, depoimentos e ensaios." },
       { name: "Analisar os dados", text: "Os dados são interpretados **com fundamento científico**, a partir de conhecimento, formação e experiência." },
       { name: "Desenvolver hipóteses", text: "A partir da análise, formulam-se **hipóteses que expliquem** o que foi observado." },
@@ -851,8 +872,14 @@ const pt: Texts = {
   },
   photoAlts: {
     terreno:
-      "Domingo Soto Gamé, com capacete da IAAI, óculos, respirador e luvas, inspeciona com uma lanterna uma parede carbonizada em uma casa incendiada, com uma prancheta na mão",
-    reunion: "Domingo Soto Gamé explica um laudo com fotografias a um advogado em um escritório",
+      "Domingo Soto Gamé, com capacete da NEXUS, óculos, respirador e luvas, inspeciona com uma lanterna uma parede carbonizada em uma casa incendiada, com uma prancheta na mão",
+    escena: "Capacete da NEXUS, respirador, luvas e lanterna sobre uma mesa em um cômodo incendiado, ao lado do marcador de evidência número 1",
+    marcador: "Marcador de evidência número 2 e uma escala ao lado de um cabo queimado na base de uma parede carbonizada",
+    marcador3: "Marcador de evidência número 3 no chão de um cômodo carbonizado, ao lado de um móvel queimado",
+    tablero: "Quadro elétrico carbonizado e aberto, com o marcador de evidência número 4 e uma escala logo abaixo",
+    incendio1: "Casa de dois andares tomada pelas chamas à noite, com uma coluna de fumaça sobre os fios da rua",
+    incendio2: "Incêndio noturno em uma casa antiga, com mangueiras de bombeiros na rua molhada",
+    incendio3: "Bombeiros com uma escada diante de uma casa em chamas, à noite",
     evidencia:
       "Parede com um padrão de queima em forma de V sobre uma caixa elétrica danificada, ao lado de uma trena e de um marcador de evidência numerado",
     informe: "Mãos revisando um laudo pericial impresso com um marca-texto, ao lado de uma luminária de mesa",

@@ -208,12 +208,13 @@ export function Perfil() {
           </div>
         </div>
 
-        {/* Cierre del perfil: el abogado y el investigador en una misma conversación */}
-        <PhotoBand
-          {...photos.reunion}
-          position="58% 35%"
-          className="mt-[clamp(3rem,7vw,6rem)] aspect-[4/3] w-full sm:aspect-[16/9]"
-        />
+        {/* Cierre del perfil (18-11): tres incendios de noche, en vertical y lado a lado, también en celular.
+            Reemplazan la escena de la reunión, en la que aparecía Domingo. */}
+        <div className="mt-[clamp(3rem,7vw,6rem)] grid grid-cols-3 gap-2 sm:gap-4 lg:gap-5">
+          <PhotoBand {...photos.incendio1} position="50% 55%" className="aspect-[3/4]" />
+          <PhotoBand {...photos.incendio2} position="50% 50%" className="aspect-[3/4]" />
+          <PhotoBand {...photos.incendio3} position="50% 50%" className="aspect-[3/4]" />
+        </div>
       </Container>
     </Section>
   );
