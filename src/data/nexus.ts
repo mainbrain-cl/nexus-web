@@ -441,7 +441,7 @@ const es: Texts = {
     emailLabel: "Correo",
     phoneLabel: "Teléfono",
     cityLabel: "Alcance",
-    coverage: "Todo Chile e internacional",
+    coverage: "Nacional e internacional",
   },
   photoAlts: {
     terreno:
@@ -661,7 +661,7 @@ const en: Texts = {
     emailLabel: "Email",
     phoneLabel: "Phone",
     cityLabel: "Where we work",
-    coverage: "Chile and abroad",
+    coverage: "Nationwide and international",
   },
   photoAlts: {
     terreno:
@@ -872,7 +872,7 @@ const pt: Texts = {
     emailLabel: "E-mail",
     phoneLabel: "Telefone",
     cityLabel: "Área de atuação",
-    coverage: "Chile e exterior",
+    coverage: "Nacional e internacional",
   },
   photoAlts: {
     terreno:

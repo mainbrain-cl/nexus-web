@@ -10,6 +10,7 @@ import { Formulario } from "@/components/formulario/Formulario";
 import { Embers } from "@/components/hero/Embers";
 import { Container, Reveal, Section, useReduce } from "@/components/ui/primitives";
 import { Icon } from "@/components/ui/icons";
+import { AlcanceIcon } from "@/components/ui/AlcanceIcon";
 import { Rich } from "@/components/ui/Rich";
 
 type Vars = CSSProperties & Record<`--${string}`, string>;
@@ -167,7 +168,7 @@ export function Contacto() {
           <div className="grid border-y border-hueso/10 sm:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)_minmax(0,1fr)] sm:divide-x sm:divide-hueso/10 max-sm:divide-y max-sm:divide-hueso/10">
             <Channel icon={<Icon name="correo" mode="static" badge className="size-10" />} label={closing.emailLabel} value={contact.email} href={links.email} />
             <Channel icon={<Icon name="telefono" mode="static" badge className="size-10" />} label={closing.phoneLabel} value={contact.phoneDisplay} href={links.phone} />
-            <Channel icon={<Icon name="alcance" mode="static" badge className="size-10" />} label={closing.cityLabel} value={closing.coverage} />
+            <Channel icon={<AlcanceIcon className="size-10" />} label={closing.cityLabel} value={closing.coverage} />
           </div>
         </Reveal>
       </Container>

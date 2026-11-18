@@ -14,7 +14,6 @@ import {
   Flame,
   Gavel,
   GitFork,
-  GlobeHemisphereWest,
   HardHat,
   MagnifyingGlass,
   PenNib,
@@ -66,8 +65,6 @@ const ICONS = {
   // Contacto
   correo: Envelope,
   telefono: Phone,
-  // Alcance: todo Chile e internacional, no un solo lugar (18-11)
-  alcance: GlobeHemisphereWest,
 } satisfies Record<string, PhosphorIcon>;
 
 export type IconName = keyof typeof ICONS;
