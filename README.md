@@ -97,4 +97,3 @@ El correo llega en español, con el asunto `Consulta web: <quién solicita> · <
 - Logo de NEXUS en SVG. La foto original de Domingo en alta resolución llegó el 17-11 (IMG_6028.JPG); falta decidir si reemplaza la de la portada.
 - Que Domingo confirme las tres fotos de incendio del cierre de Perfil (`public/fotos/incendio-1..3.webp`): son fotos reales suyas, el lugar se reconoce y en una salen bomberos.
 - Permiso para usar los logos de IAAI.
-- Cobertura: solo Valdivia o todo Chile.

@@ -35,7 +35,6 @@ export const contact = {
   phoneE164,
   email: "domingosoto@nexuschile.net",
   web: "nexuschile.net",
-  city: "Valdivia, Chile",
 };
 
 /** Enlace a WhatsApp con un mensaje ya escrito. */
@@ -242,6 +241,8 @@ export type Texts = {
     emailLabel: string;
     phoneLabel: string;
     cityLabel: string;
+    /** Alcance: todo Chile y fuera de Chile, no solo Valdivia (Aaron, 18-11). Va en Contacto, el pie y el menú. */
+    coverage: string;
   };
   photoAlts: Record<PhotoId, string>;
   footer: { motto: string; legal: string };
@@ -261,7 +262,7 @@ const es: Texts = {
   site: {
     title: "NEXUS | Evaluación pericial independiente en incendios",
     description:
-      "Evaluación independiente que integra investigación de incendios, análisis técnico-científico y comprensión jurídica de la prueba pericial, para evaluar un informe o fortalecer el suyo. Domingo Soto Gamé, abogado e investigador de incendios, IAAI-FIT. Valdivia, Chile.",
+      "Evaluación independiente que integra investigación de incendios, análisis técnico-científico y comprensión jurídica de la prueba pericial, para evaluar un informe o fortalecer el suyo. Domingo Soto Gamé, abogado e investigador de incendios, IAAI-FIT. Atención en todo Chile y en el extranjero.",
     tagline: "Método científico. Utilidad jurídica.",
   },
   whatsappText: "Hola Domingo, quiero solicitar una asesoría con NEXUS.",
@@ -435,11 +436,12 @@ const es: Texts = {
   },
   closing: {
     title: ["Hablemos", "de su caso"],
-    text: "Contacto **directo con Domingo Soto Gamé**.",
+    text: "Contacto **directo con Domingo Soto Gamé**. Atendemos casos en **todo Chile y en el extranjero**.",
     whatsappLabel: "Escribir por WhatsApp",
     emailLabel: "Correo",
     phoneLabel: "Teléfono",
-    cityLabel: "Base",
+    cityLabel: "Alcance",
+    coverage: "Todo Chile e internacional",
   },
   photoAlts: {
     terreno:
@@ -478,7 +480,7 @@ const en: Texts = {
     // trabajo de un perito.
     title: "NEXUS | Independent expert review in fire cases",
     description:
-      "Independent evaluation that brings together fire investigation, scientific and technical analysis, and a legal understanding of expert evidence, to assess a report or strengthen your own. Domingo Soto Gamé, attorney (Chile) and fire investigator, IAAI-FIT. Valdivia, Chile.",
+      "Independent evaluation that brings together fire investigation, scientific and technical analysis, and a legal understanding of expert evidence, to assess a report or strengthen your own. Domingo Soto Gamé, attorney (Chile) and fire investigator, IAAI-FIT. Serving clients throughout Chile and abroad.",
     tagline: "Scientific method. Legal value.",
   },
   whatsappText: "Hello Domingo, I would like to request a consultation with NEXUS.",
@@ -654,11 +656,12 @@ const en: Texts = {
   },
   closing: {
     title: ["Let's discuss", "your case"],
-    text: "Speak **directly with Domingo Soto Gamé**.",
+    text: "Speak **directly with Domingo Soto Gamé**. We take cases **throughout Chile and abroad**.",
     whatsappLabel: "Message on WhatsApp",
     emailLabel: "Email",
     phoneLabel: "Phone",
-    cityLabel: "Based in",
+    cityLabel: "Where we work",
+    coverage: "Chile and abroad",
   },
   photoAlts: {
     terreno:
@@ -695,7 +698,7 @@ const pt: Texts = {
   site: {
     title: "NEXUS | Avaliação pericial independente em incêndios",
     description:
-      "Avaliação independente que integra investigação de incêndios, análise técnico-científica e compreensão jurídica da prova pericial, para avaliar um laudo ou fortalecer o seu. Domingo Soto Gamé, advogado (Chile) e investigador de incêndios, IAAI-FIT. Valdivia, Chile.",
+      "Avaliação independente que integra investigação de incêndios, análise técnico-científica e compreensão jurídica da prova pericial, para avaliar um laudo ou fortalecer o seu. Domingo Soto Gamé, advogado (Chile) e investigador de incêndios, IAAI-FIT. Atendimento em todo o Chile e no exterior.",
     tagline: "Método científico. Utilidade jurídica.",
   },
   whatsappText: "Olá, Domingo. Gostaria de solicitar uma assessoria da NEXUS.",
@@ -864,11 +867,12 @@ const pt: Texts = {
   },
   closing: {
     title: ["Vamos falar", "do seu caso"],
-    text: "Contato **direto com Domingo Soto Gamé**.",
+    text: "Contato **direto com Domingo Soto Gamé**. Atendemos casos **em todo o Chile e no exterior**.",
     whatsappLabel: "Escrever pelo WhatsApp",
     emailLabel: "E-mail",
     phoneLabel: "Telefone",
-    cityLabel: "Base",
+    cityLabel: "Área de atuação",
+    coverage: "Chile e exterior",
   },
   photoAlts: {
     terreno:

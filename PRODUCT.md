@@ -40,7 +40,7 @@ Su director técnico, Domingo Soto Gamé, es a la vez abogado (desde 1997) e inv
 ## Capabilities and Constraints
 
 - Contacto principal: un formulario condicional de cinco pasos (quién solicita, servicio, estado del asunto, datos del caso y contacto), con las preguntas de Domingo. Envía la consulta a su correo; WhatsApp y correo quedan como alternativas. Tiene defensas contra abuso (token de tiempo, límite por IP, Turnstile opcional).
-- Cobertura geográfica sin confirmar: solo Valdivia o todo Chile.
+- Cobertura: todo Chile e internacional (Aaron, 18-11). La base sigue en Valdivia, pero el sitio no se limita a ella.
 - No hay precios publicados.
 
 ## Brand Commitments

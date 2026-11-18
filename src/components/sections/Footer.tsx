@@ -7,7 +7,7 @@ const linkClass =
   "inline-flex min-h-11 items-center text-[1rem] text-gris transition-colors duration-300 hover:text-hueso focus-visible:text-hueso";
 
 export function Footer({ locale }: { locale: Locale }) {
-  const { a11y, footer, footerLinks, links, site } = content[locale];
+  const { a11y, closing, footer, footerLinks, links, site } = content[locale];
   // El sitio es un export estático: el año queda fijado al compilar, que es cuando se publica.
   const year = new Date().getFullYear();
 
@@ -45,7 +45,7 @@ export function Footer({ locale }: { locale: Locale }) {
             <a href={links.phone} className={linkClass}>
               {contact.phoneDisplay}
             </a>
-            <span className="inline-flex min-h-11 items-center text-[1rem] text-gris">{contact.city}</span>
+            <span className="inline-flex min-h-11 items-center text-[1rem] text-gris">{closing.coverage}</span>
           </address>
         </div>
 

@@ -206,7 +206,7 @@ function ServicesMenu({
 }
 
 export function Navbar() {
-  const { a11y, links, navLinks, navCta, serviceGroups } = useContent();
+  const { a11y, closing, links, navLinks, navCta, serviceGroups } = useContent();
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const [hovered, setHovered] = useState<string | null>(null);
@@ -423,7 +423,7 @@ export function Navbar() {
                     {contact.phoneDisplay}
                   </a>
                   <span aria-hidden="true">&nbsp;·&nbsp;</span>
-                  {contact.city}
+                  {closing.coverage}
                 </span>
               </div>
             </motion.div>
