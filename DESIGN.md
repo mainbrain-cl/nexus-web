@@ -177,7 +177,7 @@ La hero ocupa la primera pantalla y no lleva el retrato grande (pedido de Doming
 El orden de la página: Hero, Intersección, Servicios, Perfil, Método, Resultado y Contacto, con fondos alternados desde Servicios (humo, ceniza, humo, ceniza, humo).
 
 ### Named Rules
-**The Physical Pixel Rule.** Todo desplazamiento de parallax se redondea al píxel físico (Math.round(v × devicePixelRatio) / devicePixelRatio). Mover una capa en fracciones de píxel obliga a repintarla entera en cada cuadro; medido en pantalla 2x a 120 Hz, el parallax bajó de ~190 % a ~105 % de CPU.
+**The Physical Pixel Rule.** Todo desplazamiento de parallax se redondea al píxel físico (Math.round(v × devicePixelRatio) / devicePixelRatio). Mover una capa en fracciones de píxel obliga a repintarla entera en cada cuadro; medido en pantalla 2x a 120 Hz, el parallax bajó de ~190 % a ~105 % de CPU. Vale tal cual para las capas de fondo (humo y brasas). Las capas de lectura de la hero (título, texto con botones y tarjeta) redondean el destino, no cada cuadro: un resorte propio las lleva hasta ese píxel pasando por fracciones, así se mueven continuas y al detenerse el texto queda nítido. Van con `will-change: transform`, para que el navegador las componga en la GPU y no las repinte (20-11: con el mouse lento el título avanzaba a saltos de un píxel unas 4 veces por segundo; ahora cambia en cada cuadro, con saltos de centésimas).
 
 ## Elevation & Depth
 

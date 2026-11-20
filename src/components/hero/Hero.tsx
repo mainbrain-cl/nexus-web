@@ -27,9 +27,10 @@ type Vars = CSSProperties & Record<`--${string}`, string>;
 
 /**
  * Lleva un desplazamiento al píxel físico de la pantalla más cercano.
- * Mover una capa en fracciones de píxel obliga al navegador a volver a dibujarla entera en cada cuadro;
- * medido en una pantalla 2x a 120 Hz, el parallax pasaba de ~190 % a ~105 % de CPU (quieto: ~82 %).
- * El salto es de medio píxel en pantallas 2x, imposible de ver en un movimiento con resorte.
+ * Mover en fracciones de píxel una capa que el navegador pinta (y no solo compone) obliga a volver a dibujarla
+ * entera en cada cuadro; medido en una pantalla 2x a 120 Hz, el parallax pasaba de ~190 % a ~105 % de CPU
+ * (quieto: ~82 %). Las capas de fondo (humo, brasas) siguen así: el salto de medio píxel no se ve en ellas.
+ * En el título y los botones sí se veía (Aaron, 20-11: "tosco"): esas capas usan `useSmoothLayer`.
  */
 function snap(v: number) {
   const dpr = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
@@ -42,7 +43,10 @@ function snap(v: number) {
  */
 const SCROLL_COLUMNA = 0.14;
 
-/** Desplazamiento de una capa: profundidad ante el mouse + velocidad propia ante el scroll. */
+/** Resorte del parallax: sobreamortiguado (sin rebote) y algo más lento que antes, para una inercia sedosa. */
+const SPRING = { stiffness: 36, damping: 16, mass: 0.8 };
+
+/** Desplazamiento de una capa de fondo: profundidad ante el mouse + velocidad propia ante el scroll. */
 function useLayer(
   px: MotionValue<number>,
   py: MotionValue<number>,
@@ -52,6 +56,27 @@ function useLayer(
 ) {
   const x = useTransform(px, (v) => snap(v * -depth));
   const y = useTransform([py, scrollY], ([a, b]: number[]) => snap(a * -depth * 0.6 + b * scrollK));
+  return { x, y };
+}
+
+/**
+ * Desplazamiento de una capa de lectura (título, texto y botones, tarjeta): fluido, sin saltos.
+ * Antes la posición se redondeaba al píxel físico en cada cuadro y, con el mouse lento, la capa avanzaba a
+ * saltos de un píxel unas pocas veces por segundo. Ahora se redondea el destino y un resorte propio lleva la
+ * capa hasta él pasando por fracciones de píxel: se mueve continuo y al detenerse queda en un píxel entero,
+ * con el texto nítido. No cuesta repintado porque estas capas llevan `will-change: transform`: el navegador
+ * las compone en la GPU y solo las desplaza. La parte del scroll sigue redondeada, como antes.
+ */
+function useSmoothLayer(
+  mx: MotionValue<number>,
+  my: MotionValue<number>,
+  scrollY: MotionValue<number>,
+  depth: number,
+  scrollK: number,
+) {
+  const x = useSpring(useTransform(mx, (v) => snap(v * -depth)), SPRING);
+  const mouseY = useSpring(useTransform(my, (v) => snap(v * -depth * 0.6)), SPRING);
+  const y = useTransform([mouseY, scrollY], ([a, b]: number[]) => a + snap(b * scrollK));
   return { x, y };
 }
 
@@ -113,19 +138,19 @@ export function Hero() {
 
   const mx = useMotionValue(0);
   const my = useMotionValue(0);
-  const px = useSpring(mx, { stiffness: 50, damping: 18, mass: 0.7 });
-  const py = useSpring(my, { stiffness: 50, damping: 18, mass: 0.7 });
+  const px = useSpring(mx, SPRING);
+  const py = useSpring(my, SPRING);
 
   const k = reduce ? 0 : 1;
   const bg = useLayer(px, py, scrollY, 8 * k, 0.5 * k);
   const smoke = useLayer(px, py, scrollY, 14 * k, 0.42 * k);
   const back = useLayer(px, py, scrollY, 20 * k, 0.36 * k);
-  const title = useLayer(px, py, scrollY, 16 * k, SCROLL_COLUMNA * k);
+  const title = useSmoothLayer(mx, my, scrollY, 16 * k, SCROLL_COLUMNA * k);
   const front = useLayer(px, py, scrollY, 54 * k, -0.18 * k);
-  const content = useLayer(px, py, scrollY, 6 * k, SCROLL_COLUMNA * k);
+  const content = useSmoothLayer(mx, my, scrollY, 6 * k, SCROLL_COLUMNA * k);
   // La tarjeta de Domingo flota en su propio plano: más cerca que el texto ante el mouse y un poco más rápida
   // que la página al bajar. La profundidad es corta a propósito, para que nunca alcance los botones.
-  const card = useLayer(px, py, scrollY, 22 * k, -0.06 * k);
+  const card = useSmoothLayer(mx, my, scrollY, 22 * k, -0.06 * k);
 
   // Largo de la línea más larga del título: con él, el CSS calcula el tamaño para que quepa en cada idioma.
   const titleChars = Math.max(...hero.titleLines.map((line) => Array.from(line).length));
@@ -285,7 +310,7 @@ export function Hero() {
 
         {/* 5 · Etiqueta, nombre, frase y acciones */}
         <motion.div
-          className="nx-hero-cuerpo relative z-20 mt-[clamp(1.6rem,4.6svh,3.4rem)] flex w-full flex-col items-center text-center"
+          className="nx-hero-cuerpo relative z-20 mt-[clamp(1.6rem,4.6svh,3.4rem)] flex w-full flex-col items-center text-center will-change-transform"
           style={{ ...content, opacity: contentOpacity }}
         >
           <RotatingTag items={hero.tags} className="nx-hero-tag mb-4 sm:mb-5" />
