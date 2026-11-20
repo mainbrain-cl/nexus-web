@@ -596,3 +596,65 @@
     display: none;
   }
 }
+
+/* ---------- Asesor flotante ---------- */
+
+/* Foto de Domingo fija abajo a la derecha, con su mensaje (Asesor.tsx). Va bajo la barra y el menú (z-50).
+   Oculto no se ve, no recibe clics y sale del orden de tabulación (visibility). El margen inferior respeta el
+   área segura del celular. */
+.nx-asesor {
+  position: fixed;
+  right: max(1rem, env(safe-area-inset-right));
+  bottom: calc(1rem + env(safe-area-inset-bottom));
+  z-index: 40;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.nx-asesor[data-on="true"] {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (min-width: 640px) {
+  .nx-asesor {
+    right: max(1.75rem, env(safe-area-inset-right));
+    bottom: calc(1.75rem + env(safe-area-inset-bottom));
+    gap: 0.75rem;
+  }
+}
+
+/* Entra y sale con un fundido y un desplazamiento corto. Con movimiento reducido solo aparece. */
+@media (prefers-reduced-motion: no-preference) {
+  .nx-asesor {
+    translate: 0 14px;
+    transition:
+      opacity 0.5s ease-out,
+      translate 0.6s var(--ease-expo),
+      visibility 0s 0.5s;
+  }
+
+  .nx-asesor[data-on="true"] {
+    translate: none;
+    transition-delay: 0s;
+  }
+
+  .nx-asesor-mensaje {
+    transform-origin: 100% 100%;
+    animation: asesor-mensaje 0.6s var(--ease-expo) both;
+  }
+}
+
+@keyframes asesor-mensaje {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}

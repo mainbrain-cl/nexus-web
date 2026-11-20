@@ -9,6 +9,7 @@ import { Resultado } from "@/components/sections/Resultado";
 import { Perfil } from "@/components/sections/Perfil";
 import { Contacto } from "@/components/sections/Contacto";
 import { Footer } from "@/components/sections/Footer";
+import { Asesor } from "@/components/Asesor";
 
 /** La página completa en un idioma. La usan `/` (español), `/en/` y `/pt/`. */
 export function HomePage({ locale }: { locale: Locale }) {
@@ -27,6 +28,7 @@ export function HomePage({ locale }: { locale: Locale }) {
         <Contacto />
       </main>
       <Footer locale={locale} />
+      <Asesor />
     </LocaleProvider>
   );
 }

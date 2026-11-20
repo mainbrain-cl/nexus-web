@@ -123,6 +123,9 @@ export function Hero() {
   const title = useLayer(px, py, scrollY, 16 * k, SCROLL_COLUMNA * k);
   const front = useLayer(px, py, scrollY, 54 * k, -0.18 * k);
   const content = useLayer(px, py, scrollY, 6 * k, SCROLL_COLUMNA * k);
+  // La tarjeta de Domingo flota en su propio plano: más cerca que el texto ante el mouse y un poco más rápida
+  // que la página al bajar. La profundidad es corta a propósito, para que nunca alcance los botones.
+  const card = useLayer(px, py, scrollY, 22 * k, -0.06 * k);
 
   // Largo de la línea más larga del título: con él, el CSS calcula el tamaño para que quepa en cada idioma.
   const titleChars = Math.max(...hero.titleLines.map((line) => Array.from(line).length));
@@ -350,18 +353,20 @@ export function Hero() {
 
       {/* 7 · Tarjeta de Domingo (solo desde 1024 px): contrapeso de los sellos, a su misma altura y con sus mismos
           márgenes. Toda la tarjeta es un enlace a Perfil. Entra al final, después de los botones, y se desvanece
-          con el scroll como el resto del texto. La capa de fuera lleva la opacidad del scroll y la de dentro la
-          animación de entrada, porque una animación CSS con relleno pisa la opacidad en línea.
+          con el scroll como el resto del texto. La capa de fuera lleva la opacidad del scroll y su parallax propio,
+          y la de dentro la animación de entrada, porque una animación CSS con relleno pisa la opacidad en línea.
+          Flota: sombra honda en dos capas, un filo de luz arriba y, al pasar el mouse, sube 3 px (con `translate`,
+          que no choca con el `transform` de la entrada). Sin pulsos ni parpadeos.
           Con menos de 860 px de alto no cabe bajo los botones: pasa a su forma compacta (foto y enlace), que
           cabe a su derecha como los sellos a su izquierda; si tampoco hay ancho para eso, se oculta (globals.css). */}
       <motion.div
-        className="nx-hero-tarjeta pointer-events-none absolute inset-x-0 bottom-[max(2.4rem,5.5svh)] z-20 hidden lg:block"
-        style={{ opacity: contentOpacity }}
+        className="nx-hero-tarjeta pointer-events-none absolute inset-x-0 bottom-[max(2.4rem,5.5svh)] z-20 hidden will-change-transform lg:block"
+        style={{ ...card, opacity: contentOpacity }}
       >
         <div className="nx-hero-tarjeta-fila mx-auto flex max-w-[1440px] translate-y-[10px] justify-end px-[8.5vw] xl:translate-y-[4px] xl:px-[min(8.5vw,140px)]">
           <motion.a
             href="#perfil"
-            className="group in-cta flex items-center gap-3 rounded-full border border-oro/25 bg-ceniza/55 py-1.5 pr-6 pl-1.5 text-left shadow-[0_10px_30px_-14px_rgba(0,0,0,.9)] backdrop-blur-md transition-[border-color,background-color] duration-500 hover:border-oro/55 hover:bg-ceniza/70"
+            className="group in-cta flex items-center gap-3 rounded-full border border-oro/35 bg-carbon/75 py-1.5 pr-6 pl-1.5 text-left shadow-[0_22px_48px_-14px_rgba(0,0,0,.95),0_6px_16px_-6px_rgba(0,0,0,.7),inset_0_1px_0_rgba(255,240,210,.1)] backdrop-blur-md transition-[translate,border-color,background-color,box-shadow] duration-500 hover:-translate-y-[3px] hover:border-oro/65 hover:bg-carbon/90 hover:shadow-[0_30px_60px_-16px_rgba(0,0,0,.95),0_10px_22px_-8px_rgba(0,0,0,.7),inset_0_1px_0_rgba(255,240,210,.14)]"
             style={{ "--d": "1.4s", pointerEvents: cardPointer } as unknown as Vars}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}

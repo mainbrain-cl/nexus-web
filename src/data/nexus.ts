@@ -190,6 +190,8 @@ export type Texts = {
     /** Tarjeta chica de Domingo, abajo a la derecha en escritorio. El rol es `profile.role` abreviado, sin datos nuevos. */
     card: { role: string; cta: string };
   };
+  /** Asesor flotante: la foto de Domingo fija abajo a la derecha, con un mensaje que lleva al formulario. */
+  advisor: { label: string; message: string; cta: string; close: string };
   intersection: {
     title: Tuple<string, 2>;
     body: string;
@@ -290,6 +292,12 @@ const es: Texts = {
     card: { role: "Dirección técnica · Abogado · IAAI-FIT", cta: "Conocer a Domingo" },
   },
   // Intersección: un solo bloque (Aaron, 10-11). Las tres competencias van en palabras de Domingo (12-11).
+  advisor: {
+    label: "Escribir a Domingo Soto Gamé: abrir el formulario",
+    message: "Hola, soy Domingo. ¿Necesita algo específico? Cuénteme su caso en el formulario y lo reviso personalmente.",
+    cta: "Abrir el formulario",
+    close: "Cerrar mensaje",
+  },
   intersection: {
     title: ["Tres competencias,", "un solo criterio"],
     // El diagrama ya nombra las tres competencias: el texto no las repite (revisión general, 12-11).
@@ -505,6 +513,12 @@ const en: Texts = {
     secondaryCta: "View services",
     sealsLabel: "IAAI affiliations and credential",
     card: { role: "Technical director · Attorney (Chile) · IAAI-FIT", cta: "Meet Domingo" },
+  },
+  advisor: {
+    label: "Write to Domingo Soto Gamé: open the form",
+    message: "Hello, I'm Domingo. Do you need something specific? Tell me about your case in the form and I will review it personally.",
+    cta: "Open the form",
+    close: "Close message",
   },
   intersection: {
     title: ["Three disciplines,", "one judgment"],
@@ -724,6 +738,12 @@ const pt: Texts = {
     sealsLabel: "Afiliações e credencial IAAI",
     card: { role: "Direção técnica · Advogado (Chile) · IAAI-FIT", cta: "Conheça o Domingo" },
   },
+  advisor: {
+    label: "Escrever para Domingo Soto Gamé: abrir o formulário",
+    message: "Olá, sou o Domingo. Precisa de algo específico? Conte-me o seu caso no formulário e eu o analiso pessoalmente.",
+    cta: "Abrir o formulário",
+    close: "Fechar mensagem",
+  },
   intersection: {
     title: ["Três competências,", "um só critério"],
     body: "As três em uma mesma avaliação independente, **para quem precisa avaliar um laudo e para quem quer fortalecer o seu.**",
@@ -928,6 +948,7 @@ function build(locale: Locale) {
     languageLabel: t.languageLabel,
     a11y: t.a11y,
     hero: { ...t.hero, name: contact.name, firstName: contact.firstName, lastName: contact.lastName },
+    advisor: t.advisor,
     intersection: t.intersection,
     servicesIntro: t.servicesIntro,
     services: serviceIds.map((id) => ({ id, group: serviceGroup[id], ...t.services[id] })),
