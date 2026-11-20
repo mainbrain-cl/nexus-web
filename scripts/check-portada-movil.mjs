@@ -79,7 +79,7 @@ function measure() {
   });
   const tag = hero.querySelector(".in-tag");
   boxes.etiqueta = tag && getComputedStyle(tag).display !== "none" ? r(tag.querySelector("[aria-hidden]")) : null;
-  const ps = hero.querySelectorAll(".font-name, .in-role");
+  const ps = hero.querySelectorAll(".nx-hero-nombre, .in-role");
   boxes.nombre = r(ps[0]);
   boxes.rol = r(ps[1]);
   hero.querySelectorAll("a.btn").forEach((el, i) => (boxes[i === 0 ? "botonOro" : "botonLinea"] = r(el)));
@@ -107,7 +107,7 @@ function check(m) {
 // Contraste del nombre y el rol: se oculta el texto, se fotografía su caja y se toma el píxel claro del fondo
 // (percentil 98, para no contar una brasa suelta) contra el color del texto.
 async function contrast(page) {
-  const sel = { nombre: "#inicio .font-name", rol: "#inicio .in-role" };
+  const sel = { nombre: "#inicio .nx-hero-nombre", rol: "#inicio .in-role" };
   const out = {};
   for (const [k, s] of Object.entries(sel)) {
     const box = await page.locator(s).boundingBox();

@@ -299,7 +299,7 @@
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: none;
   }
 }
 
@@ -319,7 +319,7 @@
   }
   9% {
     opacity: 1;
-    transform: none;
+    translate: none;
   }
   32% {
     opacity: 0.95;
@@ -374,7 +374,7 @@
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: none;
   }
 }
 
@@ -388,7 +388,7 @@
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: none;
   }
 }
 
@@ -399,7 +399,7 @@
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: none;
   }
 }
 
@@ -431,7 +431,7 @@
   }
   to {
     opacity: 1;
-    transform: none;
+    translate: none;
   }
 }
 
@@ -552,5 +552,46 @@
 
   .nx-hero-frase > span {
     display: inline;
+  }
+}
+
+/* Tarjeta de Domingo (portada, desde 1024 px). Completa (foto, nombre, rol y enlace) solo cuando cabe bajo los
+   botones. Con menos de 860 px de alto queda a la altura de los botones, así que pasa a su forma compacta: foto y
+   enlace, que caben a la derecha de los botones como los sellos a su izquierda. El nombre y el rol se ocultan a
+   la vista pero siguen en el enlace para los lectores de pantalla. */
+@media (min-width: 1024px) and (max-height: 859.98px) {
+  .nx-hero-tarjeta-dato {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .nx-hero-tarjeta img {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .nx-hero-tarjeta a {
+    padding-right: 1.25rem;
+  }
+
+  .nx-hero-tarjeta-fila {
+    translate: 0 5px;
+  }
+}
+
+@media (min-width: 1280px) and (max-height: 859.98px) {
+  .nx-hero-tarjeta-fila {
+    translate: none;
+  }
+}
+
+/* Angosta y baja a la vez (por ejemplo 1024×700): ni la forma compacta cabe junto a los botones. Se oculta. */
+@media (min-width: 1024px) and (max-width: 1279.98px) and (max-height: 759.98px) {
+  .nx-hero-tarjeta {
+    display: none;
   }
 }

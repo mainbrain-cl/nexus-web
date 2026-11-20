@@ -187,6 +187,8 @@ export type Texts = {
     primaryCta: string;
     secondaryCta: string;
     sealsLabel: string;
+    /** Tarjeta chica de Domingo, abajo a la derecha en escritorio. El rol es `profile.role` abreviado, sin datos nuevos. */
+    card: { role: string; cta: string };
   };
   intersection: {
     title: Tuple<string, 2>;
@@ -285,6 +287,7 @@ const es: Texts = {
     primaryCta: "Solicitar asesoría",
     secondaryCta: "Ver servicios",
     sealsLabel: "Afiliaciones y credencial IAAI",
+    card: { role: "Dirección técnica · Abogado · IAAI-FIT", cta: "Conocer a Domingo" },
   },
   // Intersección: un solo bloque (Aaron, 10-11). Las tres competencias van en palabras de Domingo (12-11).
   intersection: {
@@ -501,6 +504,7 @@ const en: Texts = {
     primaryCta: "Request a consultation",
     secondaryCta: "View services",
     sealsLabel: "IAAI affiliations and credential",
+    card: { role: "Technical director · Attorney (Chile) · IAAI-FIT", cta: "Meet Domingo" },
   },
   intersection: {
     title: ["Three disciplines,", "one judgment"],
@@ -718,6 +722,7 @@ const pt: Texts = {
     primaryCta: "Solicitar assessoria",
     secondaryCta: "Ver serviços",
     sealsLabel: "Afiliações e credencial IAAI",
+    card: { role: "Direção técnica · Advogado (Chile) · IAAI-FIT", cta: "Conheça Domingo" },
   },
   intersection: {
     title: ["Três competências,", "um só critério"],

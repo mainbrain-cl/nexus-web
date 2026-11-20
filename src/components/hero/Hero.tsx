@@ -195,6 +195,7 @@ export function Hero() {
     // Una sola columna centrada en todos los anchos: título, etiqueta, nombre, hilo, frases y botones, sobre el
     // humo, las brasas y el resplandor. Los sellos van en la misma columna, justo sobre el título, en celular y
     // tablet, y abajo a la izquierda desde 1024 px. En pantallas de poco alto la columna se compacta (globals.css).
+    // Domingo sí está, pero sin protagonismo (Aaron, 20-11): una tarjeta chica abajo a la derecha, solo desde 1024 px.
     // El relleno superior es el alto de la barra fija (80 px en celular, 96 px desde sm).
     <section
       ref={sectionRef}
@@ -344,6 +345,47 @@ export function Hero() {
         }}
         aria-hidden="true"
       />
+
+      {/* 7 · Tarjeta de Domingo (solo desde 1024 px): contrapeso de los sellos, a su misma altura y con sus mismos
+          márgenes. Toda la tarjeta es un enlace a Perfil. Entra al final, después de los botones, y se desvanece
+          con el scroll como el resto del texto. La capa de fuera lleva la opacidad del scroll y la de dentro la
+          animación de entrada, porque una animación CSS con relleno pisa la opacidad en línea.
+          Con menos de 860 px de alto no cabe bajo los botones: pasa a su forma compacta (foto y enlace), que
+          cabe a su derecha como los sellos a su izquierda; si tampoco hay ancho para eso, se oculta (globals.css). */}
+      <motion.div
+        className="nx-hero-tarjeta pointer-events-none absolute inset-x-0 bottom-[max(2.4rem,5.5svh)] z-20 hidden lg:block"
+        style={{ opacity: contentOpacity }}
+      >
+        <div className="nx-hero-tarjeta-fila mx-auto flex max-w-[1440px] translate-y-[10px] justify-end px-[8.5vw] xl:translate-y-[4px] xl:px-[min(8.5vw,140px)]">
+          <a
+            href="#perfil"
+            className="group in-cta pointer-events-auto flex items-center gap-3 rounded-full border border-oro/25 bg-ceniza/55 py-1.5 pr-6 pl-1.5 text-left shadow-[0_10px_30px_-14px_rgba(0,0,0,.9)] backdrop-blur-md transition-[border-color,background-color] duration-500 hover:border-oro/55 hover:bg-ceniza/70"
+            style={{ "--d": "1.4s" } as Vars}
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
+            <img
+              src="/hero/domingo-avatar.webp"
+              alt=""
+              width={176}
+              height={176}
+              decoding="async"
+              className="size-[3.25rem] shrink-0 rounded-full object-cover ring-1 ring-oro/40"
+              style={{ filter: "grayscale(.3) contrast(1.05) brightness(.95)" }}
+            />
+            <span className="flex flex-col">
+              <span className="nx-hero-tarjeta-dato font-name text-[0.8rem] leading-[1.2] font-extrabold tracking-[0.02em] text-hueso uppercase [font-stretch:115%]">
+                {hero.name}
+              </span>
+              <span className="nx-hero-tarjeta-dato mt-0.5 text-[0.74rem] leading-[1.3] text-gris">{hero.card.role}</span>
+              <span className="mt-0.5 inline-flex items-center gap-1.5 text-[0.76rem] leading-[1.3] font-semibold whitespace-nowrap text-oro-claro">
+                {/* En la forma compacta el nombre visible se oculta: el enlace lo conserva para lectores de pantalla. */}
+                {hero.card.cta}
+                <Arrow className="size-[1em] transition-transform duration-500 group-hover:translate-x-0.5" />
+              </span>
+            </span>
+          </a>
+        </div>
+      </motion.div>
     </section>
   );
 }
