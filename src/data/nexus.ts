@@ -496,7 +496,7 @@ const en: Texts = {
   },
   hero: {
     titleLines: ["Forensic fire", "audit"],
-    roleLines: ["Expert advice in fire investigation", "Independent expert evaluation"],
+    roleLines: ["Specialist advice on fire investigation", "Independent expert evaluation"],
     tags: ["Chilean attorney since 1997", "IAAI-FIT", "NFPA 921 method", "Fire investigator since 2012"],
     primaryCta: "Request a consultation",
     secondaryCta: "View services",
@@ -713,7 +713,7 @@ const pt: Texts = {
   },
   hero: {
     titleLines: ["Auditoria forense", "de incêndios"],
-    roleLines: ["Assessoria especializada em investigação de incêndios", "Avaliação pericial independente"],
+    roleLines: ["Assessoria técnica em investigação de incêndios", "Avaliação pericial independente"],
     tags: ["Advogado no Chile desde 1997", "IAAI-FIT", "Método NFPA 921", "Investigador de incêndios desde 2012"],
     primaryCta: "Solicitar assessoria",
     secondaryCta: "Ver serviços",

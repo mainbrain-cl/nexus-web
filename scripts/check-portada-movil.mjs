@@ -51,6 +51,7 @@ const CASES = [
   { w: 393, h: 852, dpr: 3, label: "Pantalla completa" },
   { w: 375, h: 667, dpr: 2, label: "iPhone SE" },
   { w: 360, h: 640, dpr: 3, label: "Android chico" },
+  { w: 320, h: 568, dpr: 2, label: "iPhone SE 1 / ancho mínimo" },
   { w: 412, h: 780, dpr: 3, label: "Chrome Android" },
   { w: 430, h: 830, dpr: 3, label: "iPhone Pro Max" },
   { w: 768, h: 1024, dpr: 2, label: "Tablet" },
@@ -68,7 +69,14 @@ function measure() {
   const hero = document.getElementById("inicio");
   const boxes = {};
   hero.querySelectorAll("ul[aria-label] img").forEach((el, i) => (boxes[`sello${i + 1}`] = r(el)));
-  hero.querySelectorAll("#hero-title > span[aria-hidden] > span").forEach((el, i) => (boxes[`titulo${i + 1}`] = r(el)));
+  // Cada línea del título se mide por sus letras (los span.inline-block): la línea es un bloque del ancho del
+  // contenedor y su caja no delata un título que se sale por los costados.
+  hero.querySelectorAll("#hero-title > span[aria-hidden] > span").forEach((line, i) => {
+    const cs = [...line.querySelectorAll(":scope > span.inline-block")].map(r).filter(Boolean);
+    boxes[`titulo${i + 1}`] = cs.length
+      ? { x0: Math.min(...cs.map((c) => c.x0)), y0: Math.min(...cs.map((c) => c.y0)), x1: Math.max(...cs.map((c) => c.x1)), y1: Math.max(...cs.map((c) => c.y1)) }
+      : null;
+  });
   const tag = hero.querySelector(".in-tag");
   boxes.etiqueta = tag && getComputedStyle(tag).display !== "none" ? r(tag.querySelector("[aria-hidden]")) : null;
   const ps = hero.querySelectorAll(".font-name, .in-role");

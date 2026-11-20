@@ -16,7 +16,7 @@ import { Embers } from "./Embers";
 import { RotatingTag } from "./RotatingTag";
 import { SmokeGL } from "./SmokeGL";
 
-// Entrada comprimida (revisión general, 12-11): título, nombre, frase y botones quedan en pantalla antes de ~1,5 s.
+// Entrada comprimida (revisión general, 12-11): título, nombre, frases y botones quedan en pantalla antes de ~1,5 s.
 // Los demás tiempos están en globals.css.
 // El paso entre letras bajó de 0,04 a 0,032 s con el título nuevo (20-11): la línea más larga tiene 17 letras
 // y así termina de encenderse a la misma hora que la anterior.
@@ -192,8 +192,9 @@ export function Hero() {
 
   return (
     // Portada sin retrato (pedido de Domingo, 20-11): el título es el protagonista y la foto queda para Perfil.
-    // Una sola columna centrada en todos los anchos: título, etiqueta, nombre, hilo, frase y botones, sobre el
-    // humo, las brasas y el resplandor. Los sellos van arriba en celular y tablet, y abajo a la izquierda desde 1024 px.
+    // Una sola columna centrada en todos los anchos: título, etiqueta, nombre, hilo, frases y botones, sobre el
+    // humo, las brasas y el resplandor. Los sellos van en la misma columna, justo sobre el título, en celular y
+    // tablet, y abajo a la izquierda desde 1024 px. En pantallas de poco alto la columna se compacta (globals.css).
     // El relleno superior es el alto de la barra fija (80 px en celular, 96 px desde sm).
     <section
       ref={sectionRef}
@@ -231,7 +232,31 @@ export function Hero() {
 
       {/* Columna central: ocupa el alto que queda bajo la barra y centra el conjunto. No lleva posición ni z-index
           propios, para que el título (detrás de las brasas) y el texto (delante) sigan en el apilado de la sección. */}
-      <div className="flex flex-1 flex-col items-center justify-center px-3 pt-[clamp(0.5rem,2svh,1.5rem)] pb-[clamp(1.5rem,6svh,4.5rem)] sm:px-5 lg:pb-[clamp(3.5rem,11svh,7rem)]">
+      <div className="nx-hero-columna flex flex-1 flex-col items-center justify-center px-3 pt-[clamp(0.5rem,2svh,1.5rem)] pb-[clamp(1.5rem,6svh,4.5rem)] sm:px-5 lg:pb-[clamp(3.5rem,11svh,7rem)]">
+        {/* Sellos IAAI (Aaron, 10-11). Hasta 1023 px abren la columna, pegados al título, para que todo se lea
+            como un solo grupo. Desde 1024 px salen del flujo: abajo a la izquierda, alineados con el logo. */}
+        <div className="nx-hero-sellos-caja pointer-events-none relative z-20 mb-[clamp(0.9rem,2.6svh,1.75rem)] lg:absolute lg:inset-x-0 lg:bottom-[max(2.4rem,5.5svh)] lg:mb-0">
+          <ul
+            aria-label={hero.sealsLabel}
+            className="nx-hero-sellos in-cta mx-auto flex max-w-[1440px] items-center justify-center px-5 sm:px-8 lg:justify-start lg:px-[8.5vw] xl:px-[min(8.5vw,140px)]"
+            style={{ "--d": "1.3s" } as Vars}
+          >
+            {profile.seals.map((seal, i) => (
+              <li key={seal.name} className={i > 0 ? "-ml-1.5 lg:-ml-2" : ""}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
+                <img
+                  src={seal.logo}
+                  alt={seal.name}
+                  width={320}
+                  height={320}
+                  decoding="async"
+                  className="size-9 rounded-full shadow-[0_6px_18px_-6px_rgba(0,0,0,.85)] ring-2 ring-ceniza sm:size-10 lg:size-11 xl:size-14"
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+
         {/* 4 · Título que se enciende y queda carbonizado, con la luz del fuego detrás */}
         <motion.div
           className="pointer-events-none relative -z-10 flex justify-center will-change-transform"
@@ -254,11 +279,11 @@ export function Hero() {
 
         {/* 5 · Etiqueta, nombre, frase y acciones */}
         <motion.div
-          className="relative z-20 mt-[clamp(1.6rem,4.6svh,3.4rem)] flex w-full flex-col items-center text-center"
+          className="nx-hero-cuerpo relative z-20 mt-[clamp(1.6rem,4.6svh,3.4rem)] flex w-full flex-col items-center text-center"
           style={{ ...content, opacity: contentOpacity }}
         >
-          <RotatingTag items={hero.tags} className="mb-4 sm:mb-5" />
-          <p className="font-name text-[min(1.9rem,6.4vw)] leading-[1] font-extrabold tracking-[0.01em] text-hueso uppercase [font-stretch:115%] [text-shadow:0_2px_28px_rgba(0,0,0,.6)] sm:text-[clamp(1.9rem,3.6vw,3.7rem)] lg:text-[clamp(1.9rem,min(3.2vw,5.6svh),3.4rem)]">
+          <RotatingTag items={hero.tags} className="nx-hero-tag mb-4 sm:mb-5" />
+          <p className="nx-hero-nombre font-name text-[min(1.9rem,6.4vw)] leading-[1] font-extrabold tracking-[0.01em] text-hueso uppercase [font-stretch:115%] [text-shadow:0_2px_28px_rgba(0,0,0,.6)] sm:text-[clamp(1.9rem,3.6vw,3.7rem)] lg:text-[clamp(1.9rem,min(3.2vw,5.6svh),3.4rem)]">
             <span className="sr-only">{hero.name}</span>
             <span aria-hidden="true">
               {/* El relleno superior deja ver la tilde de GAMÉ al final, y la máscara la oculta al inicio */}
@@ -274,19 +299,21 @@ export function Hero() {
               </span>
             </span>
           </p>
-          <span className="in-rule mt-[clamp(0.8rem,1.8svh,1.3rem)] block h-px w-[clamp(72px,7vw,120px)] origin-center bg-gradient-to-r from-transparent via-oro-claro to-transparent" aria-hidden="true" />
-          {/* Las dos frases: una por línea hasta 1023 px; desde 1024 px, en una sola línea con un punto medio. */}
-          <p className="in-role mt-[clamp(0.8rem,1.8svh,1.3rem)] text-[clamp(0.8rem,4.1vw,1.06rem)] leading-[1.45] font-normal tracking-[0.005em] text-balance text-hueso/85 [text-shadow:0_1px_14px_rgba(0,0,0,.6)] lg:text-[clamp(1.02rem,1.3vw,1.28rem)]">
+          <span className="nx-hero-hilo in-rule mt-[clamp(0.8rem,1.8svh,1.3rem)] block h-px w-[clamp(72px,7vw,120px)] origin-center bg-gradient-to-r from-transparent via-oro-claro to-transparent" aria-hidden="true" />
+          {/* Las dos frases: una por línea hasta 1023 px; desde 1024 px (y en celular horizontal, por falta de
+              alto), en una sola línea con un punto medio. */}
+          <p className="nx-hero-frase in-role mt-[clamp(0.8rem,1.8svh,1.3rem)] text-[clamp(0.78rem,4vw,1.06rem)] leading-[1.45] font-normal tracking-[0.005em] text-balance text-hueso/85 [text-shadow:0_1px_14px_rgba(0,0,0,.6)] lg:text-[clamp(1.02rem,1.3vw,1.28rem)]">
             <span className="block lg:inline">{hero.roleLines[0]}</span>
             <span className="hidden text-oro-claro/80 lg:inline" aria-hidden="true">
               {" · "}
             </span>
             <span className="block lg:inline">{hero.roleLines[1]}</span>
           </p>
-          <div className="mt-[clamp(1.3rem,3.4svh,2.6rem)] flex w-full max-w-[340px] flex-col items-stretch gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:gap-[clamp(1rem,3vw,3.2rem)] lg:mt-[clamp(1.5rem,4.4svh,2.8rem)]">
+          {/* Bajo 360 px los botones llevan letra y relleno algo menores: en inglés y portugués se partían en dos líneas. */}
+          <div className="nx-hero-botones mt-[clamp(1.3rem,3.4svh,2.6rem)] flex w-full max-w-[340px] flex-col items-stretch gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:gap-[clamp(1rem,3vw,3.2rem)] lg:mt-[clamp(1.5rem,4.4svh,2.8rem)]">
             <a
               href={links.formulario}
-              className="in-cta btn btn-oro h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[19rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
+              className="in-cta btn btn-oro h-[3.3rem] px-9 text-[0.92rem] max-[360px]:px-5 max-[360px]:text-[0.85rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[19rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
               style={{ "--d": "1.1s" } as Vars}
             >
               {hero.primaryCta}
@@ -294,7 +321,7 @@ export function Hero() {
             </a>
             <a
               href="#servicios"
-              className="in-cta btn btn-linea h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[15rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
+              className="in-cta btn btn-linea h-[3.3rem] px-9 text-[0.92rem] max-[360px]:px-5 max-[360px]:text-[0.85rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[15rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
               style={{ "--d": "1.18s" } as Vars}
             >
               {hero.secondaryCta}
@@ -317,30 +344,6 @@ export function Hero() {
         }}
         aria-hidden="true"
       />
-
-      {/* 7 · Sellos IAAI (Aaron, 10-11). Desde 1024 px, abajo a la izquierda, alineados con el logo.
-          Hasta 1023 px van primero en el flujo, centrados entre la barra y el título. */}
-      <div className="pointer-events-none relative z-20 order-first pt-1 lg:absolute lg:inset-x-0 lg:bottom-[max(2.4rem,5.5svh)] lg:pt-0">
-        <ul
-          aria-label={hero.sealsLabel}
-          className="nx-hero-sellos in-cta mx-auto flex max-w-[1440px] items-center justify-center px-5 sm:px-8 lg:justify-start lg:px-[8.5vw] xl:px-[min(8.5vw,140px)]"
-          style={{ "--d": "1.3s" } as Vars}
-        >
-          {profile.seals.map((seal, i) => (
-            <li key={seal.name} className={i > 0 ? "-ml-1.5 lg:-ml-2" : ""}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
-              <img
-                src={seal.logo}
-                alt={seal.name}
-                width={320}
-                height={320}
-                decoding="async"
-                className="size-9 rounded-full shadow-[0_6px_18px_-6px_rgba(0,0,0,.85)] ring-2 ring-ceniza sm:size-10 lg:size-11 xl:size-14"
-              />
-            </li>
-          ))}
-        </ul>
-      </div>
     </section>
   );
 }
