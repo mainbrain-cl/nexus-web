@@ -320,6 +320,7 @@
   9% {
     opacity: 1;
     translate: none;
+    transform: none;
   }
   32% {
     opacity: 0.95;

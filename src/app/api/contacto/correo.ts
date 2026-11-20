@@ -144,7 +144,7 @@ const COL = 260;
  * Única regla en `<style>`, como mejora: en el celular cada columna ocupa todo el ancho de la tarjeta. Si el
  * cliente de correo la descarta, la columna queda de 260 px y el correo se lee igual.
  */
-const STYLE = `@media (max-width:560px){.nx-col{max-width:100%!important}}`;
+const STYLE = `@media (max-width:560px){.nx-col{max-width:100%!important}.nx-col>div{padding-right:0!important}}`;
 
 /** Dato de una tarjeta: ícono fijo, etiqueta fija y valor. */
 type Field = [Icon, string, string];

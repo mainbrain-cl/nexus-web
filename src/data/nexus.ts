@@ -722,7 +722,7 @@ const pt: Texts = {
     primaryCta: "Solicitar assessoria",
     secondaryCta: "Ver serviços",
     sealsLabel: "Afiliações e credencial IAAI",
-    card: { role: "Direção técnica · Advogado (Chile) · IAAI-FIT", cta: "Conheça Domingo" },
+    card: { role: "Direção técnica · Advogado (Chile) · IAAI-FIT", cta: "Conheça o Domingo" },
   },
   intersection: {
     title: ["Três competências,", "um só critério"],

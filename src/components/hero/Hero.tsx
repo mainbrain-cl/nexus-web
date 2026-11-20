@@ -129,6 +129,8 @@ export function Hero() {
 
   const titleOpacity = useTransform(scrollY, [0, 520], [1, reduce ? 1 : 0.15]);
   const contentOpacity = useTransform(scrollY, [0, 360], [1, reduce ? 1 : 0]);
+  // La tarjeta de Domingo deja de recibir clics cuando ya se desvaneció con el scroll.
+  const cardPointer = useTransform(contentOpacity, (v) => (v < 0.05 ? "none" : "auto"));
 
   useEffect(() => {
     if (reduce) return;
@@ -357,10 +359,10 @@ export function Hero() {
         style={{ opacity: contentOpacity }}
       >
         <div className="nx-hero-tarjeta-fila mx-auto flex max-w-[1440px] translate-y-[10px] justify-end px-[8.5vw] xl:translate-y-[4px] xl:px-[min(8.5vw,140px)]">
-          <a
+          <motion.a
             href="#perfil"
-            className="group in-cta pointer-events-auto flex items-center gap-3 rounded-full border border-oro/25 bg-ceniza/55 py-1.5 pr-6 pl-1.5 text-left shadow-[0_10px_30px_-14px_rgba(0,0,0,.9)] backdrop-blur-md transition-[border-color,background-color] duration-500 hover:border-oro/55 hover:bg-ceniza/70"
-            style={{ "--d": "1.4s" } as Vars}
+            className="group in-cta flex items-center gap-3 rounded-full border border-oro/25 bg-ceniza/55 py-1.5 pr-6 pl-1.5 text-left shadow-[0_10px_30px_-14px_rgba(0,0,0,.9)] backdrop-blur-md transition-[border-color,background-color] duration-500 hover:border-oro/55 hover:bg-ceniza/70"
+            style={{ "--d": "1.4s", pointerEvents: cardPointer } as unknown as Vars}
           >
             {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
             <img
@@ -383,7 +385,7 @@ export function Hero() {
                 <Arrow className="size-[1em] transition-transform duration-500 group-hover:translate-x-0.5" />
               </span>
             </span>
-          </a>
+          </motion.a>
         </div>
       </motion.div>
     </section>

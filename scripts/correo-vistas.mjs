@@ -227,7 +227,7 @@ for (const [name, input] of Object.entries(cases)) {
     await page.close();
     const d = valid.data;
     const mailto = dom.hrefs.find((h) => h.startsWith("mailto:")) ?? "";
-    check(dom.tags.script === 0 && dom.tags.b === 0 && dom.styles.length === 1 && dom.styles[0] === "@media (max-width:560px){.nx-col{max-width:100%!important}}", "ninguna etiqueta del visitante (script, style, b) llegó como HTML: el único <style> es la regla fija del diseño");
+    check(dom.tags.script === 0 && dom.tags.b === 0 && dom.styles.length === 1 && dom.styles[0] === "@media (max-width:560px){.nx-col{max-width:100%!important}.nx-col>div{padding-right:0!important}}", "ninguna etiqueta del visitante (script, style, b) llegó como HTML: el único <style> es la regla fija del diseño");
     check(dom.tags.h1 === 1, "un solo título: el del diseño");
     const names = new Set(ICONS);
     const fixed = dom.imgs.every((i) => i.src === `${ASSET_BASE}/nexus-logo.png` || (i.src.startsWith(`${ASSET_BASE}/iconos/`) && i.src.endsWith(".png") && names.has(i.src.slice(ASSET_BASE.length + 8, -4))));
