@@ -159,7 +159,8 @@ function FieldShell({
     <div className={`flex flex-col gap-2 ${className}`}>
       <label htmlFor={id} className="text-[0.95rem] font-semibold text-hueso">
         {label}
-        {optional && <span className="ml-2 text-[0.8rem] font-normal text-gris">({optional})</span>}
+        {optional && " "}
+        {optional && <span className="ml-1 text-[0.8rem] font-normal text-gris">({optional})</span>}
       </label>
       {children}
       {error && (
@@ -804,8 +805,8 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
           </FieldShell>
           <fieldset className="flex flex-col gap-3 sm:col-span-2">
             <legend className="mb-2 text-[0.95rem] font-semibold text-hueso">
-              {c.urgencia.label}
-              <span className="ml-2 text-[0.8rem] font-normal text-gris">({t.optional})</span>
+              {c.urgencia.label}{" "}
+              <span className="ml-1 text-[0.8rem] font-normal text-gris">({t.optional})</span>
             </legend>
             <div className="flex flex-wrap gap-2.5">
               {c.urgencia.options.map((o) => {

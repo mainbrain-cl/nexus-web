@@ -264,7 +264,7 @@ const es: FormTexts = {
     envio: "El servicio de correo no respondió y su consulta no se envió. Intente de nuevo en unos minutos o escríbanos por WhatsApp.",
     verificacion: "No pudimos confirmar que el envío viene de una persona. Intente de nuevo o escríbanos por WhatsApp.",
     vencido: "El formulario estuvo abierto mucho tiempo. Presione Enviar consulta de nuevo.",
-    red: "No pudimos enviar su consulta. Revise su conexión e intente de nuevo.",
+    red: "Revise su conexión a internet e intente de nuevo.",
   },
   done: {
     title: "Consulta enviada",
@@ -392,7 +392,7 @@ const en: FormTexts = {
     envio: "The email service did not respond and your inquiry was not sent. Please try again in a few minutes or message us on WhatsApp.",
     verificacion: "We could not confirm that the inquiry comes from a person. Please try again or message us on WhatsApp.",
     vencido: "The form was open for a long time. Please press Send inquiry again.",
-    red: "We could not send your inquiry. Please check your connection and try again.",
+    red: "Please check your internet connection and try again.",
   },
   done: {
     title: "Inquiry sent",
@@ -520,7 +520,7 @@ const pt: FormTexts = {
     envio: "O serviço de e-mail não respondeu e sua consulta não foi enviada. Tente novamente em alguns minutos ou fale conosco pelo WhatsApp.",
     verificacion: "Não foi possível confirmar que o envio vem de uma pessoa. Tente novamente ou fale conosco pelo WhatsApp.",
     vencido: "O formulário ficou aberto por muito tempo. Clique em Enviar consulta novamente.",
-    red: "Não foi possível enviar sua consulta. Verifique sua conexão e tente novamente.",
+    red: "Verifique sua conexão com a internet e tente novamente.",
   },
   done: {
     title: "Consulta enviada",
@@ -545,31 +545,85 @@ export const getFormTexts = (locale: Locale = "es"): FormTexts => formTexts[loca
 // ---------- Correo a Domingo (siempre en español) ----------
 
 export const emailTexts = {
-  subject: (cliente: string, servicio: string) => `Consulta web: ${cliente} · ${servicio}`,
+  /**
+   * Asunto: solo textos de estas listas y la hora de Chile, nunca algo escrito por el visitante. La hora hace
+   * único cada asunto, para que Gmail no junte en una misma conversación las consultas de personas distintas.
+   */
+  subject: (servicio: string, cliente: string, hora: string, urgente: boolean) =>
+    `${urgente ? "URGENTE · " : ""}Consulta web: ${servicio} · ${cliente} · ${hora}`,
+  /** Nombres cortos para el asunto: en el celular se ven los primeros 40 a 50 caracteres. */
+  short: {
+    cliente: {
+      abogado: "Abogado",
+      aseguradora: "Aseguradora o liquidadora",
+      investigador: "Investigador o perito",
+      empresa: "Empresa",
+      particular: "Particular",
+      otro: "Otro",
+    } satisfies Record<ClientId, string>,
+    servicio: {
+      auditoria: "Auditoría de informe pericial",
+      "revision-propia": "Revisión de informe propio",
+      litigacion: "Asesoría para procedimiento judicial",
+      controvertidas: "Pericias controvertidas",
+      investigacion: "Investigación de incendio",
+      evaluacion: "Evaluación preliminar",
+      capacitacion: "Capacitación",
+      "no-se": "Servicio por definir",
+    } satisfies Record<ServiceId, string>,
+  },
+  /** Texto alternativo del logo y marca en el texto plano. */
+  brand: "NEXUS",
+  eyebrow: "Formulario de contacto",
   heading: "Nueva consulta desde el sitio web",
+  summary: {
+    title: "Resumen",
+    solicita: "Solicita",
+    servicio: "Servicio",
+    plazo: "Plazo",
+    idioma: "Idioma",
+    recibida: "Recibida",
+    /** Hora de Chile continental, que es la de Domingo. */
+    recibidaValue: (fecha: string) => `${fecha} (hora de Chile)`,
+    /** Solo se muestra si el visitante usó el sitio en otro idioma. */
+    idiomaValue: (idioma: string) => `El visitante usó el sitio en ${idioma}`,
+  },
+  languages: { es: "español", en: "inglés", pt: "portugués" } satisfies Record<Locale, string>,
   sections: {
-    cliente: "1. Quién solicita",
-    servicio: "2. Servicio",
-    estado: "3. Estado actual del asunto",
-    caso: "4. Información del caso",
-    contacto: "5. Datos de contacto",
+    descripcion: "Descripción de la consulta",
+    estado: "Estado actual del asunto",
+    caso: "Información del caso",
+    contacto: "Datos de contacto",
+    responder: "Responder",
   },
   labels: {
+    cliente: "Quién solicita",
     lugar: "Lugar",
     fecha: "Fecha aproximada",
-    descripcion: "Descripción",
     urgencia: "Plazos o urgencia",
     plazoDetalle: "Detalle del plazo",
     nombre: "Nombre",
     empresa: "Empresa o institución",
     correo: "Correo",
     telefono: "Teléfono",
+    whatsapp: "WhatsApp",
+  },
+  /** Rótulo sobre la descripción: recuerda que ese texto es del visitante. */
+  writtenByVisitor: "Escrita por el visitante",
+  /** Campos opcionales que quedaron en blanco, en una sola línea. */
+  notGiven: (campos: string) => `Sin indicar: ${campos}.`,
+  actions: {
+    correo: "Responder por correo",
+    whatsapp: "Escribir por WhatsApp",
+    telefono: "Llamar",
+    /** Asunto del correo de respuesta que abre el botón. Texto fijo, sin datos del visitante. */
+    replySubject: "Su consulta a NEXUS",
   },
   visitorNotice: "Texto escrito por el visitante, no verificado. No abra enlaces ni adjuntos de terceros.",
   empty: "No indicado",
   skipped: "No aplica",
   replyHint: "Responda este correo para contestar directamente al remitente.",
-  footer: (fecha: string, idioma: string) => `Enviado desde el formulario de nexuschile.net el ${fecha} (idioma del formulario: ${idioma}).`,
+  footer: (fecha: string, idioma: string) => `Enviado desde el formulario de nexuschile.net el ${fecha}, hora de Chile (idioma del formulario: ${idioma}).`,
 };
 
 // ---------- Abrir el formulario con un servicio ya elegido ----------
