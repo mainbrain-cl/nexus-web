@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useRef, useSyncExternalStore, type CSSProperties } from "react";
 import {
   motion,
   useMotionValue,
@@ -27,10 +27,11 @@ type Vars = CSSProperties & Record<`--${string}`, string>;
 
 /**
  * Lleva un desplazamiento al píxel físico de la pantalla más cercano.
- * Mover en fracciones de píxel una capa que el navegador pinta (y no solo compone) obliga a volver a dibujarla
- * entera en cada cuadro; medido en una pantalla 2x a 120 Hz, el parallax pasaba de ~190 % a ~105 % de CPU
- * (quieto: ~82 %). Las capas de fondo (humo, brasas) siguen así: el salto de medio píxel no se ve en ellas.
- * En el título y los botones sí se veía (Aaron, 20-11: "tosco"): esas capas usan `useSmoothLayer`.
+ * El ahorro viene de que, redondeado, el valor casi nunca cambia y Motion no escribe el estilo: una capa que
+ * recibe una posición nueva en cada cuadro obliga al navegador a recomponer en cada cuadro. Medido en una
+ * pantalla 2x a 120 Hz, el parallax pasaba de ~190 % a ~105 % de CPU (quieto: ~82 %).
+ * Las capas de fondo (humo, brasas) van siempre así: el salto de medio píxel no se ve en ellas. En el título y
+ * los botones sí se veía con el mouse (Aaron, 20-11: "tosco"): ahí, y solo con mouse, se usa `useSmoothLayer`.
  */
 function snap(v: number) {
   const dpr = typeof window === "undefined" ? 1 : window.devicePixelRatio || 1;
@@ -60,12 +61,19 @@ function useLayer(
 }
 
 /**
- * Desplazamiento de una capa de lectura (título, texto y botones, tarjeta): fluido, sin saltos.
- * Antes la posición se redondeaba al píxel físico en cada cuadro y, con el mouse lento, la capa avanzaba a
- * saltos de un píxel unas pocas veces por segundo. Ahora se redondea el destino y un resorte propio lleva la
- * capa hasta él pasando por fracciones de píxel: se mueve continuo y al detenerse queda en un píxel entero,
- * con el texto nítido. No cuesta repintado porque estas capas llevan `will-change: transform`: el navegador
- * las compone en la GPU y solo las desplaza. La parte del scroll sigue redondeada, como antes.
+ * Resorte de las capas de lectura: crítico (el más rápido que no rebota) y con un final corto. Al quedar a menos
+ * de una décima de píxel del destino, casi quieto, termina y cae en el destino redondeado: así las escrituras de
+ * estilo paran en menos de un segundo tras soltar el mouse, en vez de arrastrar una cola de varios segundos.
+ */
+const LAYER_SPRING = { stiffness: 60, damping: 14, mass: 0.8, restDelta: 0.1, restSpeed: 2 };
+
+/**
+ * Desplazamiento fluido de una capa de lectura, para cuando hay mouse.
+ * Con el redondeo por cuadro y el mouse lento, la capa avanzaba a saltos de un píxel unas pocas veces por
+ * segundo. Aquí se redondea el destino y un resorte propio lleva la capa hasta él pasando por fracciones de
+ * píxel: se mueve continua y al detenerse queda en un píxel entero, con el texto nítido.
+ * Tiene costo: mientras el resorte anda, escribe el estilo en cada cuadro. Por eso solo se usa con mouse (que
+ * se mueve a ratos) y nunca con el vaivén automático del celular, que no para. La parte del scroll va redondeada.
  */
 function useSmoothLayer(
   mx: MotionValue<number>,
@@ -74,10 +82,45 @@ function useSmoothLayer(
   depth: number,
   scrollK: number,
 ) {
-  const x = useSpring(useTransform(mx, (v) => snap(v * -depth)), SPRING);
-  const mouseY = useSpring(useTransform(my, (v) => snap(v * -depth * 0.6)), SPRING);
+  const x = useSpring(useTransform(mx, (v) => snap(v * -depth)), LAYER_SPRING);
+  const mouseY = useSpring(useTransform(my, (v) => snap(v * -depth * 0.6)), LAYER_SPRING);
   const y = useTransform([mouseY, scrollY], ([a, b]: number[]) => a + snap(b * scrollK));
   return { x, y };
+}
+
+const FINE_QUERY = "(hover: hover) and (pointer: fine)";
+
+/** `true` si hay mouse. En el servidor y en el primer render es `false`, como `useReduce`, para no descuadrar la hidratación. */
+function useFinePointer() {
+  return useSyncExternalStore(
+    (onChange) => {
+      const m = window.matchMedia(FINE_QUERY);
+      m.addEventListener("change", onChange);
+      return () => m.removeEventListener("change", onChange);
+    },
+    () => window.matchMedia(FINE_QUERY).matches,
+    () => false,
+  );
+}
+
+/**
+ * Capa de lectura (título, texto y botones, tarjeta): fluida con mouse, redondeada por cuadro en táctil.
+ * Los dos cálculos existen siempre (las reglas de los hooks) y el que no se usa va con profundidad cero, así
+ * su destino no cambia nunca y no anima nada.
+ */
+function useTextLayer(
+  fine: boolean,
+  mx: MotionValue<number>,
+  my: MotionValue<number>,
+  px: MotionValue<number>,
+  py: MotionValue<number>,
+  scrollY: MotionValue<number>,
+  depth: number,
+  scrollK: number,
+) {
+  const smooth = useSmoothLayer(mx, my, scrollY, fine ? depth : 0, fine ? scrollK : 0);
+  const stepped = useLayer(px, py, scrollY, fine ? 0 : depth, fine ? 0 : scrollK);
+  return fine ? smooth : stepped;
 }
 
 /**
@@ -133,6 +176,7 @@ function TitleLine({ text, start }: { text: string; start: number }) {
 export function Hero() {
   const { hero, links, profile } = useContent();
   const reduce = useReduce();
+  const fine = useFinePointer();
   const sectionRef = useRef<HTMLElement>(null);
   const { scrollY } = useScroll();
 
@@ -145,12 +189,12 @@ export function Hero() {
   const bg = useLayer(px, py, scrollY, 8 * k, 0.5 * k);
   const smoke = useLayer(px, py, scrollY, 14 * k, 0.42 * k);
   const back = useLayer(px, py, scrollY, 20 * k, 0.36 * k);
-  const title = useSmoothLayer(mx, my, scrollY, 16 * k, SCROLL_COLUMNA * k);
+  const title = useTextLayer(fine, mx, my, px, py, scrollY, 16 * k, SCROLL_COLUMNA * k);
   const front = useLayer(px, py, scrollY, 54 * k, -0.18 * k);
-  const content = useSmoothLayer(mx, my, scrollY, 6 * k, SCROLL_COLUMNA * k);
+  const content = useTextLayer(fine, mx, my, px, py, scrollY, 6 * k, SCROLL_COLUMNA * k);
   // La tarjeta de Domingo flota en su propio plano: más cerca que el texto ante el mouse y un poco más rápida
   // que la página al bajar. La profundidad es corta a propósito, para que nunca alcance los botones.
-  const card = useSmoothLayer(mx, my, scrollY, 22 * k, -0.06 * k);
+  const card = useTextLayer(fine, mx, my, px, py, scrollY, 22 * k, -0.06 * k);
 
   // Largo de la línea más larga del título: con él, el CSS calcula el tamaño para que quepa en cada idioma.
   const titleChars = Math.max(...hero.titleLines.map((line) => Array.from(line).length));
@@ -162,13 +206,21 @@ export function Hero() {
 
   useEffect(() => {
     if (reduce) return;
-    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    if (fine) {
+      // Con la portada fuera de pantalla el mouse no mueve nada: no tiene sentido animar capas que no se ven.
+      let onScreen = true;
+      const io = new IntersectionObserver(([e]) => (onScreen = e.isIntersecting));
+      if (sectionRef.current) io.observe(sectionRef.current);
       const onMove = (e: PointerEvent) => {
+        if (!onScreen) return;
         mx.set(e.clientX / window.innerWidth - 0.5);
         my.set(e.clientY / window.innerHeight - 0.5);
       };
       window.addEventListener("pointermove", onMove, { passive: true });
-      return () => window.removeEventListener("pointermove", onMove);
+      return () => {
+        io.disconnect();
+        window.removeEventListener("pointermove", onMove);
+      };
     }
     // Sin mouse (celular): las capas respiran solas con un vaivén lento para no perder la profundidad.
     // Empieza recién cuando termina la entrada y crece de a poco, centrado en cero, para que el título
@@ -218,7 +270,7 @@ export function Hero() {
       io.disconnect();
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, [reduce, mx, my]);
+  }, [reduce, fine, mx, my]);
 
   return (
     // Portada sin retrato (pedido de Domingo, 20-11): el título es el protagonista y la foto queda para Perfil.

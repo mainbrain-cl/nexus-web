@@ -291,13 +291,13 @@ const es: Texts = {
     sealsLabel: "Afiliaciones y credencial IAAI",
     card: { role: "Dirección técnica · Abogado · IAAI-FIT", cta: "Conocer a Domingo" },
   },
-  // Intersección: un solo bloque (Aaron, 10-11). Las tres competencias van en palabras de Domingo (12-11).
   advisor: {
     label: "Escribir a Domingo Soto Gamé: abrir el formulario",
     message: "Hola, soy Domingo. ¿Necesita algo específico? Cuénteme su caso en el formulario y lo reviso personalmente.",
     cta: "Abrir el formulario",
     close: "Cerrar mensaje",
   },
+  // Intersección: un solo bloque (Aaron, 10-11). Las tres competencias van en palabras de Domingo (12-11).
   intersection: {
     title: ["Tres competencias,", "un solo criterio"],
     // El diagrama ya nombra las tres competencias: el texto no las repite (revisión general, 12-11).

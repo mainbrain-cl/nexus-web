@@ -16,6 +16,10 @@ const DISMISSED_KEY = "nexus:asesor-mensaje";
 const MESSAGE_DELAY_MS = 1500;
 /** La portada cuenta como "en pantalla" mientras se vea más de esta fracción de ella. */
 const HERO_RATIO = 0.4;
+/** En celular el mensaje tapa parte del texto: se cierra solo pasado este tiempo o al bajar esta distancia. */
+const NARROW_QUERY = "(max-width: 639.98px)";
+const AUTO_CLOSE_MS = 10000;
+const AUTO_CLOSE_SCROLL = 600;
 
 function wasDismissed() {
   try {
@@ -35,8 +39,9 @@ export function Asesor() {
   const { advisor, hero, links } = useContent();
   const [visible, setVisible] = useState(false);
   const [message, setMessage] = useState(false);
-  /** El mensaje sale una sola vez por carga: después de cerrarlo o de haberlo mostrado no se vuelve a programar. */
+  /** El mensaje sale una sola vez por visita: después de cerrarlo o de haberlo mostrado no se vuelve a programar. */
   const scheduled = useRef(false);
+  const rootRef = useRef<HTMLDivElement>(null);
 
   // Visible fuera de la portada, de Contacto y del pie.
   useEffect(() => {
@@ -45,7 +50,13 @@ export function Asesor() {
     const footer = document.querySelector("footer");
     if (!hero) return;
     const state = { hero: true, contact: false, footer: false };
-    const update = () => setVisible(!state.hero && !state.contact && !state.footer);
+    const update = () => {
+      const next = !state.hero && !state.contact && !state.footer;
+      // Si se oculta con el foco dentro (teclado), el foco no debe quedar en un elemento invisible.
+      const active = document.activeElement;
+      if (!next && active instanceof HTMLElement && rootRef.current?.contains(active)) active.blur();
+      setVisible(next);
+    };
     const heroIo = new IntersectionObserver(
       ([e]) => {
         state.hero = e.intersectionRatio > HERO_RATIO;
@@ -53,7 +64,7 @@ export function Asesor() {
       },
       { threshold: [0, HERO_RATIO, 1] },
     );
-    // Contacto y el pie cuentan desde que asoman por el cuarto inferior de la pantalla, donde va el asesor.
+    // Contacto y el pie cuentan desde que superan el 12 % inferior de la pantalla, la franja donde va el asesor.
     const restIo = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
@@ -78,10 +89,28 @@ export function Asesor() {
     if (!visible || scheduled.current || wasDismissed()) return;
     const t = window.setTimeout(() => {
       scheduled.current = true;
+      // Se marca al mostrarlo, no solo al cerrarlo: una vez por visita, aunque se recargue o se cambie de idioma.
+      rememberDismissed();
       setMessage(true);
     }, MESSAGE_DELAY_MS);
     return () => window.clearTimeout(t);
   }, [visible]);
+
+  // En celular el mensaje se retira solo: a los 10 s o cuando el visitante sigue leyendo (600 px de scroll).
+  useEffect(() => {
+    if (!message || !window.matchMedia(NARROW_QUERY).matches) return;
+    const close = () => setMessage(false);
+    const y0 = window.scrollY;
+    const onScroll = () => {
+      if (Math.abs(window.scrollY - y0) > AUTO_CLOSE_SCROLL) close();
+    };
+    const t = window.setTimeout(close, AUTO_CLOSE_MS);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [message]);
 
   const dismiss = () => {
     scheduled.current = true;
@@ -99,10 +128,10 @@ export function Asesor() {
   };
 
   return (
-    <div className="nx-asesor" data-on={visible}>
+    <div ref={rootRef} className="nx-asesor" data-on={visible}>
       {message && (
         <div className="nx-asesor-mensaje relative mb-1.5 w-[min(15rem,calc(100vw-6.25rem))] rounded-[1.25rem] rounded-br-[0.35rem] border border-oro/25 bg-humo/90 shadow-[0_18px_44px_-14px_rgba(0,0,0,.9),0_4px_14px_-6px_rgba(0,0,0,.6)] backdrop-blur-md sm:w-[19rem]">
-          <a href={links.formulario} onClick={go} className="group block rounded-[inherit] py-3 pr-10 pl-4 sm:py-3.5 sm:pl-[1.125rem]">
+          <a href={links.formulario} onClick={go} className="group block rounded-[inherit] py-3 pr-11 pl-4 sm:py-3.5 sm:pr-10 sm:pl-[1.125rem]">
             <span className="block text-[0.68rem] leading-[1.3] font-semibold tracking-[0.14em] text-oro-claro uppercase">{hero.name}</span>
             <span className="mt-1.5 block text-[0.86rem] leading-[1.45] text-hueso/90 sm:text-[0.92rem]">{advisor.message}</span>
             <span className="mt-2 inline-flex items-center gap-1.5 text-[0.8rem] leading-[1.3] font-semibold text-oro-claro">
@@ -114,7 +143,7 @@ export function Asesor() {
             type="button"
             onClick={dismiss}
             aria-label={advisor.close}
-            className="absolute top-1 right-1 grid size-9 cursor-pointer place-items-center rounded-full text-hueso/60 transition-colors duration-300 hover:text-hueso"
+            className="absolute top-0 right-0 grid size-11 cursor-pointer sm:top-1 sm:right-1 sm:size-9 place-items-center rounded-full text-hueso/60 transition-colors duration-300 hover:text-hueso"
           >
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="size-3.5">
               <path d="m4 4 12 12M16 4 4 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
