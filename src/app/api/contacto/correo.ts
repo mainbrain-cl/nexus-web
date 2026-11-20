@@ -1,14 +1,17 @@
 // Arma el correo a Domingo a partir de una consulta ya validada. Siempre en español.
 //
-// Diseño: encabezado oscuro con el logo, un resumen (servicio, tipo de cliente, urgencia, fecha) y el aviso fijo;
-// después la descripción destacada, las respuestas en bloques y los botones para responder. Hecho para Gmail: tablas,
-// estilos en línea, 600 px de ancho máximo y fuentes del sistema; no depende de `<style>` ni de fuentes web.
+// Diseño: de lectura fácil y visual. Franja oscura con el logo; título con el servicio, fecha y, si la hay, la
+// urgencia en una banda; el aviso fijo; y cuatro tarjetas con ícono: quién escribe, qué necesita, detalles del caso
+// (solo los que vienen con dato) y cómo responder, con botones grandes. Los datos cortos van en dos columnas que
+// en el celular pasan a una. Hecho para Gmail: tablas, estilos en línea,
+// 600 px de ancho máximo y fuentes del sistema; no depende de fuentes web, y la única regla en `<style>` es una mejora.
 //
 // Defensas (si el diseño choca con una, gana la defensa):
 // - Todo valor del visitante se escapa antes de entrar al HTML; el asunto solo lleva textos de las listas blancas.
-// - Aviso fijo arriba, en el encabezado, y enlaces desactivados (`https://x.com` → `hxxps://x[.]com`).
-// - El encabezado solo lleva datos de listas cerradas; del visitante, apenas su nombre, recortado y rotulado.
-//   Así no puede escribir ahí algo que parezca un aviso de NEXUS.
+// - Arriba del aviso fijo va solo lo que arma el sistema con listas cerradas (servicio, urgencia) y la fecha.
+//   Todo lo del visitante va después del aviso, bajo una etiqueta y en peso normal: la negrita es de los textos
+//   fijos, así que no puede escribir algo que parezca un título o un aviso de NEXUS.
+// - Enlaces desactivados (`https://x.com` → `hxxps://x[.]com`), también los disfrazados con caracteres invisibles.
 // - En texto plano, la descripción va con sangría para que no pueda imitar una sección del correo.
 // - Los enlaces de los botones (mailto, wa.me y tel) se arman solo con el correo ya validado y con los dígitos
 //   del teléfono; si no pasan su propia revisión, el botón no se muestra.
@@ -18,8 +21,11 @@ import { isEmail, type ContactPayload } from "@/lib/contacto";
 
 const es = getFormTexts("es");
 
-/** Logo para el correo: PNG servido por el sitio (Gmail no muestra SVG). Se genera con `scripts/correo-logo.mjs`. */
-export const LOGO_URL = "https://nexuschile.net/correo/nexus-logo.png";
+/**
+ * Base de las imágenes del correo (logo e íconos): PNG servidos por el sitio, porque Gmail no muestra SVG.
+ * Se generan con `scripts/correo-logo.mjs` y `scripts/correo-iconos.mjs` en `public/correo/`.
+ */
+export const ASSET_BASE = "https://nexuschile.net/correo";
 const LOGO = { width: 124, height: 40 };
 
 const escapeHtml = (s: string) =>
@@ -75,14 +81,11 @@ export function phoneHrefs(telefono: string): { tel: string; whatsapp: string | 
 
 // ---------- Contenido ----------
 
-/** Largo máximo del nombre del visitante en el encabezado. Completo va en Datos de contacto. */
-const NAME_MAX = 40;
 const INDENT = "    ";
 const indent = (v: string) => v.split("\n").map((l) => INDENT + l).join("\n");
 
 const label = <T extends { id: string; label: string }>(list: T[], id: string) => list.find((o) => o.id === id)?.label ?? id;
 
-type Row = [string, string];
 
 /** Fecha y hora de Chile, en 24 horas: larga para el cuerpo (`20 de noviembre de 2026, 14:32`) y corta para el asunto. */
 function chileDate(sentAt: Date) {
@@ -98,27 +101,53 @@ function chileDate(sentAt: Date) {
 }
 
 // ---------- Estilos en línea ----------
+// Tarjetas blancas sobre un fondo cálido, cada una con su ícono y su título; los datos cortos van en una grilla de dos
+// columnas que en el celular pasa a una. La jerarquía se marca con el tamaño y el peso, siempre igual:
+// título (25 px, 800) > título de tarjeta (20 px, 700) > dato o párrafo (18 px, 400) > etiqueta (15 px, 600, un
+// tono más suave) > aviso (15 px) > pie (13 px). La negrita queda para los textos fijos del correo: lo que escribió
+// el visitante va siempre en peso normal.
 
 const C = {
   ceniza: "#120f0d",
-  humo: "#1d1815",
-  hilo: "#3a3029", // separador sobre fondo oscuro
   oro: "#c9a26b",
-  oroClaro: "#e0c08f",
-  oroTinta: "#7c5c34", // oro oscuro legible sobre papel
+  oroTinta: "#7c5c34", // oro oscuro del logo: fondo del botón principal
   hueso: "#f4eee6",
-  gris: "#b3aaa0",
-  fondo: "#ece5da",
-  papel: "#fdfbf7",
-  caja: "#f6f0e6",
-  linea: "#e4d9c8",
-  tinta: "#241e1a",
-  tenue: "#6b6158",
+  fondo: "#f1ebe1",
+  tarjeta: "#ffffff",
+  aviso: "#f7ecd9",
+  urgente: "#f3dfbd",
+  borde: "#e2d6c3",
+  tinta: "#14100d", // datos, párrafos y títulos
+  etiqueta: "#4d4238", // etiquetas: más suave que el dato, pero de alto contraste (9:1 sobre blanco)
+  pie: "#5c5148",
 };
 const FONT = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;";
 /** Un texto largo sin espacios (una URL, por ejemplo) no ensancha el correo en el celular. */
 const WRAP = "word-break:break-word;overflow-wrap:anywhere;";
 const TABLE = 'role="presentation" cellpadding="0" cellspacing="0" border="0"';
+
+/**
+ * Íconos del correo: nombres fijos de archivos en `public/correo/iconos/` (los genera `scripts/correo-iconos.mjs`).
+ * Nunca dependen de lo que escribió el visitante. Son decorativos: llevan `alt=""` y el texto se entiende sin ellos.
+ */
+export const ICONS = [
+  "persona", "mensaje", "llama", "responder", "aviso", "urgencia", "cliente", "identificacion", "empresa", "idioma",
+  "situacion", "lugar", "fecha", "plazo", "correo", "telefono",
+] as const;
+type Icon = (typeof ICONS)[number];
+const icon = (name: Icon, size: number, style: string) =>
+  `<img src="${ASSET_BASE}/iconos/${name}.png" width="${size}" height="${size}" alt="" style="width:${size}px;height:${size}px;border:0;outline:none;${style}">`;
+
+/** Ancho de cada columna de la grilla: dos caben en la tarjeta a 600 px; en el celular queda una por fila. */
+const COL = 260;
+/**
+ * Única regla en `<style>`, como mejora: en el celular cada columna ocupa todo el ancho de la tarjeta. Si el
+ * cliente de correo la descarta, la columna queda de 260 px y el correo se lee igual.
+ */
+const STYLE = `@media (max-width:560px){.nx-col{max-width:100%!important}}`;
+
+/** Dato de una tarjeta: ícono fijo, etiqueta fija y valor. */
+type Field = [Icon, string, string];
 
 export function buildEmail(d: ContactPayload, sentAt: Date) {
   const s = es.steps;
@@ -147,139 +176,100 @@ export function buildEmail(d: ContactPayload, sentAt: Date) {
   const estado = d.estado.map((id) => label(variant, id));
   const fecha = chileDate(sentAt);
   const idioma = t.languages[d.idioma];
-  const footer = t.footer(idioma);
-  const casoTitle = noIncident ? t.sections.capacitacion : t.sections.caso;
-
-  // El encabezado es la parte que se lee como "del sistema": lleva solo datos de listas cerradas (servicio, tipo
-  // de cliente, urgencia) y la fecha. Lo único del visitante es su nombre, recortado, en peso normal y rotulado.
-  // Empresa, "¿Quién?" y el detalle del plazo van abajo, en sus bloques: ahí no pueden pasar por un aviso de NEXUS.
-  const chars = Array.from(v.nombre);
-  const recortado = chars.length > NAME_MAX;
-  const nombreCorto = recortado ? `${chars.slice(0, NAME_MAX).join("").trimEnd()}…` : v.nombre;
+  const title = t.title(servicio);
+  const detallesTitle = noIncident ? t.sections.detallesCapacitacion : t.sections.detalles;
 
   const mailto = mailtoHref(d.correo, t.actions.replySubject);
   const phone = d.telefono ? phoneHrefs(d.telefono) : null;
 
-  // Sin datos repetidos: la urgencia con plazo ya está en el resumen, así que aquí queda solo su detalle.
-  const caso: Row[] = [
-    ...(noIncident
-      ? []
-      : ([
-          [t.labels.lugar, v.lugar],
-          [t.labels.fecha, v.fecha],
-        ] as Row[])),
-    ...(conPlazo ? [] : ([[t.labels.urgencia, urgencia]] as Row[])),
-    ...(v.plazoDetalle ? ([[t.labels.plazoDetalle, v.plazoDetalle]] as Row[]) : []),
-  ];
-  const detalle: Row[] = [
-    ...(d.cliente === "otro" && v.clienteOtro ? ([[t.labels.clienteOtro, v.clienteOtro]] as Row[]) : []),
-    ...(d.cliente === "particular" ? [] : ([[t.labels.empresa, v.empresa]] as Row[])),
-    [t.labels.correo, d.correo],
-    [t.labels.telefono, v.telefono],
-  ];
-  // En el HTML el nombre ya está arriba: en Datos de contacto se repite solo si arriba quedó recortado.
-  const contactoHtml: Row[] = [...(recortado ? ([[t.labels.nombre, v.nombre]] as Row[]) : []), ...detalle];
-  const contactoText: Row[] = [[t.labels.nombre, v.nombre], ...detalle];
+  // Arriba del aviso fijo va solo lo que arma el sistema con listas cerradas: el servicio en el título, la fecha y la
+  // urgencia. Todo lo que escribió el visitante va después del aviso, cada dato bajo su etiqueta y en peso normal.
+  // Solo se muestran los datos que vienen con algo: un campo opcional en blanco no ocupa lugar.
+  const filled = (rows: Field[]) => rows.filter(([, , val]) => val);
+  const quien = filled([
+    ["persona", t.labels.nombre, v.nombre],
+    ["cliente", t.labels.cliente, cliente],
+    ["identificacion", t.labels.clienteOtro, d.cliente === "otro" ? v.clienteOtro : ""],
+    ["empresa", t.labels.empresa, v.empresa],
+    ["idioma", t.labels.idioma, d.idioma === "es" ? "" : t.idiomaValue(idioma)],
+  ]);
+  // La urgencia con plazo ya está arriba, en su banda: aquí queda solo el detalle.
+  const detalles = filled([
+    ["lugar", t.labels.lugar, noIncident ? "" : v.lugar],
+    ["fecha", t.labels.fecha, noIncident ? "" : v.fecha],
+    ["plazo", t.labels.urgencia, conPlazo ? "" : urgencia],
+    ["plazo", t.labels.plazoDetalle, v.plazoDetalle],
+  ]);
 
   // ----- Texto plano -----
-  const line = ([k, val]: Row) => `${k}: ${val || t.empty}`;
+  const line = ([, k, val]: Field) => `${k}: ${val}`;
   const text = [
-    `${t.brand} · ${t.heading}`,
+    `${t.brand} · ${title}`,
+    t.received(fecha.long),
+    ...(conPlazo ? [`${t.labels.urgencia}: ${urgencia}`] : []),
     "",
     `[ ${t.visitorNotice} ]`,
     "",
-    t.summary.title.toUpperCase(),
-    line([t.summary.servicio, servicio]),
-    line([t.labels.cliente, cliente]),
-    ...(conPlazo ? [line([t.summary.urgencia, urgencia])] : []),
-    ...(d.idioma === "es" ? [] : [line([t.summary.idioma, t.summary.idiomaValue(idioma)])]),
-    line([t.summary.recibida, t.summary.recibidaValue(fecha.long)]),
+    t.sections.quien.toUpperCase(),
+    ...quien.map(line),
     "",
-    t.sections.descripcion.toUpperCase(),
+    t.sections.necesita.toUpperCase(),
     indent(v.descripcion),
     "",
-    t.sections.estado.toUpperCase(),
-    ...(estado.length ? estado.map((i) => `- ${i}`) : [t.skipped]),
-    "",
-    ...(caso.length ? [casoTitle.toUpperCase(), ...caso.map(line), ""] : []),
-    t.sections.contacto.toUpperCase(),
-    ...contactoText.map(line),
-    "",
+    ...(estado.length || detalles.length
+      ? [detallesTitle.toUpperCase(), ...estado.map((i) => `- ${i}`), ...detalles.map(line), ""]
+      : []),
     t.sections.responder.toUpperCase(),
-    t.replyHint,
+    `${t.labels.correo}: ${d.correo}`,
+    ...(v.telefono ? [`${t.labels.telefono}: ${v.telefono}`] : []),
     ...(phone?.whatsapp ? [`${t.labels.whatsapp}: ${phone.whatsapp}`] : []),
-    ...(phone ? [`${t.actions.telefono}: ${phone.tel.slice(4)}`] : []),
+    t.replyHint,
     "",
     "--",
-    footer,
+    t.footer(idioma),
   ].join("\n");
 
   // ----- HTML -----
   const e = escapeHtml;
   const multiline = (val: string) => e(val).replace(/\n/g, "<br>");
 
-  // Resumen, sobre el fondo oscuro del encabezado.
-  const summaryRow = (k: string, html: string, first = false) =>
-    `<tr><td width="92" valign="top" style="${FONT}width:92px;padding:11px 12px 11px 0;${first ? "" : `border-top:1px solid ${C.hilo};`}font-size:11px;line-height:20px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${C.gris}">${e(k)}</td>` +
-    `<td valign="top" style="${FONT}${WRAP}padding:11px 0;${first ? "" : `border-top:1px solid ${C.hilo};`}font-size:15px;line-height:20px;color:${C.hueso}">${html}</td></tr>`;
-  const summary = [
-    summaryRow(t.summary.servicio, `<strong>${e(servicio)}</strong>`, true),
-    summaryRow(t.summary.solicita, `<strong>${e(cliente)}</strong>`),
-    summaryRow(
-      t.labels.nombre,
-      `${e(nombreCorto)}<br><span style="font-size:12px;color:${C.gris}">${e(t.visitorData)}</span>`,
-    ),
-    ...(conPlazo ? [summaryRow(t.summary.urgencia, `<strong style="color:${C.oroClaro}">${e(urgencia)}</strong>`)] : []),
-    ...(d.idioma === "es" ? [] : [summaryRow(t.summary.idioma, e(t.summary.idiomaValue(idioma)))]),
-    summaryRow(t.summary.recibida, e(t.summary.recibidaValue(fecha.long))),
-  ].join("");
-  // Aviso fijo, arriba y dentro del encabezado: se lee antes que cualquier texto del visitante.
-  const notice =
-    `<table ${TABLE} width="100%" style="width:100%;margin-top:16px"><tr><td bgcolor="${C.humo}" style="${FONT}padding:12px 14px;border:1px solid ${C.oro};border-radius:8px;background-color:${C.humo}">` +
-    `<div style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:${C.oroClaro}">${e(t.noticeTitle)}</div>` +
-    `<div style="margin-top:3px;font-size:14px;line-height:21px;color:${C.hueso}">${e(t.visitorNotice)}</div></td></tr></table>`;
+  const labelHtml = (ic: Icon, k: string) =>
+    `<div style="font-size:15px;line-height:22px;font-weight:600;color:${C.etiqueta}">${icon(ic, 18, "vertical-align:-3px;margin-right:7px;")}${e(k)}:</div>`;
+  const valueHtml = (html: string) => `<div style="${WRAP}font-size:18px;line-height:28px;font-weight:400;color:${C.tinta}">${html}</div>`;
+  /** Una celda de la grilla. `html` reemplaza al valor cuando la celda lleva algo más (los botones). */
+  const cell = (ic: Icon, k: string, html: string) =>
+    `<div class="nx-col" style="display:inline-block;width:100%;max-width:${COL}px;vertical-align:top"><div style="${FONT}padding:16px 14px 0 0">${labelHtml(ic, k)}${html}</div></div>`;
+  /** Grilla fluida: celdas `inline-block` de ancho máximo fijo. `font-size:0` quita el espacio entre celdas. */
+  const grid = (cells: string[]) => (cells.length ? `<div style="font-size:0;line-height:0">${cells.join("")}</div>` : "");
+  const fieldCells = (rows: Field[]) => rows.map(([ic, k, val]) => cell(ic, k, valueHtml(e(val))));
 
-  // Bloques sobre papel: título con hilo dorado, etiqueta en mayúscula pequeña y valor debajo.
-  const sectionTitle = (title: string, note = "") =>
-    `<tr><td style="${FONT}padding:26px 0 9px;border-bottom:1px solid ${C.oro};font-size:16px;line-height:22px;font-weight:700;color:${C.ceniza}">${e(title)}` +
-    (note ? ` <span style="font-size:12px;font-weight:400;color:${C.tenue}">· ${e(note)}</span>` : "") +
-    `</td></tr>`;
-  const field = ([k, val]: Row) =>
-    `<tr><td style="${FONT}${WRAP}padding:12px 0 0">` +
-    `<div style="font-size:11px;line-height:16px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:${C.tenue}">${e(k)}</div>` +
-    `<div style="font-size:16px;line-height:24px;color:${C.tinta}">${e(val)}</div></td></tr>`;
-  /** Los campos opcionales en blanco no ocupan una fila cada uno: se nombran juntos en una línea tenue. */
-  const fields = (rows: Row[]) => {
-    const missing = rows.filter(([, val]) => !val).map(([k]) => k.toLowerCase());
-    return (
-      rows.filter(([, val]) => val).map(field).join("") +
-      (missing.length
-        ? `<tr><td style="${FONT}padding:12px 0 0;font-size:13px;line-height:20px;color:${C.tenue}">${e(t.notGiven(missing.join(", ")))}</td></tr>`
-        : "")
-    );
-  };
-  const estadoHtml = estado.length
-    ? estado
-        .map(
-          (i) =>
-            `<tr><td width="18" valign="top" style="${FONT}width:18px;padding:10px 0 0;font-size:16px;line-height:24px;color:${C.oro}">&bull;</td>` +
-            `<td valign="top" style="${FONT}padding:10px 0 0;font-size:16px;line-height:24px;color:${C.tinta}">${e(i)}</td></tr>`,
-        )
-        .join("")
-    : "";
+  /** Tarjeta de sección: ícono y título en la cabecera, y el contenido debajo. */
+  const card = (ic: Icon, title: string, body: string) =>
+    `<tr><td style="padding:14px 0 0"><div style="${FONT}padding:20px 20px 22px;border:1px solid ${C.borde};border-radius:12px;background-color:${C.tarjeta}">` +
+    `<div style="font-size:20px;line-height:26px;font-weight:700;color:${C.tinta}">${icon(ic, 24, "vertical-align:-5px;margin-right:10px;")}${e(title)}</div>${body}</div></td></tr>`;
+  /** Banda de aviso: ícono a la izquierda y texto fijo. */
+  const band = (ic: Icon, bg: string, html: string, size: number, weight: number) =>
+    `<tr><td style="padding:14px 0 0"><table ${TABLE} width="100%" style="width:100%"><tr>` +
+    `<td width="40" valign="top" bgcolor="${bg}" style="width:40px;padding:14px 0 14px 16px;border-radius:12px 0 0 12px;background-color:${bg}">${icon(ic, 24, "display:block;")}</td>` +
+    `<td valign="top" bgcolor="${bg}" style="${FONT}padding:14px 16px 14px 12px;border-radius:0 12px 12px 0;background-color:${bg};font-size:${size}px;line-height:${size + 8}px;font-weight:${weight};color:${C.tinta}">${html}</td>` +
+    `</tr></table></td></tr>`;
 
-  // Los dos botones llevan letra clara sobre fondo oscuro. Con letra oscura sobre el dorado claro, un modo oscuro
-  // forzado aclara la letra y deja el fondo igual: queda ilegible, aunque el color se fije de forma explícita.
-  // El principal usa el oro oscuro del logo; así se lee igual con o sin inversión.
-  const button = (href: string, text: string, primary = false) => {
-    const bg = primary ? C.oroTinta : C.ceniza;
-    return `<a href="${e(href)}" target="_blank" rel="noopener noreferrer" style="${FONT}display:inline-block;margin:0 8px 10px 0;padding:13px 22px;border:1px solid ${primary ? C.oroTinta : C.oro};border-radius:999px;background-color:${bg};font-size:15px;line-height:20px;font-weight:700;text-decoration:none;color:${C.hueso}"><span style="color:${C.hueso}">${e(text)}</span></a>`;
-  };
-  const buttons = [
-    ...(mailto ? [button(mailto, t.actions.correo, true)] : []),
-    ...(phone?.whatsapp ? [button(phone.whatsapp, t.actions.whatsapp)] : []),
-    ...(phone ? [button(phone.tel, t.actions.telefono)] : []),
-  ].join("");
+  // Botones a todo el ancho de su columna y de 52 px de alto. Letra clara sobre fondo oscuro: con letra oscura sobre
+  // dorado claro, un modo oscuro forzado aclara la letra y deja el fondo igual, y no se lee.
+  const button = (href: string, text: string, primary = false) =>
+    `<a href="${e(href)}" target="_blank" rel="noopener noreferrer" style="${FONT}display:block;margin-top:12px;padding:14px 12px;border:1px solid ${primary ? C.oroTinta : C.ceniza};border-radius:10px;background-color:${primary ? C.oroTinta : C.ceniza};font-size:18px;line-height:22px;font-weight:700;text-align:center;text-decoration:none;color:${C.hueso}"><span style="color:${C.hueso}">${e(text)}</span></a>`;
+  const responder = grid([
+    cell("correo", t.labels.correo, valueHtml(e(d.correo)) + (mailto ? button(mailto, t.actions.correo, true) : "")),
+    ...(v.telefono
+      ? [
+          cell(
+            "telefono",
+            t.labels.telefono,
+            valueHtml(e(v.telefono)) + (phone?.whatsapp ? button(phone.whatsapp, t.actions.whatsapp) : "") + (phone ? button(phone.tel, t.actions.telefono) : ""),
+          ),
+        ]
+      : []),
+  ]);
 
   const html = `<!doctype html>
 <html lang="es">
@@ -288,34 +278,44 @@ export function buildEmail(d: ContactPayload, sentAt: Date) {
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light only">
 <meta name="supported-color-schemes" content="light only">
-<title>${e(t.heading)}</title>
+<title>${e(title)}</title>
+<style>${STYLE}</style>
 </head>
 <body style="margin:0;padding:0;background-color:${C.fondo};-webkit-text-size-adjust:100%">
 <table ${TABLE} width="100%" bgcolor="${C.fondo}" style="width:100%;background-color:${C.fondo}"><tr><td align="center" style="padding:0">
 <table ${TABLE} width="600" style="width:100%;max-width:600px">
-<tr><td bgcolor="${C.ceniza}" style="padding:26px 24px 22px;background-color:${C.ceniza}">
-<img src="${LOGO_URL}" width="${LOGO.width}" height="${LOGO.height}" alt="${e(t.brand)}" style="${FONT}display:block;border:0;outline:none;text-decoration:none;font-size:26px;line-height:${LOGO.height}px;font-weight:700;letter-spacing:.06em;color:${C.hueso}">
-<p style="${FONT}margin:22px 0 0;font-size:11px;line-height:16px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:${C.oroClaro}">${e(t.eyebrow)}</p>
-<h1 style="${FONT}margin:4px 0 0;font-size:23px;line-height:29px;font-weight:700;color:${C.hueso}">${e(t.heading)}</h1>
-<table ${TABLE} width="100%" style="width:100%;margin-top:14px">${summary}</table>
-${notice}
+<tr><td bgcolor="${C.ceniza}" style="padding:20px 20px;background-color:${C.ceniza}">
+<img src="${ASSET_BASE}/nexus-logo.png" width="${LOGO.width}" height="${LOGO.height}" alt="${e(t.brand)}" style="${FONT}display:block;border:0;outline:none;text-decoration:none;font-size:26px;line-height:${LOGO.height}px;font-weight:700;letter-spacing:.06em;color:${C.hueso}">
 </td></tr>
 <tr><td bgcolor="${C.oro}" height="2" style="height:2px;font-size:0;line-height:0;background-color:${C.oro}">&nbsp;</td></tr>
-<tr><td bgcolor="${C.papel}" style="padding:2px 24px 30px;background-color:${C.papel}">
+<tr><td bgcolor="${C.fondo}" style="padding:26px 16px 22px;background-color:${C.fondo}">
 <table ${TABLE} width="100%" style="width:100%">
-${sectionTitle(t.sections.descripcion, t.writtenByVisitor)}
-<tr><td style="padding:14px 0 0"><div style="${FONT}${WRAP}padding:16px 18px;border:1px solid ${C.linea};border-radius:10px;background-color:${C.caja};font-size:16px;line-height:26px;color:${C.tinta}">${multiline(v.descripcion)}</div></td></tr>
-${estadoHtml ? `${sectionTitle(t.sections.estado)}<tr><td><table ${TABLE} width="100%" style="width:100%">${estadoHtml}</table></td></tr>` : ""}
-${caso.length ? `${sectionTitle(casoTitle)}${fields(caso)}` : ""}
-${sectionTitle(t.sections.contacto)}
-${fields(contactoHtml)}
-${sectionTitle(t.sections.responder)}
-<tr><td style="padding:16px 0 0">${buttons}</td></tr>
-<tr><td style="${FONT}padding:4px 0 0;font-size:13px;line-height:20px;color:${C.tenue}">${e(t.replyHint)}</td></tr>
-</table>
+<tr><td style="${FONT}padding:0 4px">
+<h1 style="${FONT}margin:0;font-size:25px;line-height:32px;font-weight:800;color:${C.tinta}">${e(title)}</h1>
+<div style="margin-top:8px;font-size:15px;line-height:22px;font-weight:400;color:${C.etiqueta}">${e(t.received(fecha.long))}</div>
 </td></tr>
-<tr><td bgcolor="${C.fondo}" style="${FONT}padding:18px 24px 28px;background-color:${C.fondo};font-size:12px;line-height:18px;color:${C.tenue}">
-<p style="margin:0">${e(footer)}</p>
+${conPlazo ? band("urgencia", C.urgente, e(urgencia), 18, 700) : ""}
+${band("aviso", C.aviso, `<span style="font-weight:600">${e(t.noticeTitle)}:</span> ${e(t.visitorNotice)}`, 15, 400)}
+${card("persona", t.sections.quien, grid(fieldCells(quien)))}
+${card("mensaje", t.sections.necesita, `<div style="padding:14px 0 0">${valueHtml(multiline(v.descripcion))}</div>`)}
+${
+  estado.length || detalles.length
+    ? card(
+        "llama",
+        detallesTitle,
+        (estado.length
+          ? `<div style="padding:16px 0 0">${labelHtml("situacion", t.labels.estado)}${estado.map((i) => valueHtml(`&bull;&nbsp;${e(i)}`)).join("")}</div>`
+          : "") + grid(fieldCells(detalles)),
+      )
+    : ""
+}
+${card(
+  "responder",
+  t.sections.responder,
+  `${responder}<div style="padding:18px 0 0;font-size:15px;line-height:23px;font-weight:400;color:${C.etiqueta}">${e(t.replyHint)}</div>`,
+)}
+<tr><td style="${FONT}padding:18px 4px 0;font-size:13px;line-height:20px;font-weight:400;color:${C.pie}">${e(t.footer(idioma))}</td></tr>
+</table>
 </td></tr>
 </table>
 </td></tr></table>
