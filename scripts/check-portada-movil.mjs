@@ -1,9 +1,10 @@
-// Verifica la portada en celular y tablet: que nada se monte sobre la cara de Domingo, el título ni los sellos,
-// que los botones se vean sin desplazarse y que el nombre y el rol se lean sobre fondo oscuro.
+// Verifica la portada en celular y tablet: que nada se monte entre el título, los sellos, la etiqueta, el nombre,
+// las frases y los botones, que los botones se vean sin desplazarse, que nada se salga por los costados y que el
+// nombre y las frases se lean sobre fondo oscuro. (Hasta el 20-11 también cuidaba la cara de Domingo; la portada
+// ya no lleva su foto.)
 //
 // Mide las cajas reales en el navegador a 1,5 s (fin de la entrada) y a 2,5 s, y otra vez tras bajar 150 px
-// (parallax). La cara se estima como un rectángulo fijo dentro de la foto: del pelo al mentón es el 31 %
-// superior de la imagen y, a lo ancho, del 28 % al 66 % (medido sobre la transparencia de domingo.webp).
+// (parallax).
 //
 // Uso: npm run build && npm run test:portada        (o BASE=http://127.0.0.1:3000 para un servidor ya abierto)
 // Capturas: SHOTS=<carpeta> guarda una por pantalla, idioma y tiempo, y una con las cajas marcadas.
@@ -13,8 +14,6 @@ import { mkdirSync } from "node:fs";
 import { createServer } from "node:net";
 import { join } from "node:path";
 import { chromium } from "playwright";
-
-const FACE = { x0: 0.28, x1: 0.66, y0: 0, y1: 0.31 };
 
 let base = process.env.BASE;
 let next;
@@ -58,8 +57,8 @@ const CASES = [
   { w: 1024, h: 700, dpr: 2, label: "Tablet horizontal" },
 ];
 
-// Cajas de todo lo que se lee en la portada, más la cara.
-function measure(face) {
+// Cajas de todo lo que se lee en la portada.
+function measure() {
   const r = (el) => {
     if (!el) return null;
     const b = el.getBoundingClientRect();
@@ -76,15 +75,7 @@ function measure(face) {
   boxes.nombre = r(ps[0]);
   boxes.rol = r(ps[1]);
   hero.querySelectorAll("a.btn").forEach((el, i) => (boxes[i === 0 ? "botonOro" : "botonLinea"] = r(el)));
-  const img = hero.querySelector("img[fetchpriority]");
-  const p = img.getBoundingClientRect();
-  const cara = {
-    x0: p.left + p.width * face.x0,
-    x1: p.left + p.width * face.x1,
-    y0: p.top + p.height * face.y0,
-    y1: p.top + p.height * face.y1,
-  };
-  return { boxes, cara, foto: { x0: p.left, y0: p.top, x1: p.right, y1: p.bottom }, vh: innerHeight, vw: innerWidth };
+  return { boxes, vh: innerHeight, vw: innerWidth };
 }
 
 const overlap = (a, b) => a && b && a.x0 < b.x1 && b.x0 < a.x1 && a.y0 < b.y1 && b.y0 < a.y1;
@@ -99,7 +90,7 @@ function check(m) {
       if (a.startsWith("sello") && b.startsWith("sello")) continue;
       if (overlap(m.boxes[a], m.boxes[b])) problems.push(`${a}∩${b}`);
     }
-  for (const k of names) if (overlap(m.boxes[k], m.cara)) problems.push(`${k}∩cara`);
+  for (const k of names) if (m.boxes[k].x0 < -0.5 || m.boxes[k].x1 > m.vw + 0.5) problems.push(`${k} se sale del ancho`);
   const btn = m.boxes.botonOro;
   if (!btn || btn.y1 > m.vh + 0.5) problems.push("botón dorado fuera de pantalla");
   return problems;
@@ -147,7 +138,6 @@ async function annotate(page, m) {
       d.textContent = label;
       document.body.append(d);
     };
-    add(m.cara, "#ff2d55", "cara");
     for (const [k, b] of Object.entries(m.boxes)) add(b, "#2dd4ff", k);
   }, m);
 }
@@ -188,10 +178,10 @@ for (const c of CASES) {
     const res = { caso: `${c.w}×${c.h}`, lang };
 
     await wait(1500);
-    const m15 = await page.evaluate(measure, FACE);
+    const m15 = await page.evaluate(measure);
     if (shots) await page.screenshot({ path: join(shots, `${name}-1.5s.png`) });
     await wait(2500);
-    const m25 = await page.evaluate(measure, FACE);
+    const m25 = await page.evaluate(measure);
     if (shots) await page.screenshot({ path: join(shots, `${name}-2.5s.png`) });
     res.c = await contrast(page);
     if (shots && lang === "es") {
@@ -201,15 +191,13 @@ for (const c of CASES) {
     }
     await page.evaluate(() => window.scrollTo(0, 150));
     await page.waitForTimeout(700);
-    const mScroll = await page.evaluate(measure, FACE);
+    const mScroll = await page.evaluate(measure);
 
     res.p15 = check(m15);
     res.p25 = check(m25);
     res.pScroll = check(mScroll).filter((p) => !p.startsWith("botón"));
     const b = m25.boxes;
-    res.caraAlto = Math.round(m25.cara.y1 - m25.cara.y0);
-    res.aireTitulo = Math.round(m25.cara.y0 - b.titulo2.y1);
-    res.aireMenton = Math.round((b.etiqueta ?? b.nombre).y0 - m25.cara.y1);
+    res.aireTitulo = Math.round((b.etiqueta ?? b.nombre).y0 - b.titulo2.y1);
     res.etiqueta = !!b.etiqueta;
     res.botones = b.botonLinea && b.botonLinea.y1 <= m25.vh + 0.5 ? "ambos" : b.botonOro && b.botonOro.y1 <= m25.vh + 0.5 ? "dorado" : "ninguno";
     const ok = !res.p15.length && !res.p25.length && !res.pScroll.length && res.c.nombre >= 4.5 && res.c.rol >= 4.5;
@@ -217,7 +205,7 @@ for (const c of CASES) {
     res.ok = ok;
     rows.push(res);
     console.log(
-      `${ok ? "OK   " : "FALLA"} ${lang} ${res.caso.padEnd(9)} cara ${String(res.caraAlto).padStart(3)} px · aire título ${String(res.aireTitulo).padStart(3)} · aire mentón ${String(res.aireMenton).padStart(3)} · etiqueta ${res.etiqueta ? "sí" : "no"} · botones ${res.botones} · contraste nombre ${res.c.nombre.toFixed(1)} rol ${res.c.rol.toFixed(1)}` +
+      `${ok ? "OK   " : "FALLA"} ${lang} ${res.caso.padEnd(9)} aire bajo el título ${String(res.aireTitulo).padStart(3)} px · etiqueta ${res.etiqueta ? "sí" : "no"} · botones ${res.botones} · contraste nombre ${res.c.nombre.toFixed(1)} rol ${res.c.rol.toFixed(1)}` +
         (res.p15.length ? ` · 1,5 s: ${res.p15.join(", ")}` : "") +
         (res.p25.length ? ` · 2,5 s: ${res.p25.join(", ")}` : "") +
         (res.pScroll.length ? ` · scroll: ${res.pScroll.join(", ")}` : ""),
@@ -232,4 +220,4 @@ if (failed) {
   console.error(`\n${failed} pantalla(s) bajo 1024 px con cruces, botones fuera o poco contraste.`);
   process.exit(1);
 }
-console.log("\nPortada sin cruces bajo 1024 px. (1024×700 usa la composición de escritorio, que no se tocó.)");
+console.log("\nPortada sin cruces bajo 1024 px. (1024×700 usa la variante de escritorio: sellos abajo y frases en una línea.)");

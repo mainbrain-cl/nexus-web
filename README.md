@@ -23,12 +23,13 @@ npm install
 npm run dev         # desarrollo en http://localhost:3000
 npm run build       # build de producción (la página queda prerenderizada)
 npm run test:title  # tras el build: levanta next start y verifica que el título de la hero no se corte (/, /en/ y /pt/)
+npm run test:portada  # tras el build: mide que nada se monte en la portada de celular y tablet, y el contraste del texto
 ```
 
 ## Íconos, imagen al compartir y 404
 
 - **Favicon:** la X dorada del logo sobre ceniza, en `src/app/icon.svg`. `node scripts/iconos.mjs` genera desde ese SVG `src/app/favicon.ico` (16 y 32 px) y `src/app/apple-icon.png` (180 px).
-- **Imagen al compartir (Open Graph y X/Twitter):** una por idioma en `public/og/<idioma>.jpg` (1200×630), con el logo, la foto de Domingo, el título y el rol del idioma. Se dibujan con las fuentes y la textura del sitio: `npm run build && node scripts/og.mjs` (o `node scripts/og.mjs http://localhost:3000` con `next dev` abierto). Hay que regenerarlas si cambian el título, el rol o la foto de la hero.
+- **Imagen al compartir (Open Graph y X/Twitter):** una por idioma en `public/og/<idioma>-3.jpg` (1200×630), con el logo, el título, el nombre y las dos frases del idioma, sin foto, igual que la portada. Se dibujan con las fuentes y la textura del sitio: `npm run build && node scripts/og.mjs` (o `node scripts/og.mjs http://localhost:3000` con `next dev` abierto). Hay que regenerarlas si cambian el título, el nombre o las frases de la hero; si cambia el diseño, se sube el número del archivo (en `og.image` de `src/data/nexus.ts`) para renovar la caché de WhatsApp y las redes, y se borran las anteriores.
 - **404:** `src/app/global-not-found.tsx` (con `experimental.globalNotFound` en `next.config.ts`, porque hay dos layouts raíz). Toma el idioma de la ruta pedida (`/en/xyz` sale en inglés).
 
 ## Despliegue

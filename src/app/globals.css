@@ -232,15 +232,12 @@
     animation: ignite 1.5s cubic-bezier(0.2, 0.7, 0.3, 1) var(--d, 0s) both;
   }
 
-  .in-person {
-    animation: in-person 1.9s var(--ease-expo) 0.55s both;
-  }
-
-  .in-rim {
+  /* La luz tras el título sube mientras las letras se encienden y después parpadea apenas */
+  .in-halo {
     will-change: opacity;
     animation:
-      in-rim 2.2s ease-out 0.7s both,
-      flicker 5s ease-in-out 2.9s infinite;
+      in-halo 2s ease-out 0.25s both,
+      flicker 5s ease-in-out 2.25s infinite;
   }
 
   .in-word {
@@ -334,27 +331,12 @@
   }
 }
 
-@keyframes in-person {
-  from {
-    opacity: 0;
-    transform: translateY(6%) scale(1.03);
-  }
-  /* Se vuelve opaco rápido para que el título encendido no se transparente a través de él */
-  30% {
-    opacity: 1;
-  }
-  to {
-    opacity: 1;
-    transform: none;
-  }
-}
-
-@keyframes in-rim {
+@keyframes in-halo {
   0% {
     opacity: 0;
   }
   45% {
-    opacity: 0.55;
+    opacity: 0.62;
   }
   100% {
     opacity: 0.4;
@@ -454,59 +436,46 @@
 }
 
 
-/* ---------- Portada en celular y tablet (hasta 1023 px) ---------- */
+/* ---------- Portada ---------- */
 
-/* La portada va en flujo vertical: sellos, título, Domingo y texto, sin capas que se monten (Aaron, 12-11).
-   La escena (nx-hero-escena) es el alto que queda entre el título y el texto. La foto se calcula para que la cara
-   completa (del pelo al mentón, el 31 % superior de la imagen) quepa ahí con aire arriba y abajo; el pecho sigue
-   por detrás del texto, bajo un fondo oscuro. En pantallas altas la foto se limita para no crecer de más. */
+/* Sin retrato desde el 20-11: el título es el protagonista, en una columna centrada (ver Hero.tsx).
+   Tamaño del título: lo fija el ancho, para que la línea más larga quepa con aire a los lados desde 320 px.
+   --nx-letras es el largo de esa línea (lo pone Hero.tsx) y cada letra de la Barlow Condensed cursiva mide en
+   promedio 0,42 veces el tamaño: "AUDITORÍA FORENSE" (17) queda en 12,6vw y ocupa el 90 % del ancho en celular;
+   "FORENSIC FIRE" (13) sale más grande y llena un ancho parecido. El tope en svh evita que, en pantallas anchas
+   y bajas, el título empuje los botones fuera de la primera pantalla. */
+.nx-hero-titulo {
+  --nx-letra: calc(var(--nx-letras, 17) * 0.42);
+  font-size: calc(90vw / var(--nx-letra));
+}
+
+@media (min-width: 640px) {
+  .nx-hero-titulo {
+    font-size: min(88.5vw / var(--nx-letra), 19svh);
+  }
+}
+
+@media (min-width: 1024px) {
+  .nx-hero-titulo {
+    font-size: min(83vw / var(--nx-letra), 20svh, 15rem);
+  }
+}
+
+/* La luz del fuego detrás del título: ocupa el lugar que tenía el resplandor tras la silueta. Va dentro de la
+   capa del título, así se mueve y se apaga con él. En reposo queda al 40 % y parpadea apenas (flicker). */
+.nx-hero-halo {
+  position: absolute;
+  inset: -22% -8% -42%;
+  z-index: -1;
+  opacity: 0.4;
+  background:
+    radial-gradient(46% 42% at 50% 58%, rgba(255, 122, 42, 0.62), rgba(255, 104, 30, 0.2) 48%, rgba(255, 104, 30, 0) 74%),
+    radial-gradient(30% 22% at 50% 78%, rgba(255, 190, 120, 0.3), rgba(255, 150, 70, 0) 72%);
+}
+
+/* Los sellos van arriba en el flujo hasta 1023 px: entran antes, con el título, y no al final como en escritorio. */
 @media (max-width: 1023.98px) {
-  .nx-hero-escena {
-    --nx-aire-arriba: 0.5rem;
-    --nx-aire-abajo: 1.75rem;
-    /* Alto de la cara: lo que deja la escena o, si la foto llegó a su tope, el 31 % de ese tope. */
-    --nx-cara: min(100% - var(--nx-aire-arriba) - var(--nx-aire-abajo), 46.5vw, 24.18svh);
-  }
-
-  .nx-hero-figura {
-    position: absolute;
-    inset-inline: 0;
-    top: var(--nx-aire-arriba);
-    display: flex;
-    justify-content: center;
-    height: calc(var(--nx-cara) / 0.31);
-  }
-
-  /* El pecho se funde a oscuro antes del texto: empieza bajo el mentón y llega a casi negro donde empieza el
-     texto. Con aire de sobra (pantallas altas) el fundido es más largo, hasta 5rem. */
-  .nx-hero-escena::after {
-    content: "";
-    position: absolute;
-    inset-inline: -1rem;
-    bottom: 0;
-    height: min(5rem, 100% - var(--nx-aire-arriba) - var(--nx-cara) - 0.25rem);
-    background: linear-gradient(180deg, rgba(18, 15, 13, 0), rgba(18, 15, 13, 0.55) 55%, rgba(18, 15, 13, 0.97));
-  }
-
-  /* Fondo oscuro parejo bajo el nombre, el rol y los botones: el texto nunca se lee sobre parches ni bordados.
-     Abajo, bajo los botones, se aclara un poco para que asome el resplandor de brasas del suelo. */
-  .nx-hero-velo {
-    position: absolute;
-    inset: 0 -1rem;
-    z-index: -1;
-    background: linear-gradient(180deg, rgba(18, 15, 13, 0.97), rgba(18, 15, 13, 0.97) 55%, rgba(18, 15, 13, 0.82));
-  }
-
-  /* Los sellos van arriba en el flujo: entran antes, con el título, y no al final como en escritorio. */
   .nx-hero-sellos {
     --d: 0.3s !important;
-  }
-
-  /* La etiqueta rotativa va sobre el nombre solo si la pantalla tiene alto de sobra; en las bajas
-     (navegadores dentro de WhatsApp o Instagram, iPhone SE, Android chico) se oculta para no achicar la cara. */
-  @media (max-height: 739.98px) {
-    .nx-hero-tag {
-      display: none;
-    }
   }
 }

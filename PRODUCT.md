@@ -48,7 +48,7 @@ Su director técnico, Domingo Soto Gamé, es a la vez abogado (desde 1997) e inv
 - Nombre: NEXUS, con la X en dorado. El logo aún no llega en SVG.
 - Paleta del material entregado: azul marino profundo, dorado arena y blanco. La hero aprobada vive en un mundo oscuro de humo y brasas.
 - Lemas del brochure: "Método científico. Utilidad jurídica." y "Evidencia · Análisis · Contexto · Decisiones".
-- Hero aprobada por Aaron: `referencias/hero-diseno.png`.
+- Hero aprobada por Aaron: `referencias/hero-diseno.png`. Desde el 20-11 la portada no lleva la foto de Domingo (él la prefiere en el interior, no al inicio) y el título es "Auditoría forense de incendios"; la referencia vale por el mundo de humo y brasas, no por la composición.
 
 ## Evidence on Hand
 

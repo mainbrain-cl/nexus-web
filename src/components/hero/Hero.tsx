@@ -16,9 +16,11 @@ import { Embers } from "./Embers";
 import { RotatingTag } from "./RotatingTag";
 import { SmokeGL } from "./SmokeGL";
 
-// Entrada comprimida (revisión general, 12-11): título, nombre, rol y botones quedan en pantalla antes de ~1,5 s.
-// Antes el nombre llegaba a los 2,8 s y los botones a los 3,3 s. Los demás tiempos están en globals.css.
-const CHAR_STEP = 0.04; // s entre letra y letra al encenderse
+// Entrada comprimida (revisión general, 12-11): título, nombre, frase y botones quedan en pantalla antes de ~1,5 s.
+// Los demás tiempos están en globals.css.
+// El paso entre letras bajó de 0,04 a 0,032 s con el título nuevo (20-11): la línea más larga tiene 17 letras
+// y así termina de encenderse a la misma hora que la anterior.
+const CHAR_STEP = 0.032; // s entre letra y letra al encenderse
 const LINE_START = [0.15, 0.38];
 
 type Vars = CSSProperties & Record<`--${string}`, string>;
@@ -34,26 +36,22 @@ function snap(v: number) {
   return Math.round(v * dpr) / dpr;
 }
 
-/** Bajo 1024 px la portada va en flujo vertical (ver globals.css). */
-function isNarrow() {
-  return typeof window !== "undefined" && window.innerWidth < 1024;
-}
-
 /**
- * Desplazamiento de una capa: profundidad ante el mouse + velocidad propia ante el scroll.
- * `scrollKNarrow` es la velocidad bajo 1024 px: ahí título, persona y texto bajan juntos al hacer scroll,
- * porque con velocidades distintas el título se metía en la cabeza y el texto subía hacia la cara.
+ * Velocidad de scroll que comparten el título y el texto: van uno sobre el otro en la misma columna y con
+ * velocidades distintas se cruzarían al bajar.
  */
+const SCROLL_COLUMNA = 0.14;
+
+/** Desplazamiento de una capa: profundidad ante el mouse + velocidad propia ante el scroll. */
 function useLayer(
   px: MotionValue<number>,
   py: MotionValue<number>,
   scrollY: MotionValue<number>,
   depth: number,
   scrollK: number,
-  scrollKNarrow = scrollK,
 ) {
   const x = useTransform(px, (v) => snap(v * -depth));
-  const y = useTransform([py, scrollY], ([a, b]: number[]) => snap(a * -depth * 0.6 + b * (isNarrow() ? scrollKNarrow : scrollK)));
+  const y = useTransform([py, scrollY], ([a, b]: number[]) => snap(a * -depth * 0.6 + b * scrollK));
   return { x, y };
 }
 
@@ -122,15 +120,15 @@ export function Hero() {
   const bg = useLayer(px, py, scrollY, 8 * k, 0.5 * k);
   const smoke = useLayer(px, py, scrollY, 14 * k, 0.42 * k);
   const back = useLayer(px, py, scrollY, 20 * k, 0.36 * k);
-  const title = useLayer(px, py, scrollY, 16 * k, 0.3 * k, 0.1 * k);
-  const person = useLayer(px, py, scrollY, 28 * k, 0.1 * k);
+  const title = useLayer(px, py, scrollY, 16 * k, SCROLL_COLUMNA * k);
   const front = useLayer(px, py, scrollY, 54 * k, -0.18 * k);
-  const content = useLayer(px, py, scrollY, 6 * k, -0.08 * k, 0.1 * k);
+  const content = useLayer(px, py, scrollY, 6 * k, SCROLL_COLUMNA * k);
+
+  // Largo de la línea más larga del título: con él, el CSS calcula el tamaño para que quepa en cada idioma.
+  const titleChars = Math.max(...hero.titleLines.map((line) => Array.from(line).length));
 
   const titleOpacity = useTransform(scrollY, [0, 520], [1, reduce ? 1 : 0.15]);
   const contentOpacity = useTransform(scrollY, [0, 360], [1, reduce ? 1 : 0]);
-  // Oscurecer con opacidad sobre fondo oscuro: se compone en GPU, sin repintar la foto en cada scroll.
-  const personOpacity = useTransform(scrollY, [0, 600], [1, reduce ? 1 : 0.45]);
 
   useEffect(() => {
     if (reduce) return;
@@ -143,7 +141,7 @@ export function Hero() {
       return () => window.removeEventListener("pointermove", onMove);
     }
     // Sin mouse (celular): las capas respiran solas con un vaivén lento para no perder la profundidad.
-    // Empieza recién cuando termina la entrada y crece de a poco, centrado en cero, para que Domingo
+    // Empieza recién cuando termina la entrada y crece de a poco, centrado en cero, para que el título
     // aparezca centrado y no parezca que se va acomodando.
     // Se detiene cuando la hero sale de pantalla o la pestaña queda oculta: antes corría para siempre.
     let raf = 0;
@@ -193,14 +191,15 @@ export function Hero() {
   }, [reduce, mx, my]);
 
   return (
-    // Hasta 1023 px la portada va en flujo vertical, sin capas que se monten (Aaron, 12-11): barra fija, sellos,
-    // título, Domingo en el alto que sobra y, abajo, nombre, rol y botones. Desde 1024 px, capas absolutas como antes.
+    // Portada sin retrato (pedido de Domingo, 20-11): el título es el protagonista y la foto queda para Perfil.
+    // Una sola columna centrada en todos los anchos: título, etiqueta, nombre, hilo, frase y botones, sobre el
+    // humo, las brasas y el resplandor. Los sellos van arriba en celular y tablet, y abajo a la izquierda desde 1024 px.
     // El relleno superior es el alto de la barra fija (80 px en celular, 96 px desde sm).
     <section
       ref={sectionRef}
       id="inicio"
       aria-labelledby="hero-title"
-      className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-ceniza pt-20 sm:pt-24 lg:block lg:h-[100svh] lg:min-h-[640px] lg:pt-0"
+      className="relative isolate flex min-h-[100svh] flex-col overflow-hidden bg-ceniza pt-20 sm:pt-24 lg:h-[100svh] lg:min-h-[660px]"
     >
       {/* 1 · Fondo fotográfico de humo */}
       <motion.div className="absolute -inset-[4%] -z-50" style={bg}>
@@ -230,98 +229,36 @@ export function Hero() {
         <Embers layer="back" burstDelay={reduce ? undefined : 300} className="size-full" />
       </motion.div>
 
-      {/* 4 · Título que se enciende y queda carbonizado */}
-      <motion.div
-        className="pointer-events-none relative -z-10 mt-[clamp(0.5rem,1.6svh,1.25rem)] flex justify-center px-3 will-change-transform lg:absolute lg:inset-x-0 lg:top-[13svh] lg:mt-0"
-        style={{ ...title, opacity: titleOpacity }}
-      >
-        <h1
-          id="hero-title"
-          className="font-display text-center text-[17vw] leading-[0.86] uppercase italic [font-kerning:none] sm:text-[min(12.6vw,23svh)] lg:text-[min(12.6vw,20svh)]"
-          style={{ opacity: 0.88 }}
-        >
-          <span className="sr-only">{hero.titleLines.join(" ")}</span>
-          <span aria-hidden="true" className="block">
-            {hero.titleLines.map((line, i) => (
-              <TitleLine key={line} text={line} start={LINE_START[i]} />
-            ))}
-          </span>
-        </h1>
-      </motion.div>
-
-      {/* 5 · Domingo. El desvanecido inferior viene horneado en la imagen.
-          Hasta 1023 px ocupa el alto que queda entre el título y el texto: la cara entera cabe en ese espacio y el
-          pecho sigue por detrás del texto (nx-hero-figura). Escritorio: baja a 40svh (y el título se limita a 20svh
-          de alto) para que la cabeza tape a lo sumo el pie de una letra, nunca la letra entera. */}
-      <div className="nx-hero-escena pointer-events-none relative min-h-[8.5rem] flex-1 lg:absolute lg:inset-0 lg:flex lg:justify-center lg:pt-[40svh]">
-        <div className="nx-hero-figura lg:contents">
+      {/* Columna central: ocupa el alto que queda bajo la barra y centra el conjunto. No lleva posición ni z-index
+          propios, para que el título (detrás de las brasas) y el texto (delante) sigan en el apilado de la sección. */}
+      <div className="flex flex-1 flex-col items-center justify-center px-3 pt-[clamp(0.5rem,2svh,1.5rem)] pb-[clamp(1.5rem,6svh,4.5rem)] sm:px-5 lg:pb-[clamp(3.5rem,11svh,7rem)]">
+        {/* 4 · Título que se enciende y queda carbonizado, con la luz del fuego detrás */}
         <motion.div
-          className="relative h-full will-change-transform lg:h-[64svh] lg:min-h-[460px]"
-          style={{ ...person, opacity: personOpacity }}
+          className="pointer-events-none relative -z-10 flex justify-center will-change-transform"
+          style={{ ...title, opacity: titleOpacity }}
         >
-          <div className="in-person relative h-full">
-            {/* Luz de fuego que asoma por el borde: silueta negra con resplandor, oculta detrás de la foto */}
-            {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
-            <img
-              src="/hero/domingo.webp"
-              alt=""
-              aria-hidden="true"
-              className="in-rim absolute inset-0 h-full w-auto max-w-none opacity-40"
-              style={{ filter: "brightness(0) drop-shadow(0 6px 14px rgba(255,118,40,.55))" }}
-            />
-            {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
-            <img
-              src="/hero/domingo.webp"
-              alt={hero.photoAlt}
-              width={950}
-              height={1503}
-              fetchPriority="high"
-              className="relative h-full w-auto max-w-none"
-              // Se baja apenas para que la foto viva dentro del humo, sin perder el contraste original.
-              style={{ filter: "brightness(.9) saturate(.92)" }}
-            />
-            {/* Reflejo cálido del fuego en los costados, recortado a su silueta */}
-            <div
-              className="absolute inset-0"
-              style={{
-                WebkitMaskImage: "url(/hero/domingo.webp)",
-                maskImage: "url(/hero/domingo.webp)",
-                WebkitMaskSize: "100% 100%",
-                maskSize: "100% 100%",
-                background:
-                  "linear-gradient(90deg, rgba(255,120,40,.16), transparent 22%, transparent 78%, rgba(255,120,40,.14)), radial-gradient(70% 35% at 50% 100%, rgba(255,110,30,.14), transparent 70%)",
-              }}
-              aria-hidden="true"
-            />
-          </div>
+          <div className="nx-hero-halo in-halo" aria-hidden="true" />
+          <h1
+            id="hero-title"
+            className="nx-hero-titulo font-display text-center leading-[0.86] uppercase italic [font-kerning:none]"
+            style={{ opacity: 0.9, "--nx-letras": String(titleChars) } as Vars}
+          >
+            <span className="sr-only">{hero.titleLines.join(" ")}</span>
+            <span aria-hidden="true" className="block">
+              {hero.titleLines.map((line, i) => (
+                <TitleLine key={line} text={line} start={LINE_START[i]} />
+              ))}
+            </span>
+          </h1>
         </motion.div>
-        </div>
-      </div>
 
-      {/* 6 · Brasas cercanas, desenfocadas, por delante de todo */}
-      <motion.div className="pointer-events-none absolute inset-0 z-10 will-change-transform" style={front}>
-        <Embers layer="front" burstDelay={reduce ? undefined : 1100} className="size-full" />
-      </motion.div>
-
-      {/* Sombra inferior para leer el texto sobre la foto */}
-      <div
-        className="pointer-events-none absolute inset-0 z-10"
-        style={{
-          background:
-            "linear-gradient(0deg, rgba(18,15,13,.94) 0%, rgba(18,15,13,.62) 20%, rgba(18,15,13,0) 46%), radial-gradient(60% 38% at 50% 92%, rgba(12,10,9,.55), transparent 75%), linear-gradient(180deg, rgba(18,15,13,.7), transparent 16%)",
-        }}
-        aria-hidden="true"
-      />
-
-      {/* 7 · Nombre, rol y acciones */}
-      <motion.div
-        className="relative z-20 flex flex-col items-center px-5 pb-[max(1.25rem,3svh)] text-center lg:absolute lg:inset-x-0 lg:bottom-[max(2.2rem,5svh)] lg:pb-0"
-        style={{ ...content, opacity: contentOpacity }}
-      >
-        <div className="nx-hero-velo lg:hidden" aria-hidden="true" />
-        <div className="relative flex flex-col items-center">
-          <RotatingTag items={hero.tags} className="nx-hero-tag mb-4 sm:mb-5" />
-          <p className="font-name text-[min(1.9rem,6.4vw)] leading-[1] sm:text-[clamp(1.9rem,3.6vw,3.7rem)] font-extrabold tracking-[0.01em] text-hueso uppercase [font-stretch:115%] [text-shadow:0_2px_28px_rgba(0,0,0,.6)]">
+        {/* 5 · Etiqueta, nombre, frase y acciones */}
+        <motion.div
+          className="relative z-20 mt-[clamp(1.6rem,4.6svh,3.4rem)] flex w-full flex-col items-center text-center"
+          style={{ ...content, opacity: contentOpacity }}
+        >
+          <RotatingTag items={hero.tags} className="mb-4 sm:mb-5" />
+          <p className="font-name text-[min(1.9rem,6.4vw)] leading-[1] font-extrabold tracking-[0.01em] text-hueso uppercase [font-stretch:115%] [text-shadow:0_2px_28px_rgba(0,0,0,.6)] sm:text-[clamp(1.9rem,3.6vw,3.7rem)] lg:text-[clamp(1.9rem,min(3.2vw,5.6svh),3.4rem)]">
             <span className="sr-only">{hero.name}</span>
             <span aria-hidden="true">
               {/* El relleno superior deja ver la tilde de GAMÉ al final, y la máscara la oculta al inicio */}
@@ -337,35 +274,51 @@ export function Hero() {
               </span>
             </span>
           </p>
+          <span className="in-rule mt-[clamp(0.8rem,1.8svh,1.3rem)] block h-px w-[clamp(72px,7vw,120px)] origin-center bg-gradient-to-r from-transparent via-oro-claro to-transparent" aria-hidden="true" />
+          {/* Las dos frases: una por línea hasta 1023 px; desde 1024 px, en una sola línea con un punto medio. */}
+          <p className="in-role mt-[clamp(0.8rem,1.8svh,1.3rem)] text-[clamp(0.8rem,4.1vw,1.06rem)] leading-[1.45] font-normal tracking-[0.005em] text-balance text-hueso/85 [text-shadow:0_1px_14px_rgba(0,0,0,.6)] lg:text-[clamp(1.02rem,1.3vw,1.28rem)]">
+            <span className="block lg:inline">{hero.roleLines[0]}</span>
+            <span className="hidden text-oro-claro/80 lg:inline" aria-hidden="true">
+              {" · "}
+            </span>
+            <span className="block lg:inline">{hero.roleLines[1]}</span>
+          </p>
+          <div className="mt-[clamp(1.3rem,3.4svh,2.6rem)] flex w-full max-w-[340px] flex-col items-stretch gap-3 sm:w-auto sm:max-w-none sm:flex-row sm:items-center sm:gap-[clamp(1rem,3vw,3.2rem)] lg:mt-[clamp(1.5rem,4.4svh,2.8rem)]">
+            <a
+              href={links.formulario}
+              className="in-cta btn btn-oro h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[19rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
+              style={{ "--d": "1.1s" } as Vars}
+            >
+              {hero.primaryCta}
+              <Arrow className="btn-arrow size-[1.1em]" />
+            </a>
+            <a
+              href="#servicios"
+              className="in-cta btn btn-linea h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[15rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
+              style={{ "--d": "1.18s" } as Vars}
+            >
+              {hero.secondaryCta}
+            </a>
+          </div>
+        </motion.div>
+      </div>
 
-        </div>
-        <span className="in-rule mt-[clamp(0.7rem,1.6svh,1.2rem)] block h-px w-[clamp(72px,7vw,120px)] origin-center bg-gradient-to-r from-transparent via-oro-claro to-transparent" aria-hidden="true" />
-        <p className="in-role mt-[clamp(0.8rem,1.8svh,1.2rem)] text-[clamp(1.02rem,1.35vw,1.32rem)] leading-[1.4] font-normal tracking-[0.005em] text-hueso/85 [text-shadow:0_1px_14px_rgba(0,0,0,.6)]">
-          {hero.roleLines[0]}
-          <br className="sm:hidden" />
-          <span className="hidden sm:inline"> </span>
-          {hero.roleLines[1]}
-        </p>
-        <div className="mt-[clamp(1.1rem,3svh,2.6rem)] flex sm:mt-[clamp(1.4rem,4.4svh,2.6rem)] w-full max-w-[340px] flex-col items-stretch gap-3 sm:max-w-none sm:w-auto sm:flex-row sm:items-center sm:gap-[clamp(1rem,3vw,3.2rem)]">
-          <a
-            href={links.formulario}
-            className="in-cta btn btn-oro h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[19rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
-            style={{ "--d": "1.1s" } as Vars}
-          >
-            {hero.primaryCta}
-            <Arrow className="btn-arrow size-[1.1em]" />
-          </a>
-          <a
-            href="#servicios"
-            className="in-cta btn btn-linea h-[3.3rem] px-9 text-[0.92rem] sm:h-[clamp(3.4rem,6.4svh,3.9rem)] sm:min-w-[15rem] sm:text-[clamp(0.9rem,1vw,1.05rem)]"
-            style={{ "--d": "1.18s" } as Vars}
-          >
-            {hero.secondaryCta}
-          </a>
-        </div>
+      {/* 6 · Brasas cercanas, desenfocadas, por delante de todo */}
+      <motion.div className="pointer-events-none absolute inset-0 z-10 will-change-transform" style={front}>
+        <Embers layer="front" burstDelay={reduce ? undefined : 1100} className="size-full" />
       </motion.div>
 
-      {/* 8 · Sellos IAAI (Aaron, 10-11). Desde 1024 px, abajo a la izquierda, alineados con el logo.
+      {/* Sombra superior para leer la barra y fundido inferior hacia la sección que sigue */}
+      <div
+        className="pointer-events-none absolute inset-0 z-10"
+        style={{
+          background:
+            "linear-gradient(0deg, rgba(18,15,13,.9) 0%, rgba(18,15,13,.4) 14%, rgba(18,15,13,0) 34%), linear-gradient(180deg, rgba(18,15,13,.7), transparent 16%)",
+        }}
+        aria-hidden="true"
+      />
+
+      {/* 7 · Sellos IAAI (Aaron, 10-11). Desde 1024 px, abajo a la izquierda, alineados con el logo.
           Hasta 1023 px van primero en el flujo, centrados entre la barra y el título. */}
       <div className="pointer-events-none relative z-20 order-first pt-1 lg:absolute lg:inset-x-0 lg:bottom-[max(2.4rem,5.5svh)] lg:pt-0">
         <ul

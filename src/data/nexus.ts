@@ -180,13 +180,12 @@ export type Texts = {
   };
   hero: {
     titleLines: Tuple<string, 2>;
-    /** Dos partes para cortar la línea en móvil. */
+    /** Dos frases: en escritorio van en una línea, separadas por un punto medio que pone el componente; en celular, una por línea. */
     roleLines: Tuple<string, 2>;
     /** Etiqueta rotativa junto al nombre: solo datos de la trayectoria, nada inventado. */
     tags: Tuple<string, 4>;
     primaryCta: string;
     secondaryCta: string;
-    photoAlt: string;
     sealsLabel: string;
   };
   intersection: {
@@ -280,12 +279,11 @@ const es: Texts = {
     backHome: "volver al inicio",
   },
   hero: {
-    titleLines: ["Fuego, ciencia", "y derecho"],
-    roleLines: ["Evaluación pericial independiente", "e investigación de incendios"],
+    titleLines: ["Auditoría forense", "de incendios"],
+    roleLines: ["Asesoría experta en investigación de incendios", "Evaluación pericial independiente"],
     tags: ["Abogado desde 1997", "IAAI-FIT", "Método NFPA 921", "Investigador de incendios desde 2012"],
     primaryCta: "Solicitar asesoría",
     secondaryCta: "Ver servicios",
-    photoAlt: "Domingo Soto Gamé con uniforme de la International Association of Arson Investigators",
     sealsLabel: "Afiliaciones y credencial IAAI",
   },
   // Intersección: un solo bloque (Aaron, 10-11). Las tres competencias van en palabras de Domingo (12-11).
@@ -467,7 +465,7 @@ const es: Texts = {
     text: "Puede que el enlace esté mal escrito o que la página se haya movido.",
     back: "Volver al inicio",
   },
-  ogAlt: "NEXUS: Domingo Soto Gamé y el título Fuego, ciencia y derecho",
+  ogAlt: "NEXUS: Auditoría forense de incendios. Domingo Soto Gamé",
 };
 
 // ---------- English ----------
@@ -497,12 +495,11 @@ const en: Texts = {
     backHome: "back to top",
   },
   hero: {
-    titleLines: ["Fire, science", "and law"],
-    roleLines: ["Independent expert review", "and fire investigation"],
+    titleLines: ["Forensic fire", "audit"],
+    roleLines: ["Expert advice in fire investigation", "Independent expert evaluation"],
     tags: ["Chilean attorney since 1997", "IAAI-FIT", "NFPA 921 method", "Fire investigator since 2012"],
     primaryCta: "Request a consultation",
     secondaryCta: "View services",
-    photoAlt: "Domingo Soto Gamé in the uniform of the International Association of Arson Investigators",
     sealsLabel: "IAAI affiliations and credential",
   },
   intersection: {
@@ -687,7 +684,7 @@ const en: Texts = {
     text: "The link may be mistyped, or the page may have moved.",
     back: "Back to home",
   },
-  ogAlt: "NEXUS: Domingo Soto Gamé and the title Fire, science and law",
+  ogAlt: "NEXUS: Forensic fire audit. Domingo Soto Gamé",
 };
 
 // ---------- Português (Brasil) ----------
@@ -715,12 +712,11 @@ const pt: Texts = {
     backHome: "voltar ao início",
   },
   hero: {
-    titleLines: ["Fogo, ciência", "e direito"],
-    roleLines: ["Avaliação pericial independente", "e investigação de incêndios"],
+    titleLines: ["Auditoria forense", "de incêndios"],
+    roleLines: ["Assessoria especializada em investigação de incêndios", "Avaliação pericial independente"],
     tags: ["Advogado no Chile desde 1997", "IAAI-FIT", "Método NFPA 921", "Investigador de incêndios desde 2012"],
     primaryCta: "Solicitar assessoria",
     secondaryCta: "Ver serviços",
-    photoAlt: "Domingo Soto Gamé com o uniforme da International Association of Arson Investigators",
     sealsLabel: "Afiliações e credencial IAAI",
   },
   intersection: {
@@ -898,7 +894,7 @@ const pt: Texts = {
     text: "O link pode estar digitado errado ou a página pode ter mudado de endereço.",
     back: "Voltar ao início",
   },
-  ogAlt: "NEXUS: Domingo Soto Gamé e o título Fogo, ciência e direito",
+  ogAlt: "NEXUS: Auditoria forense de incêndios. Domingo Soto Gamé",
 };
 
 export const texts: Record<Locale, Texts> = { es, en, pt };
@@ -954,7 +950,7 @@ function build(locale: Locale) {
     ) as Record<PhotoId, (typeof photoFiles)[PhotoId] & { alt: string }>,
     footer: t.footer,
     notFound: t.notFound,
-    og: { image: `/og/${locale}-2.jpg`, width: 1200, height: 630, alt: t.ogAlt },
+    og: { image: `/og/${locale}-3.jpg`, width: 1200, height: 630, alt: t.ogAlt },
   };
 }
 

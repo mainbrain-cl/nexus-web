@@ -16,7 +16,7 @@ colors:
 typography:
   display:
     fontFamily: "Barlow Condensed, ui-sans-serif, system-ui, sans-serif"
-    fontSize: "min(12.6vw, 20svh)"
+    fontSize: "min(83vw / (letras × 0.42), 20svh, 15rem)"
     fontWeight: 800
     lineHeight: 0.86
     letterSpacing: "normal"
@@ -101,7 +101,7 @@ components:
 
 **Creative North Star: "La escena después del fuego"**
 
-El fuego es el escenario; el investigador es el sujeto. La página vive en un humo negro y cálido, donde el título se enciende letra por letra y queda carbonizado, como queda una escena cuando el fuego ya se apagó. No hay llamas en primer plano ni rojo de alarma: la luz saturada son unas pocas brasas, y todo lo demás es ceniza, hueso y oro arena.
+El fuego es el escenario; el trabajo del investigador es el sujeto. La página vive en un humo negro y cálido, donde el título se enciende letra por letra y queda carbonizado, como queda una escena cuando el fuego ya se apagó. No hay llamas en primer plano ni rojo de alarma: la luz saturada son unas pocas brasas, y todo lo demás es ceniza, hueso y oro arena.
 
 Bajo la hero, la página es de "el hilo": NEXUS es el nudo donde se cruzan derecho, ciencia forense e investigación de incendios, y cada conclusión queda atada a su evidencia. El hilo dorado de 1 px es lo único que conecta: dibuja la X de la intersección, recorre el método de nodo en nodo, separa el registro del perfil y toca el canto de las placas. La densidad es baja y la lectura pausada; la sobriedad viene de PRODUCT.md, porque el rubro trata pérdidas reales.
 
@@ -154,7 +154,7 @@ Una paleta de humo cálido con un solo acento metálico y una sola luz encendida
 **Character:** La cursiva condensada en mayúsculas tiene la urgencia de un titular de emergencia; la Archivo ancha y recta pesa como una placa grabada; la Schibsted argumenta con la calma de un escrito jurídico.
 
 ### Hierarchy
-- **Display** (800 cursiva, 17vw en móvil, min(12.6vw, 23svh) desde sm y min(12.6vw, 20svh) desde lg, interlineado 0.86, mayúsculas, sin kerning): el título carbonizado de la hero y el título reencendido de Contacto (clamp(3.4rem, 10vw, 9rem)). Solo estos dos llevan la textura de ceniza y la ignición.
+- **Display** (800 cursiva, interlineado 0.86, mayúsculas, sin kerning; el tamaño sale del largo de la línea más larga del idioma, para que ocupe el 90 % del ancho en móvil, el 88 % desde sm con tope de 19svh y el 83 % desde lg con topes de 20svh y 15rem: en español, 12.6vw, 12.4vw y 11.6vw): el título carbonizado de la hero y el título reencendido de Contacto (clamp(3.4rem, 10vw, 9rem)). Solo estos dos llevan la textura de ceniza y la ignición.
 - **Headline** (800 cursiva, clamp(2.9rem, 6.4vw, 5.75rem) o clamp(2.3rem, 4.6vw, 4rem) en tamaño medio, interlineado 0.9, mayúsculas): títulos de sección en hueso, una línea acentuada en oro claro, cada línea sube desde su máscara. También los nombres de servicio y los pasos del método, a escala de 1.75 a 2.75rem.
 - **Thesis** (Schibsted 600, clamp(1.9rem, 3.6vw, 3.1rem), interlineado 1.08, tracking -0.025em, máx. 22ch): el titular de Intersección y solo él.
 - **Name** (Archivo 800 al 115 %, mayúsculas, tracking 0.01em): el nombre de Domingo en la hero y en Perfil, los códigos NFPA de las placas y las entradas del registro.
@@ -172,7 +172,7 @@ Un contenedor central de 1240 px con márgenes laterales de 20, 32 y 48 px (móv
 
 En escritorio las secciones se arman en rejillas asimétricas de dos columnas (1.1fr contra 1fr, 0.72fr contra 1fr, 0.75fr contra 2fr) con separaciones en clamp de 3 a 6.5rem; en móvil todo cae a una columna en el orden del DOM. Servicios es maestro-detalle en escritorio y acordeón en móvil. Las listas se separan con hilos, no con tarjetas: a quién sirve es una fila de cuatro columnas con divisores dorados verticales que en móvil pasan a ser horizontales.
 
-La hero ocupa la primera pantalla. Desde 1024 px se arma en capas: título en dos líneas al ~88 % del ancho desde el 13 % superior, Domingo centrado delante del título (la foto empieza en 40svh y la cabeza tapa a lo sumo el pie de la letra central), y su nombre, el hilo, el subtítulo y los dos botones sobre el torso, con los sellos IAAI abajo a la izquierda. Hasta 1023 px va en flujo vertical, sin nada montado (12-11): barra fija, sellos centrados, título, Domingo en el alto que sobra y, abajo, nombre (en una línea en celular), hilo, rol y botones. La foto se calcula para que la cara entera (el 31 % superior de la imagen) quepa entre el título y el texto, con 0,5rem de aire arriba y 1,75rem bajo el mentón; el pecho sigue por detrás del texto, que se lee sobre un fondo casi negro parejo. La etiqueta rotativa va sobre el nombre solo si la pantalla mide 740 px de alto o más. Título, persona y texto bajan juntos al hacer scroll, para que el parallax no los cruce. La entrada completa (sellos, título, nombre, rol y botones) queda en pantalla antes de ~1,5 s. `npm run test:portada` mide los cruces en nueve pantallas y tres idiomas.
+La hero ocupa la primera pantalla y no lleva retrato (pedido de Domingo, 20-11: su foto va en Perfil, no al inicio). El título "Auditoría forense de incendios" es el protagonista: dos líneas en cursiva carbonizada, con la línea más larga a cerca del 82 % del ancho en escritorio y del 90 % en celular, y un resplandor de brasa detrás que sube mientras las letras se encienden y después parpadea apenas. Todo va en una sola columna centrada en el alto que queda bajo la barra, igual en todos los anchos: título, etiqueta rotativa, nombre (en una línea), hilo dorado, las dos frases y los dos botones. Las dos frases van en una línea separadas por un punto medio desde 1024 px, y una por línea, sin punto, en celular y tablet; el punto lo pone el componente, no los textos. Los sellos IAAI van abajo a la izquierda, alineados con el logo, desde 1024 px, y centrados entre la barra y el título hasta 1023 px. El fondo es solo humo, brasas y resplandor: se probó una escena del sitio muy atenuada detrás y competía con el título, así que no va. Título y texto comparten la velocidad de scroll, para que el parallax no los cruce. La entrada completa (sellos, título, nombre, frases y botones) queda en pantalla antes de ~1,5 s. `npm run test:portada` mide los cruces en nueve pantallas y tres idiomas.
 
 El orden de la página: Hero, Intersección, Servicios, Perfil, Método, Resultado y Contacto, con fondos alternados desde Servicios (humo, ceniza, humo, ceniza, humo).
 
@@ -181,7 +181,7 @@ El orden de la página: Hero, Intersección, Servicios, Perfil, Método, Resulta
 
 ## Elevation & Depth
 
-La profundidad viene de capas, no de sombras. La hero apila seis planos con parallax de mouse y scroll (humo fotográfico, humo WebGL, brasas de fondo, título, persona, brasas en bokeh al frente) y las secciones se separan por tono (ceniza contra humo). Las sombras son luz: resplandores de brasa y la sombra cálida del botón dorado. La única sombra de objeto es la de la hoja, que se apoya sobre el escritorio oscuro.
+La profundidad viene de capas, no de sombras. La hero apila seis planos con parallax de mouse y scroll (humo fotográfico, humo WebGL, brasas de fondo, título con su resplandor, texto, brasas en bokeh al frente) y las secciones se separan por tono (ceniza contra humo). Las sombras son luz: resplandores de brasa y la sombra cálida del botón dorado. La única sombra de objeto es la de la hoja, que se apoya sobre el escritorio oscuro.
 
 ### Shadow Vocabulary
 - **Caída de la hoja** (`box-shadow: 0 1px 1px rgba(0,0,0,.3), 0 8px 16px -4px rgba(0,0,0,.4), 0 30px 60px -18px rgba(0,0,0,.6), 0 40px 70px -24px rgba(0,0,0,.45)`): solo la hoja del informe.
