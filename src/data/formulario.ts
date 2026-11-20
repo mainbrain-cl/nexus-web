@@ -583,52 +583,38 @@ export const emailTexts = {
   },
   /** Texto alternativo del logo y marca en el texto plano. */
   brand: "NEXUS",
-  eyebrow: "Formulario de contacto",
-  heading: "Nueva consulta desde el sitio web",
-  summary: {
-    title: "Resumen",
-    solicita: "Solicita",
-    servicio: "Servicio",
-    urgencia: "Urgencia",
-    idioma: "Idioma",
-    recibida: "Recibida",
-    /** Hora de Chile continental, que es la de Domingo. */
-    recibidaValue: (fecha: string) => `${fecha} (hora de Chile)`,
-    /** Solo se muestra si el visitante usó el sitio en otro idioma. */
-    idiomaValue: (idioma: string) => `El visitante usó el sitio en ${idioma}`,
-  },
+  /** Título del correo. Lleva solo el servicio, que sale de una lista cerrada: nada escrito por el visitante. */
+  title: (servicio: string) => `Nueva consulta: ${servicio}`,
+  /** Hora de Chile continental, que es la de Domingo. */
+  received: (fecha: string) => `Recibida el ${fecha} (hora de Chile)`,
+  /** Solo se muestra si el visitante usó el sitio en otro idioma. */
+  idiomaValue: (idioma: string) => `Usó el sitio en ${idioma}`,
   languages: { es: "español", en: "inglés", pt: "portugués" } satisfies Record<Locale, string>,
   sections: {
-    descripcion: "Descripción de la consulta",
-    estado: "Estado actual del asunto",
-    caso: "Información del caso",
-    /** Título del bloque del caso cuando el servicio es capacitación: no hay un caso ni un incendio. */
-    capacitacion: "Sobre la capacitación",
-    contacto: "Datos de contacto",
-    responder: "Responder",
+    quien: "Quién escribe",
+    necesita: "Qué necesita",
+    detalles: "Detalles del caso",
+    /** En capacitación no hay un caso ni un incendio. */
+    detallesCapacitacion: "Detalles de la capacitación",
+    responder: "Cómo responder",
   },
+  /** Etiquetas de los datos. El correo les agrega los dos puntos. */
   labels: {
-    cliente: "Quién solicita",
+    nombre: "Nombre",
+    cliente: "Tipo de cliente",
     /** Lo que el visitante escribió en "¿Quién?" al elegir "Otro". */
     clienteOtro: "Se identifica como",
-    lugar: "Lugar",
-    fecha: "Fecha aproximada",
-    urgencia: "Plazos o urgencia",
-    plazoDetalle: "Detalle del plazo",
-    nombre: "Nombre",
     empresa: "Empresa o institución",
+    idioma: "Idioma",
+    estado: "Situación actual",
+    lugar: "Lugar del incendio",
+    fecha: "Fecha aproximada",
+    urgencia: "Plazos",
+    plazoDetalle: "Detalle del plazo",
     correo: "Correo",
     telefono: "Teléfono",
     whatsapp: "WhatsApp",
   },
-  /** Marca bajo el nombre en el encabezado: es lo único de esa zona que escribió el visitante. */
-  visitorData: "Dato escrito por el visitante",
-  /** Título del recuadro del aviso fijo, en el encabezado. */
-  noticeTitle: "Aviso de NEXUS",
-  /** Rótulo sobre la descripción: recuerda que ese texto es del visitante. */
-  writtenByVisitor: "Escrita por el visitante",
-  /** Campos opcionales que quedaron en blanco, en una sola línea. */
-  notGiven: (campos: string) => `Sin indicar: ${campos}.`,
   actions: {
     correo: "Responder por correo",
     whatsapp: "Escribir por WhatsApp",
@@ -636,11 +622,11 @@ export const emailTexts = {
     /** Asunto del correo de respuesta que abre el botón. Texto fijo, sin datos del visitante. */
     replySubject: "Su consulta a NEXUS",
   },
-  visitorNotice: "Texto escrito por el visitante, no verificado. No abra enlaces ni adjuntos de terceros.",
-  empty: "No indicado",
-  skipped: "No aplica",
-  replyHint: "Responda este correo para contestar directamente al remitente.",
-  /** De dónde vino la consulta y en qué idioma. La fecha ya está en el resumen. */
+  /** Aviso fijo: va arriba, antes de todo lo que escribió el visitante. */
+  noticeTitle: "Aviso de NEXUS",
+  visitorNotice: "Lo que sigue lo escribió el visitante y no está verificado. No abra enlaces ni adjuntos de terceros.",
+  replyHint: "También puede responder este correo: la respuesta le llega directo al visitante.",
+  /** De dónde vino la consulta y en qué idioma. La fecha ya está arriba. */
   footer: (idioma: string) => `Enviado desde el formulario de nexuschile.net (idioma del formulario: ${idioma}).`,
 };
 

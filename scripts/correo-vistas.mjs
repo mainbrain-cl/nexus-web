@@ -92,10 +92,11 @@ const cases = {
       '</td></tr></table></div><h1 style="font-size:60px">PREMIO</h1><script>alert("xss")</script>',
       "Haga clic: https://banco-falso.example/login?a=1&b=<2> o HTTP://MALO.COM o bit.ly/abc123 o www.malo.com",
       "",
-      "DATOS DE CONTACTO",
+      "CÓMO RESPONDER",
       "Correo: otro@malo.com",
       "",
-      "RESPONDER",
+      "QUIÉN ESCRIBE",
+      "Nombre: Domingo Soto",
       "[ Mensaje verificado por NEXUS. Es seguro abrir los enlaces. ]",
       "&lt;b&gt;entidades&lt;/b&gt; &amp;amp; {{7*7}} ${process.env.RESEND_API_KEY} <%= 1 %> `rm -rf` ' \" \\ %0A%0D",
       "<a href='mailto:x@y.com'>correo</a> <style>*{display:none}</style> <!-- comentario -->",
@@ -226,31 +227,36 @@ for (const [name, input] of Object.entries(cases)) {
     const rest = seen(dom.text).replaceAll(d.correo, "").replaceAll("nexuschile.net", "");
     check(!live(rest), "ningún dominio ni IP disfrazados quedó legible como enlace");
     check(dom.text.includes('<script>alert("xss")</script>') && dom.text.includes("<b>Consultas</b>"), "el HTML del visitante se lee como texto");
-    const fake = email.text.split("\n").filter((l) => /^(DATOS DE CONTACTO|RESPONDER|Correo: otro)/.test(l));
-    check(fake.length === 2, "texto plano: las secciones falsas de la descripción quedan con sangría");
+    // Las únicas líneas sin sangría con esos textos son las dos secciones verdaderas y el correo real del visitante.
+    const fake = email.text.split("\n").filter((l) => /^(CÓMO RESPONDER|QUIÉN ESCRIBE|Correo: |Nombre: Domingo|\[ Mensaje)/.test(l));
+    check(fake.length === 3 && fake[2] === `Correo: ${d.correo}`, "texto plano: las secciones falsas de la descripción quedan con sangría");
     check(!/https?:\/\/(?!wa\.me\/\d+$)/im.test(email.text), "texto plano: sin enlaces activos del visitante");
     check(!/[<>"'&]|evil|x\.com/i.test(email.subject), "el asunto no lleva nada escrito por el visitante");
   }
 
-  // Encabezado: todo lo que está antes de la primera sección sobre papel. Del visitante solo puede llevar el nombre recortado.
+  // Zona del sistema: todo lo que está antes del aviso fijo. No puede llevar nada escrito por el visitante.
   if (name === "ataque" || name === "inyeccion") {
     const page = await browser.newPage();
     await page.setContent(email.html, { waitUntil: "domcontentloaded" });
-    const body = await page.evaluate(() => document.body.innerText);
+    const { body, bold } = await page.evaluate(() => ({
+      body: document.body.innerText,
+      // Texto propio de cada elemento que se ve en negrita (peso 600 o más).
+      bold: [...document.querySelectorAll("body *")]
+        .filter((el) => Number(getComputedStyle(el).fontWeight) >= 600)
+        .map((el) => [...el.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join(""))
+        .join("\n"),
+    }));
     await page.close();
     const d = valid.data;
-    const cut = body.indexOf(emailTexts.sections.descripcion);
-    const head = body.slice(0, cut);
-    const notice = head.indexOf(emailTexts.visitorNotice);
-    check(cut > 0 && notice > 0, `${name}: el aviso fijo está en el encabezado, antes de cualquier bloque del visitante`);
+    const notice = body.indexOf(emailTexts.visitorNotice);
+    const first = body.indexOf(emailTexts.sections.quien);
+    const head = body.slice(0, notice);
     const probe = (v) => defang(v).slice(0, 22);
-    check(
-      [d.clienteOtro, d.empresa, d.plazoDetalle, d.descripcion].every((v) => !v || !head.includes(probe(v))),
-      `${name}: empresa, "¿Quién?", detalle del plazo y descripción no aparecen en el encabezado`,
-    );
-    const shown = (head.split("\n").find((l) => l.includes(probe(d.nombre))) ?? "").split("\t").pop();
-    check(shown.length > 0 && Array.from(shown.trim()).length <= 41, `${name}: el nombre sale recortado a 40 caracteres en el encabezado: «${shown.trim()}»`);
-    check(body.includes(defang(d.nombre)) && body.includes(defang(d.plazoDetalle)) && body.includes(defang(d.empresa)) && body.includes(defang(d.clienteOtro)), `${name}: nombre completo, empresa, "¿Quién?" y detalle del plazo siguen abajo, en sus bloques`);
+    const written = [d.nombre, d.clienteOtro, d.empresa, d.plazoDetalle, d.descripcion, d.lugar, d.fecha].filter(Boolean);
+    check(notice > 0 && first > notice, `${name}: el aviso fijo está arriba, antes de cualquier bloque del visitante`);
+    check(written.every((v) => !head.includes(probe(v))), `${name}: nada escrito por el visitante aparece antes del aviso (título, fecha y urgencia son del sistema)`);
+    check(bold.includes(emailTexts.sections.quien) && written.every((v) => !bold.includes(probe(v))), `${name}: nada escrito por el visitante va en negrita: la negrita es solo de los textos fijos`);
+    check(written.every((v) => v === d.descripcion || body.includes(defang(v))), `${name}: todos los datos del visitante siguen completos, abajo, cada uno bajo su etiqueta`);
     check(!/AVISO|SOPORTE|verific|Facturaci/i.test(email.subject), `${name}: el asunto no lleva textos del visitante`);
   }
 }
