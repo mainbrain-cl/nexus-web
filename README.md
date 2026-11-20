@@ -51,13 +51,21 @@ Variables de entorno (en Vercel: Settings → Environment Variables):
 
 Sin `RESEND_API_KEY`, en desarrollo el correo se muestra en la consola y el formulario responde bien; en producción la ruta responde 503 y el formulario ofrece WhatsApp y correo.
 
+Para activarlo:
+
+1. Crear una cuenta en [resend.com](https://resend.com) y una API key con permiso de envío.
+2. Cargar `RESEND_API_KEY` en Vercel y volver a desplegar.
+3. Con el remitente de prueba `onboarding@resend.dev`, Resend solo entrega al correo dueño de la cuenta. Para enviar a `FORM_TO` desde el dominio propio: verificar `nexuschile.net` en Resend (Domains, registros DNS SPF y DKIM) y definir `FORM_FROM`, por ejemplo `NEXUS Web <web@nexuschile.net>`.
+
+El correo llega en español, en HTML y texto plano, y con `reply_to` apuntando al visitante: Domingo responde directo desde su correo. La consulta no se guarda en ningún lado.
+
 #### Defensas contra abuso
 
 - **Token de tiempo firmado.** En la primera interacción el formulario pide `GET /api/contacto/` y recibe un token con la hora de emisión, firmado con HMAC (`FORM_SECRET`; si falta, una clave derivada de `RESEND_API_KEY`; si faltan las dos, el token se desactiva y queda un aviso en los logs). El servidor exige al menos 4 s desde la emisión, rechaza tokens de más de 6 h (el formulario pide uno nuevo antes) y no acepta reutilizar uno ya enviado. Un token malo recibe un error real, nunca un éxito falso: solo la trampa invisible (honeypot) responde `ok` sin enviar.
 - **Límite por IP:** 5 consultas cada 15 min por IP (las IPv6 se agrupan por su /64) y 60 por hora en total, en memoria de cada instancia. **Depende de Vercel:** la IP sale de `x-real-ip`, que Vercel escribe con la IP real. Fuera de Vercel esa cabecera no es confiable y todas las visitas sin ella comparten un mismo cupo.
 - **Origen:** si el navegador manda `Origin`, debe ser `NEXT_PUBLIC_SITE_URL` (o su variante con o sin `www`), `https://nexus-web-beryl-five.vercel.app`, `VERCEL_URL` o `VERCEL_BRANCH_URL`. En desarrollo se acepta `localhost`.
-- **Cuerpo:** solo `application/json` (con `charset=utf-8` opcional), hasta 32 KB y UTF-8 válido. Los textos no admiten caracteres de control ni invisibles (ancho cero, marcas de dirección, uso privado, surrogates sueltos); la tabulación se convierte en espacio.
-- **Correo a Domingo:** lleva un aviso fijo sobre lo escrito por el visitante, los enlaces desactivados (`https://x.com` → `hxxps://x[.]com`) y, en texto plano, la descripción con sangría para que no pueda imitar una sección.
+- **Cuerpo:** solo `application/json` (con `charset=utf-8` opcional), hasta 32 KB y UTF-8 válido. Los textos no admiten caracteres de control ni invisibles (ancho cero, marcas de dirección, uso privado, surrogates sueltos, braille en blanco U+2800); la tabulación se convierte en espacio. El correo del visitante admite en la parte local solo letras, números y `. _ % + -` (sin punto al inicio, al final ni dos seguidos): así no puede parecer una dirección web ni una palabra codificada. El formulario valida con la misma regla.
+- **Correo a Domingo:** todo lo escrito por el visitante va escapado en el HTML. El aviso fijo sobre ese texto va arriba, en el encabezado. El encabezado solo lleva datos de listas cerradas (servicio, tipo de cliente, urgencia) y la fecha; del visitante, apenas su nombre, recortado a 40 caracteres y rotulado como dato suyo: así no puede escribir ahí algo que parezca un aviso de NEXUS. Los enlaces van desactivados (`https://x.com` → `hxxps://x[.]com`), también los disfrazados con caracteres que no se ven, acentos combinantes o puntos parecidos (el texto se pasa a NFKC y se le quitan los invisibles antes de buscar) y las IP sin esquema. En texto plano, la descripción va con sangría para que no pueda imitar una sección. El asunto solo lleva textos de listas fijas y la hora. Los botones para responder (`mailto:`, `wa.me` y `tel:`) se arman con el correo ya validado y con los dígitos del teléfono; si no pasan esa revisión, el botón no aparece.
 - **Cabeceras de seguridad** en `next.config.ts`: `frame-ancestors 'none'`, `nosniff`, `Referrer-Policy` y `Permissions-Policy`.
 
 #### Cloudflare Turnstile (opcional)
@@ -71,13 +79,14 @@ Con las dos variables `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`,
 
 Si Cloudflare no responde, el envío falla con un mensaje de error y el formulario ofrece WhatsApp y correo.
 
-Para activarlo:
+#### El correo que recibe Domingo
 
-1. Crear una cuenta en [resend.com](https://resend.com) y una API key con permiso de envío.
-2. Cargar `RESEND_API_KEY` en Vercel y volver a desplegar.
-3. Con el remitente de prueba `onboarding@resend.dev`, Resend solo entrega al correo dueño de la cuenta. Para enviar a `FORM_TO` desde el dominio propio: verificar `nexuschile.net` en Resend (Domains, registros DNS SPF y DKIM) y definir `FORM_FROM`, por ejemplo `NEXUS Web <web@nexuschile.net>`.
-
-El correo llega en español, con el asunto `Consulta web: <quién solicita> · <servicio>`, en HTML y texto plano, y con `reply_to` apuntando al visitante: Domingo responde directo desde su correo. La consulta no se guarda en ningún lado.
+- **Asunto:** `Consulta web: <servicio> · <quién solicita> · <día-mes hora de Chile>`, con nombres cortos, y `URGENTE · ` adelante si el visitante marcó "Es urgente". La hora hace único cada asunto: así Gmail no junta en una misma conversación las consultas de personas distintas.
+- **Diseño** (`src/app/api/contacto/correo.ts`; textos en `emailTexts` de `src/data/formulario.ts`): encabezado ceniza con el logo, un resumen (servicio, tipo de cliente, nombre del visitante, urgencia si hay plazo, idioma si no es español, fecha y hora de Chile) y el aviso fijo en un recuadro; después la descripción destacada; el estado del asunto, la información del caso ("Sobre la capacitación" en ese servicio) y los datos de contacto en bloques; y los botones "Responder por correo", "Escribir por WhatsApp" y "Llamar". Ningún dato se repite: lo que está en el resumen no vuelve a salir abajo, salvo el nombre completo cuando arriba quedó recortado. Los campos opcionales en blanco se nombran en una sola línea ("Sin indicar: …"). Los botones llevan letra clara sobre fondo oscuro para que se lean igual si el cliente de correo fuerza el modo oscuro.
+- **Compatibilidad:** tablas y estilos en línea, 600 px de ancho máximo, fuentes del sistema, sin `<style>` ni fuentes web. Pensado para Gmail en computador y celular.
+- **Logo:** `public/correo/nexus-logo.png`, que el correo carga desde `https://nexuschile.net/correo/nexus-logo.png` (Gmail no muestra SVG). Tiene fondo ceniza opaco para que se lea aunque el modo oscuro del cliente de correo cambie los colores del encabezado. Se regenera con `node scripts/correo-logo.mjs http://localhost:3000` (con el sitio abierto); solo hace falta si cambia el logo. **El archivo tiene que estar en producción antes o junto con el código del correo**: si no, el encabezado muestra el texto "NEXUS" en lugar de la imagen.
+- **WhatsApp:** el botón aparece si el teléfono viene con `+` y código de país, o si es un celular chileno (9 dígitos que empiezan con 9). Con otro formato queda solo "Llamar".
+- **Vistas previas:** `node scripts/correo-vistas.mjs [carpeta]` (necesita Node 22.18 o superior, porque lee los archivos TypeScript del proyecto directamente) genera cuatro casos (completo, mínimo, intento de inyección y suplantación de NEXUS) en HTML, texto plano y capturas a 600 y 375 px, más una captura con modo oscuro forzado. Comprueba que nada de lo escrito por el visitante llegue como HTML ni como enlace, que los enlaces disfrazados queden desactivados, que el encabezado no lleve textos del visitante y qué correos se aceptan o rechazan; termina con error si algo falla. Conviene correrlo después de tocar `correo.ts` o `src/lib/contacto.ts`.
 
 ### Abrir Servicios con una línea ya elegida
 

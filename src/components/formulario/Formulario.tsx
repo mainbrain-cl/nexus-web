@@ -159,7 +159,8 @@ function FieldShell({
     <div className={`flex flex-col gap-2 ${className}`}>
       <label htmlFor={id} className="text-[0.95rem] font-semibold text-hueso">
         {label}
-        {optional && <span className="ml-2 text-[0.8rem] font-normal text-gris">({optional})</span>}
+        {optional && " "}
+        {optional && <span className="ml-1 text-[0.8rem] font-normal text-gris">({optional})</span>}
       </label>
       {children}
       {error && (
@@ -327,6 +328,8 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
 
   const steps = stepsFor(data);
   const index = Math.max(0, steps.indexOf(step));
+  // Sin servicio elegido `stepsFor` ya cuenta la rama más común (5 pasos, con el de estado); al elegir se ajusta.
+  const totalSteps = steps.length;
   const st = t.steps;
   const done = phase === "done";
 
@@ -649,6 +652,14 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
       ? {}
       : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, ease, delay: 0.06 + i * 0.035 } };
 
+  // Al aparecer "¿Quién?" se enfoca sin que el navegador mueva la página por su cuenta (dejaba el título bajo la barra
+  // fija) y se trae a la vista solo si hace falta; `scroll-padding-top` del html respeta la barra.
+  const focusOtro = useCallback((el: HTMLInputElement | null) => {
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ block: "nearest" });
+  }, []);
+
   const heading = (text: string, help?: string) => (
     <div className="flex flex-col gap-2">
       <h3
@@ -703,7 +714,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
             <input
               id={fid("clienteOtro")}
               type="text"
-              autoFocus
+              ref={focusOtro}
               maxLength={limits.clienteOtro}
               value={data.clienteOtro}
               onChange={(e) => set("clienteOtro", e.target.value)}
@@ -776,7 +787,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
     const c = st.caso;
     body = (
       <>
-        {heading(c.title, c.help)}
+        {heading(noIncident ? c.titleCapacitacion : c.title, noIncident ? c.helpCapacitacion : c.help)}
         <div className="mt-7 grid gap-5 sm:grid-cols-2">
           {!noIncident && (
             <>
@@ -804,8 +815,8 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
           </FieldShell>
           <fieldset className="flex flex-col gap-3 sm:col-span-2">
             <legend className="mb-2 text-[0.95rem] font-semibold text-hueso">
-              {c.urgencia.label}
-              <span className="ml-2 text-[0.8rem] font-normal text-gris">({t.optional})</span>
+              {c.urgencia.label}{" "}
+              <span className="ml-1 text-[0.8rem] font-normal text-gris">({t.optional})</span>
             </legend>
             <div className="flex flex-wrap gap-2.5">
               {c.urgencia.options.map((o) => {
@@ -904,7 +915,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
         {phase !== "done" && (
           <div className="mb-8 flex items-start gap-5">
             <div className="flex-1">
-              <Progress id={fid("progreso")} index={index} total={steps.length} label={t.stepOf(index + 1, steps.length)} />
+              <Progress id={fid("progreso")} index={index} total={totalSteps} label={t.stepOf(index + 1, totalSteps)} />
             </div>
           </div>
         )}

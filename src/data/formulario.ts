@@ -108,6 +108,9 @@ export type FormTexts = {
     caso: {
       title: string;
       help: string;
+      /** Título y ayuda cuando el servicio es capacitación (no hay incidente). */
+      titleCapacitacion: string;
+      helpCapacitacion: string;
       lugar: { label: string; placeholder: string };
       fecha: { label: string; placeholder: string };
       descripcion: { label: string; placeholder: string; placeholderCapacitacion: string };
@@ -223,12 +226,14 @@ const es: FormTexts = {
     caso: {
       title: "Información básica del caso",
       help: "Esta información permite evaluar preliminarmente la naturaleza del encargo.",
+      titleCapacitacion: "Sobre la capacitación",
+      helpCapacitacion: "Cuéntenos el tema, cuántas personas participarían y las fechas tentativas.",
       lugar: { label: "Lugar donde ocurrió el incendio", placeholder: "Comuna o ciudad" },
       fecha: { label: "Fecha aproximada del incidente", placeholder: "Por ejemplo: marzo de 2026" },
       descripcion: {
         label: "Breve descripción de la consulta",
         placeholder: "Cuéntenos en pocas líneas qué ocurrió y qué necesita.",
-        placeholderCapacitacion: "Tema, cantidad aproximada de participantes y fechas tentativas.",
+        placeholderCapacitacion: "Por ejemplo: investigación de incendios para 12 brigadistas, en marzo.",
       },
       urgencia: {
         label: "¿Existen plazos relevantes o urgencia?",
@@ -257,14 +262,14 @@ const es: FormTexts = {
     nombre: "Indique su nombre.",
     correoVacio: "Indique su correo electrónico.",
     correo: "Revise su correo electrónico: no parece válido.",
-    telefono: "Revise el teléfono: use solo números, espacios y el signo +.",
+    telefono: "Revise el teléfono: use solo números, espacios, el signo + y los símbolos ( ), - y punto.",
     invalido: "Algunos datos no se pudieron validar. Revíselos e intente de nuevo.",
     limite: "Recibimos varias consultas seguidas desde su conexión. Espere unos minutos o escríbanos por WhatsApp.",
     noDisponible: "El envío por formulario no está disponible en este momento.",
     envio: "El servicio de correo no respondió y su consulta no se envió. Intente de nuevo en unos minutos o escríbanos por WhatsApp.",
     verificacion: "No pudimos confirmar que el envío viene de una persona. Intente de nuevo o escríbanos por WhatsApp.",
     vencido: "El formulario estuvo abierto mucho tiempo. Presione Enviar consulta de nuevo.",
-    red: "No pudimos enviar su consulta. Revise su conexión e intente de nuevo.",
+    red: "Revise su conexión a internet e intente de nuevo.",
   },
   done: {
     title: "Consulta enviada",
@@ -351,12 +356,14 @@ const en: FormTexts = {
     caso: {
       title: "Basic case information",
       help: "This information allows a preliminary assessment of the nature of the engagement.",
+      titleCapacitacion: "About the training",
+      helpCapacitacion: "Tell us the topic, how many people would take part and tentative dates.",
       lugar: { label: "Where the fire occurred", placeholder: "City or town" },
       fecha: { label: "Approximate date of the incident", placeholder: "For example: March 2026" },
       descripcion: {
         label: "Brief description of your inquiry",
         placeholder: "Tell us in a few lines what happened and what you need.",
-        placeholderCapacitacion: "Topic, approximate number of participants and tentative dates.",
+        placeholderCapacitacion: "For example: fire investigation for 12 firefighters, in March.",
       },
       urgencia: {
         label: "Are there relevant deadlines or urgency?",
@@ -385,14 +392,14 @@ const en: FormTexts = {
     nombre: "Please enter your name.",
     correoVacio: "Please enter your email address.",
     correo: "Please check your email address: it does not appear to be valid.",
-    telefono: "Please check the phone number: use only digits, spaces and the + sign.",
+    telefono: "Please check the phone number: use only digits, spaces, the + sign and the symbols ( ), - and period.",
     invalido: "Some of the information could not be validated. Please review it and try again.",
     limite: "We received several inquiries in a row from your connection. Please wait a few minutes or message us on WhatsApp.",
     noDisponible: "The form is not available right now.",
     envio: "The email service did not respond and your inquiry was not sent. Please try again in a few minutes or message us on WhatsApp.",
     verificacion: "We could not confirm that the inquiry comes from a person. Please try again or message us on WhatsApp.",
     vencido: "The form was open for a long time. Please press Send inquiry again.",
-    red: "We could not send your inquiry. Please check your connection and try again.",
+    red: "Please check your internet connection and try again.",
   },
   done: {
     title: "Inquiry sent",
@@ -479,12 +486,14 @@ const pt: FormTexts = {
     caso: {
       title: "Informações básicas do caso",
       help: "Essas informações permitem uma avaliação preliminar da natureza do trabalho.",
+      titleCapacitacion: "Sobre o treinamento",
+      helpCapacitacion: "Conte-nos o tema, quantas pessoas participariam e as datas previstas.",
       lugar: { label: "Local onde ocorreu o incêndio", placeholder: "Cidade ou município" },
       fecha: { label: "Data aproximada do incidente", placeholder: "Por exemplo: março de 2026" },
       descripcion: {
         label: "Breve descrição da consulta",
         placeholder: "Conte em poucas linhas o que aconteceu e do que você precisa.",
-        placeholderCapacitacion: "Tema, número aproximado de participantes e datas previstas.",
+        placeholderCapacitacion: "Por exemplo: investigação de incêndios para 12 brigadistas, em março.",
       },
       urgencia: {
         label: "Há prazos relevantes ou urgência?",
@@ -513,14 +522,14 @@ const pt: FormTexts = {
     nombre: "Informe seu nome.",
     correoVacio: "Informe seu e-mail.",
     correo: "Verifique seu e-mail: ele não parece válido.",
-    telefono: "Verifique o telefone: use apenas números, espaços e o sinal +.",
+    telefono: "Verifique o telefone: use apenas números, espaços, o sinal + e os símbolos ( ), - e ponto.",
     invalido: "Alguns dados não puderam ser validados. Revise-os e tente novamente.",
     limite: "Recebemos várias consultas seguidas da sua conexão. Aguarde alguns minutos ou fale conosco pelo WhatsApp.",
     noDisponible: "O envio pelo formulário não está disponível no momento.",
     envio: "O serviço de e-mail não respondeu e sua consulta não foi enviada. Tente novamente em alguns minutos ou fale conosco pelo WhatsApp.",
     verificacion: "Não foi possível confirmar que o envio vem de uma pessoa. Tente novamente ou fale conosco pelo WhatsApp.",
     vencido: "O formulário ficou aberto por muito tempo. Clique em Enviar consulta novamente.",
-    red: "Não foi possível enviar sua consulta. Verifique sua conexão e tente novamente.",
+    red: "Verifique sua conexão com a internet e tente novamente.",
   },
   done: {
     title: "Consulta enviada",
@@ -545,31 +554,94 @@ export const getFormTexts = (locale: Locale = "es"): FormTexts => formTexts[loca
 // ---------- Correo a Domingo (siempre en español) ----------
 
 export const emailTexts = {
-  subject: (cliente: string, servicio: string) => `Consulta web: ${cliente} · ${servicio}`,
+  /**
+   * Asunto: solo textos de estas listas y la hora de Chile, nunca algo escrito por el visitante. La hora hace
+   * único cada asunto, para que Gmail no junte en una misma conversación las consultas de personas distintas.
+   */
+  subject: (servicio: string, cliente: string, hora: string, urgente: boolean) =>
+    `${urgente ? "URGENTE · " : ""}Consulta web: ${servicio} · ${cliente} · ${hora}`,
+  /** Nombres cortos para el asunto: en el celular se ven los primeros 40 a 50 caracteres. */
+  short: {
+    cliente: {
+      abogado: "Abogado",
+      aseguradora: "Aseguradora o liquidadora",
+      investigador: "Investigador o perito",
+      empresa: "Empresa",
+      particular: "Particular",
+      otro: "Otro",
+    } satisfies Record<ClientId, string>,
+    servicio: {
+      auditoria: "Auditoría de informe pericial",
+      "revision-propia": "Revisión de informe propio",
+      litigacion: "Asesoría para procedimiento judicial",
+      controvertidas: "Pericias controvertidas",
+      investigacion: "Investigación de incendio",
+      evaluacion: "Evaluación preliminar",
+      capacitacion: "Capacitación",
+      "no-se": "Servicio por definir",
+    } satisfies Record<ServiceId, string>,
+  },
+  /** Texto alternativo del logo y marca en el texto plano. */
+  brand: "NEXUS",
+  eyebrow: "Formulario de contacto",
   heading: "Nueva consulta desde el sitio web",
+  summary: {
+    title: "Resumen",
+    solicita: "Solicita",
+    servicio: "Servicio",
+    urgencia: "Urgencia",
+    idioma: "Idioma",
+    recibida: "Recibida",
+    /** Hora de Chile continental, que es la de Domingo. */
+    recibidaValue: (fecha: string) => `${fecha} (hora de Chile)`,
+    /** Solo se muestra si el visitante usó el sitio en otro idioma. */
+    idiomaValue: (idioma: string) => `El visitante usó el sitio en ${idioma}`,
+  },
+  languages: { es: "español", en: "inglés", pt: "portugués" } satisfies Record<Locale, string>,
   sections: {
-    cliente: "1. Quién solicita",
-    servicio: "2. Servicio",
-    estado: "3. Estado actual del asunto",
-    caso: "4. Información del caso",
-    contacto: "5. Datos de contacto",
+    descripcion: "Descripción de la consulta",
+    estado: "Estado actual del asunto",
+    caso: "Información del caso",
+    /** Título del bloque del caso cuando el servicio es capacitación: no hay un caso ni un incendio. */
+    capacitacion: "Sobre la capacitación",
+    contacto: "Datos de contacto",
+    responder: "Responder",
   },
   labels: {
+    cliente: "Quién solicita",
+    /** Lo que el visitante escribió en "¿Quién?" al elegir "Otro". */
+    clienteOtro: "Se identifica como",
     lugar: "Lugar",
     fecha: "Fecha aproximada",
-    descripcion: "Descripción",
     urgencia: "Plazos o urgencia",
     plazoDetalle: "Detalle del plazo",
     nombre: "Nombre",
     empresa: "Empresa o institución",
     correo: "Correo",
     telefono: "Teléfono",
+    whatsapp: "WhatsApp",
+  },
+  /** Marca bajo el nombre en el encabezado: es lo único de esa zona que escribió el visitante. */
+  visitorData: "Dato escrito por el visitante",
+  /** Título del recuadro del aviso fijo, en el encabezado. */
+  noticeTitle: "Aviso de NEXUS",
+  /** Rótulo sobre la descripción: recuerda que ese texto es del visitante. */
+  writtenByVisitor: "Escrita por el visitante",
+  /** Campos opcionales que quedaron en blanco, en una sola línea. */
+  notGiven: (campos: string) => `Sin indicar: ${campos}.`,
+  actions: {
+    correo: "Responder por correo",
+    whatsapp: "Escribir por WhatsApp",
+    telefono: "Llamar",
+    /** Asunto del correo de respuesta que abre el botón. Texto fijo, sin datos del visitante. */
+    replySubject: "Su consulta a NEXUS",
   },
   visitorNotice: "Texto escrito por el visitante, no verificado. No abra enlaces ni adjuntos de terceros.",
   empty: "No indicado",
   skipped: "No aplica",
   replyHint: "Responda este correo para contestar directamente al remitente.",
-  footer: (fecha: string, idioma: string) => `Enviado desde el formulario de nexuschile.net el ${fecha} (idioma del formulario: ${idioma}).`,
+  /** De dónde vino la consulta y en qué idioma. La fecha ya está en el resumen. */
+  footer: (idioma: string) => `Enviado desde el formulario de nexuschile.net (idioma del formulario: ${idioma}).`,
 };
 
 // ---------- Abrir el formulario con un servicio ya elegido ----------
