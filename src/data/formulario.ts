@@ -233,7 +233,7 @@ const es: FormTexts = {
       descripcion: {
         label: "Breve descripción de la consulta",
         placeholder: "Cuéntenos en pocas líneas qué ocurrió y qué necesita.",
-        placeholderCapacitacion: "Tema, cantidad aproximada de participantes y fechas tentativas.",
+        placeholderCapacitacion: "Por ejemplo: investigación de incendios para 12 brigadistas, en marzo.",
       },
       urgencia: {
         label: "¿Existen plazos relevantes o urgencia?",
@@ -262,7 +262,7 @@ const es: FormTexts = {
     nombre: "Indique su nombre.",
     correoVacio: "Indique su correo electrónico.",
     correo: "Revise su correo electrónico: no parece válido.",
-    telefono: "Revise el teléfono: use solo números, espacios, el signo + y los símbolos ( ) - .",
+    telefono: "Revise el teléfono: use solo números, espacios, el signo + y los símbolos ( ), - y punto.",
     invalido: "Algunos datos no se pudieron validar. Revíselos e intente de nuevo.",
     limite: "Recibimos varias consultas seguidas desde su conexión. Espere unos minutos o escríbanos por WhatsApp.",
     noDisponible: "El envío por formulario no está disponible en este momento.",
@@ -363,7 +363,7 @@ const en: FormTexts = {
       descripcion: {
         label: "Brief description of your inquiry",
         placeholder: "Tell us in a few lines what happened and what you need.",
-        placeholderCapacitacion: "Topic, approximate number of participants and tentative dates.",
+        placeholderCapacitacion: "For example: fire investigation for 12 firefighters, in March.",
       },
       urgencia: {
         label: "Are there relevant deadlines or urgency?",
@@ -392,7 +392,7 @@ const en: FormTexts = {
     nombre: "Please enter your name.",
     correoVacio: "Please enter your email address.",
     correo: "Please check your email address: it does not appear to be valid.",
-    telefono: "Please check the phone number: use only digits, spaces, the + sign and the symbols ( ) - .",
+    telefono: "Please check the phone number: use only digits, spaces, the + sign and the symbols ( ), - and period.",
     invalido: "Some of the information could not be validated. Please review it and try again.",
     limite: "We received several inquiries in a row from your connection. Please wait a few minutes or message us on WhatsApp.",
     noDisponible: "The form is not available right now.",
@@ -493,7 +493,7 @@ const pt: FormTexts = {
       descripcion: {
         label: "Breve descrição da consulta",
         placeholder: "Conte em poucas linhas o que aconteceu e do que você precisa.",
-        placeholderCapacitacion: "Tema, número aproximado de participantes e datas previstas.",
+        placeholderCapacitacion: "Por exemplo: investigação de incêndios para 12 brigadistas, em março.",
       },
       urgencia: {
         label: "Há prazos relevantes ou urgência?",
@@ -522,7 +522,7 @@ const pt: FormTexts = {
     nombre: "Informe seu nome.",
     correoVacio: "Informe seu e-mail.",
     correo: "Verifique seu e-mail: ele não parece válido.",
-    telefono: "Verifique o telefone: use apenas números, espaços, o sinal + e os símbolos ( ) - .",
+    telefono: "Verifique o telefone: use apenas números, espaços, o sinal + e os símbolos ( ), - e ponto.",
     invalido: "Alguns dados não puderam ser validados. Revise-os e tente novamente.",
     limite: "Recebemos várias consultas seguidas da sua conexão. Aguarde alguns minutos ou fale conosco pelo WhatsApp.",
     noDisponible: "O envio pelo formulário não está disponível no momento.",
@@ -589,7 +589,7 @@ export const emailTexts = {
     title: "Resumen",
     solicita: "Solicita",
     servicio: "Servicio",
-    plazo: "Plazo",
+    urgencia: "Urgencia",
     idioma: "Idioma",
     recibida: "Recibida",
     /** Hora de Chile continental, que es la de Domingo. */
@@ -602,11 +602,15 @@ export const emailTexts = {
     descripcion: "Descripción de la consulta",
     estado: "Estado actual del asunto",
     caso: "Información del caso",
+    /** Título del bloque del caso cuando el servicio es capacitación: no hay un caso ni un incendio. */
+    capacitacion: "Sobre la capacitación",
     contacto: "Datos de contacto",
     responder: "Responder",
   },
   labels: {
     cliente: "Quién solicita",
+    /** Lo que el visitante escribió en "¿Quién?" al elegir "Otro". */
+    clienteOtro: "Se identifica como",
     lugar: "Lugar",
     fecha: "Fecha aproximada",
     urgencia: "Plazos o urgencia",
@@ -617,6 +621,10 @@ export const emailTexts = {
     telefono: "Teléfono",
     whatsapp: "WhatsApp",
   },
+  /** Marca bajo el nombre en el encabezado: es lo único de esa zona que escribió el visitante. */
+  visitorData: "Dato escrito por el visitante",
+  /** Título del recuadro del aviso fijo, en el encabezado. */
+  noticeTitle: "Aviso de NEXUS",
   /** Rótulo sobre la descripción: recuerda que ese texto es del visitante. */
   writtenByVisitor: "Escrita por el visitante",
   /** Campos opcionales que quedaron en blanco, en una sola línea. */
@@ -632,7 +640,8 @@ export const emailTexts = {
   empty: "No indicado",
   skipped: "No aplica",
   replyHint: "Responda este correo para contestar directamente al remitente.",
-  footer: (fecha: string, idioma: string) => `Enviado desde el formulario de nexuschile.net el ${fecha}, hora de Chile (idioma del formulario: ${idioma}).`,
+  /** De dónde vino la consulta y en qué idioma. La fecha ya está en el resumen. */
+  footer: (idioma: string) => `Enviado desde el formulario de nexuschile.net (idioma del formulario: ${idioma}).`,
 };
 
 // ---------- Abrir el formulario con un servicio ya elegido ----------

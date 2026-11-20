@@ -328,8 +328,8 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
 
   const steps = stepsFor(data);
   const index = Math.max(0, steps.indexOf(step));
-  // Mientras no hay servicio se muestra el total de la rama más común (con paso de estado); al elegir se ajusta.
-  const totalSteps = data.servicio ? steps.length : 5;
+  // Sin servicio elegido `stepsFor` ya cuenta la rama más común (5 pasos, con el de estado); al elegir se ajusta.
+  const totalSteps = steps.length;
   const st = t.steps;
   const done = phase === "done";
 

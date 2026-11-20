@@ -35,14 +35,18 @@ export type ContactPayload = {
   idioma: Locale;
 };
 
-// Correo: parte local y dominio con al menos un punto, sin espacios ni caracteres de control.
-const EMAIL = /^[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]{1,64}@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
+// Correo: parte local de hasta 64 caracteres, solo con letras, números y `. _ % + -`, sin punto al inicio, al
+// final ni dos seguidos; y dominio con al menos un punto. La parte local no admite `/ ? = # { | } ~ ' &`: con ellos
+// un correo puede leerse como una dirección web (`www.banco.cl/pago?id=1@x.com`) o como una palabra codificada
+// (`=?utf-8?q?…?=`). El formulario y el servidor usan esta misma regla.
+const EMAIL = /^(?=[^@]{1,64}@)[A-Za-z0-9_%+-]+(?:\.[A-Za-z0-9_%+-]+)*@[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)+$/;
 const PHONE = /^\+?[0-9 ()\-.]{6,30}$/;
 // Caracteres prohibidos en todo texto del visitante: de control, de formato invisibles (ancho cero, marcas de
 // dirección, etiquetas), surrogates sueltos, de uso privado y separadores de línea o párrafo Unicode.
-const FORBIDDEN = /[\p{Cc}\p{Cf}\p{Cs}\p{Co}\p{Zl}\p{Zp}]/u;
+// U+2800 (braille en blanco) se ve como un espacio pero no lo es.
+const FORBIDDEN = /[\p{Cc}\p{Cf}\p{Cs}\p{Co}\p{Zl}\p{Zp}\u2800]/u;
 // En textos de varias líneas se permite el salto de línea.
-const FORBIDDEN_MULTILINE = /(?!\n)\p{Cc}|[\p{Cf}\p{Cs}\p{Co}\p{Zl}\p{Zp}]/u;
+const FORBIDDEN_MULTILINE = /(?!\n)\p{Cc}|[\p{Cf}\p{Cs}\p{Co}\p{Zl}\p{Zp}\u2800]/u;
 const FORBIDDEN_ALL = new RegExp(FORBIDDEN.source, "gu");
 const FORBIDDEN_MULTILINE_ALL = new RegExp(FORBIDDEN_MULTILINE.source, "gu");
 
