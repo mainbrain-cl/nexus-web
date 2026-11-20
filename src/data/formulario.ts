@@ -108,6 +108,9 @@ export type FormTexts = {
     caso: {
       title: string;
       help: string;
+      /** Título y ayuda cuando el servicio es capacitación (no hay incidente). */
+      titleCapacitacion: string;
+      helpCapacitacion: string;
       lugar: { label: string; placeholder: string };
       fecha: { label: string; placeholder: string };
       descripcion: { label: string; placeholder: string; placeholderCapacitacion: string };
@@ -223,6 +226,8 @@ const es: FormTexts = {
     caso: {
       title: "Información básica del caso",
       help: "Esta información permite evaluar preliminarmente la naturaleza del encargo.",
+      titleCapacitacion: "Sobre la capacitación",
+      helpCapacitacion: "Cuéntenos el tema, cuántas personas participarían y las fechas tentativas.",
       lugar: { label: "Lugar donde ocurrió el incendio", placeholder: "Comuna o ciudad" },
       fecha: { label: "Fecha aproximada del incidente", placeholder: "Por ejemplo: marzo de 2026" },
       descripcion: {
@@ -257,7 +262,7 @@ const es: FormTexts = {
     nombre: "Indique su nombre.",
     correoVacio: "Indique su correo electrónico.",
     correo: "Revise su correo electrónico: no parece válido.",
-    telefono: "Revise el teléfono: use solo números, espacios y el signo +.",
+    telefono: "Revise el teléfono: use solo números, espacios, el signo + y los símbolos ( ) - .",
     invalido: "Algunos datos no se pudieron validar. Revíselos e intente de nuevo.",
     limite: "Recibimos varias consultas seguidas desde su conexión. Espere unos minutos o escríbanos por WhatsApp.",
     noDisponible: "El envío por formulario no está disponible en este momento.",
@@ -351,6 +356,8 @@ const en: FormTexts = {
     caso: {
       title: "Basic case information",
       help: "This information allows a preliminary assessment of the nature of the engagement.",
+      titleCapacitacion: "About the training",
+      helpCapacitacion: "Tell us the topic, how many people would take part and tentative dates.",
       lugar: { label: "Where the fire occurred", placeholder: "City or town" },
       fecha: { label: "Approximate date of the incident", placeholder: "For example: March 2026" },
       descripcion: {
@@ -385,7 +392,7 @@ const en: FormTexts = {
     nombre: "Please enter your name.",
     correoVacio: "Please enter your email address.",
     correo: "Please check your email address: it does not appear to be valid.",
-    telefono: "Please check the phone number: use only digits, spaces and the + sign.",
+    telefono: "Please check the phone number: use only digits, spaces, the + sign and the symbols ( ) - .",
     invalido: "Some of the information could not be validated. Please review it and try again.",
     limite: "We received several inquiries in a row from your connection. Please wait a few minutes or message us on WhatsApp.",
     noDisponible: "The form is not available right now.",
@@ -479,6 +486,8 @@ const pt: FormTexts = {
     caso: {
       title: "Informações básicas do caso",
       help: "Essas informações permitem uma avaliação preliminar da natureza do trabalho.",
+      titleCapacitacion: "Sobre o treinamento",
+      helpCapacitacion: "Conte-nos o tema, quantas pessoas participariam e as datas previstas.",
       lugar: { label: "Local onde ocorreu o incêndio", placeholder: "Cidade ou município" },
       fecha: { label: "Data aproximada do incidente", placeholder: "Por exemplo: março de 2026" },
       descripcion: {
@@ -513,7 +522,7 @@ const pt: FormTexts = {
     nombre: "Informe seu nome.",
     correoVacio: "Informe seu e-mail.",
     correo: "Verifique seu e-mail: ele não parece válido.",
-    telefono: "Verifique o telefone: use apenas números, espaços e o sinal +.",
+    telefono: "Verifique o telefone: use apenas números, espaços, o sinal + e os símbolos ( ) - .",
     invalido: "Alguns dados não puderam ser validados. Revise-os e tente novamente.",
     limite: "Recebemos várias consultas seguidas da sua conexão. Aguarde alguns minutos ou fale conosco pelo WhatsApp.",
     noDisponible: "O envio pelo formulário não está disponível no momento.",

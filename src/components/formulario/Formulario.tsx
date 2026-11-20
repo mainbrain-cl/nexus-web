@@ -328,6 +328,8 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
 
   const steps = stepsFor(data);
   const index = Math.max(0, steps.indexOf(step));
+  // Mientras no hay servicio se muestra el total de la rama más común (con paso de estado); al elegir se ajusta.
+  const totalSteps = data.servicio ? steps.length : 5;
   const st = t.steps;
   const done = phase === "done";
 
@@ -650,6 +652,14 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
       ? {}
       : { initial: { opacity: 0, y: 10 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, ease, delay: 0.06 + i * 0.035 } };
 
+  // Al aparecer "¿Quién?" se enfoca sin que el navegador mueva la página por su cuenta (dejaba el título bajo la barra
+  // fija) y se trae a la vista solo si hace falta; `scroll-padding-top` del html respeta la barra.
+  const focusOtro = useCallback((el: HTMLInputElement | null) => {
+    if (!el) return;
+    el.focus({ preventScroll: true });
+    el.scrollIntoView({ block: "nearest" });
+  }, []);
+
   const heading = (text: string, help?: string) => (
     <div className="flex flex-col gap-2">
       <h3
@@ -704,7 +714,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
             <input
               id={fid("clienteOtro")}
               type="text"
-              autoFocus
+              ref={focusOtro}
               maxLength={limits.clienteOtro}
               value={data.clienteOtro}
               onChange={(e) => set("clienteOtro", e.target.value)}
@@ -777,7 +787,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
     const c = st.caso;
     body = (
       <>
-        {heading(c.title, c.help)}
+        {heading(noIncident ? c.titleCapacitacion : c.title, noIncident ? c.helpCapacitacion : c.help)}
         <div className="mt-7 grid gap-5 sm:grid-cols-2">
           {!noIncident && (
             <>
@@ -905,7 +915,7 @@ export function Formulario({ locale = "es" }: { locale?: Locale }) {
         {phase !== "done" && (
           <div className="mb-8 flex items-start gap-5">
             <div className="flex-1">
-              <Progress id={fid("progreso")} index={index} total={steps.length} label={t.stepOf(index + 1, steps.length)} />
+              <Progress id={fid("progreso")} index={index} total={totalSteps} label={t.stepOf(index + 1, totalSteps)} />
             </div>
           </div>
         )}

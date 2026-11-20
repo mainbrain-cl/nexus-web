@@ -50,6 +50,14 @@ Variables de entorno (en Vercel: Settings → Environment Variables):
 
 Sin `RESEND_API_KEY`, en desarrollo el correo se muestra en la consola y el formulario responde bien; en producción la ruta responde 503 y el formulario ofrece WhatsApp y correo.
 
+Para activarlo:
+
+1. Crear una cuenta en [resend.com](https://resend.com) y una API key con permiso de envío.
+2. Cargar `RESEND_API_KEY` en Vercel y volver a desplegar.
+3. Con el remitente de prueba `onboarding@resend.dev`, Resend solo entrega al correo dueño de la cuenta. Para enviar a `FORM_TO` desde el dominio propio: verificar `nexuschile.net` en Resend (Domains, registros DNS SPF y DKIM) y definir `FORM_FROM`, por ejemplo `NEXUS Web <web@nexuschile.net>`.
+
+El correo llega en español, en HTML y texto plano, y con `reply_to` apuntando al visitante: Domingo responde directo desde su correo. La consulta no se guarda en ningún lado.
+
 #### Defensas contra abuso
 
 - **Token de tiempo firmado.** En la primera interacción el formulario pide `GET /api/contacto/` y recibe un token con la hora de emisión, firmado con HMAC (`FORM_SECRET`; si falta, una clave derivada de `RESEND_API_KEY`; si faltan las dos, el token se desactiva y queda un aviso en los logs). El servidor exige al menos 4 s desde la emisión, rechaza tokens de más de 6 h (el formulario pide uno nuevo antes) y no acepta reutilizar uno ya enviado. Un token malo recibe un error real, nunca un éxito falso: solo la trampa invisible (honeypot) responde `ok` sin enviar.
@@ -69,14 +77,6 @@ Con las dos variables `NEXT_PUBLIC_TURNSTILE_SITE_KEY` y `TURNSTILE_SECRET_KEY`,
 4. Volver a desplegar: la clave pública se incrusta en el build.
 
 Si Cloudflare no responde, el envío falla con un mensaje de error y el formulario ofrece WhatsApp y correo.
-
-Para activarlo:
-
-1. Crear una cuenta en [resend.com](https://resend.com) y una API key con permiso de envío.
-2. Cargar `RESEND_API_KEY` en Vercel y volver a desplegar.
-3. Con el remitente de prueba `onboarding@resend.dev`, Resend solo entrega al correo dueño de la cuenta. Para enviar a `FORM_TO` desde el dominio propio: verificar `nexuschile.net` en Resend (Domains, registros DNS SPF y DKIM) y definir `FORM_FROM`, por ejemplo `NEXUS Web <web@nexuschile.net>`.
-
-El correo llega en español, en HTML y texto plano, y con `reply_to` apuntando al visitante: Domingo responde directo desde su correo. La consulta no se guarda en ningún lado.
 
 #### El correo que recibe Domingo
 
