@@ -130,11 +130,14 @@ export function Asesor() {
   return (
     <div ref={rootRef} className="nx-asesor" data-on={visible}>
       {message && (
-        <div className="nx-asesor-mensaje relative mb-1.5 w-[min(15rem,calc(100vw-6.25rem))] rounded-[1.25rem] rounded-br-[0.35rem] border border-oro/25 bg-humo/90 shadow-[0_18px_44px_-14px_rgba(0,0,0,.9),0_4px_14px_-6px_rgba(0,0,0,.6)] backdrop-blur-md sm:w-[19rem]">
-          <a href={links.formulario} onClick={go} className="group block rounded-[inherit] py-3 pr-11 pl-4 sm:py-3.5 sm:pr-10 sm:pl-[1.125rem]">
-            <span className="block text-[0.68rem] leading-[1.3] font-semibold tracking-[0.14em] text-oro-claro uppercase">{hero.name}</span>
-            <span className="mt-1.5 block text-[0.86rem] leading-[1.45] text-hueso/90 sm:text-[0.92rem]">{advisor.message}</span>
-            <span className="mt-2 inline-flex items-center gap-1.5 text-[0.8rem] leading-[1.3] font-semibold text-oro-claro">
+        // Globo: en celular va sobre la foto, casi a todo el ancho, para que el mensaje quepa en dos líneas a
+        // 16 px; desde 640 px va a su izquierda. El ancho está medido para esas dos líneas en es, en y pt.
+        <div className="nx-asesor-mensaje relative w-[min(19rem,calc(100vw-2rem))] rounded-[1.4rem] rounded-br-[0.4rem] border border-oro/30 bg-humo/92 shadow-[0_22px_50px_-14px_rgba(0,0,0,.92),0_6px_16px_-6px_rgba(0,0,0,.6)] backdrop-blur-md sm:mb-2 sm:w-[20.5rem]">
+          <a href={links.formulario} onClick={go} className="group block rounded-[inherit] px-4 pt-3.5 pb-4 sm:px-5 sm:pt-4 sm:pb-[1.125rem]">
+            <span className="block pr-9 text-[0.7rem] leading-[1.3] font-semibold tracking-[0.14em] text-oro-claro uppercase">{hero.name}</span>
+            <span className="mt-2 block text-[1rem] leading-[1.45] text-balance text-hueso/92 sm:text-[0.97rem]">{advisor.message}</span>
+            {/* La acción, como botón chico: se lee como algo que se toca sin competir con el botón dorado de la barra. */}
+            <span className="mt-3 inline-flex h-9 items-center gap-2 rounded-full border border-oro/50 bg-oro/[0.14] px-4 text-[0.86rem] leading-none font-bold tracking-[0.01em] text-oro-claro transition-colors duration-300 group-hover:border-oro-claro group-hover:bg-oro/25">
               {advisor.cta}
               <Arrow className="size-[1em] transition-transform duration-500 group-hover:translate-x-0.5" />
             </span>
@@ -143,7 +146,7 @@ export function Asesor() {
             type="button"
             onClick={dismiss}
             aria-label={advisor.close}
-            className="absolute top-0 right-0 grid size-11 cursor-pointer sm:top-1 sm:right-1 sm:size-9 place-items-center rounded-full text-hueso/60 transition-colors duration-300 hover:text-hueso"
+            className="absolute top-0 right-0 grid size-11 cursor-pointer place-items-center rounded-full text-hueso/60 transition-colors duration-300 hover:text-hueso sm:top-1 sm:right-1 sm:size-9"
           >
             <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" className="size-3.5">
               <path d="m4 4 12 12M16 4 4 16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -151,11 +154,13 @@ export function Asesor() {
           </button>
         </div>
       )}
+      {/* Foto: 64 px en celular y 72 px desde 640 px, con borde dorado y un anillo dorado tenue por fuera. Todo
+          estático: sin pulso ni punto de "en línea", porque detrás hay un formulario, no un chat en vivo. */}
       <a
         href={links.formulario}
         onClick={go}
         aria-label={advisor.label}
-        className="nx-asesor-foto block shrink-0 rounded-full border-2 border-oro/70 bg-carbon shadow-[0_14px_34px_-10px_rgba(0,0,0,.95),0_4px_12px_-4px_rgba(0,0,0,.7)] transition-[translate,border-color,box-shadow] duration-500 hover:-translate-y-0.5 hover:border-oro-claro hover:shadow-[0_18px_40px_-10px_rgba(0,0,0,.95),0_0_0_4px_rgba(201,162,107,.16)]"
+        className="nx-asesor-foto block shrink-0 rounded-full border-[2.5px] border-oro/80 bg-carbon shadow-[0_0_0_5px_rgba(201,162,107,.14),0_18px_40px_-10px_rgba(0,0,0,.95),0_6px_16px_-4px_rgba(0,0,0,.7)] transition-[translate,border-color,box-shadow] duration-500 hover:-translate-y-0.5 hover:border-oro-claro hover:shadow-[0_0_0_6px_rgba(201,162,107,.22),0_22px_46px_-10px_rgba(0,0,0,.95),0_6px_16px_-4px_rgba(0,0,0,.7)] sm:border-[3px]"
       >
         {/* eslint-disable-next-line @next/next/no-img-element -- export estático, sin optimizador de imágenes */}
         <img
@@ -165,7 +170,7 @@ export function Asesor() {
           height={176}
           loading="lazy"
           decoding="async"
-          className="size-12 rounded-full object-cover sm:size-14"
+          className="size-[3.6875rem] rounded-full object-cover sm:size-[4.125rem]"
         />
       </a>
     </div>

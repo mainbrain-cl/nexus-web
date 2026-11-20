@@ -190,7 +190,8 @@ export type Texts = {
     /** Tarjeta chica de Domingo, abajo a la derecha en escritorio. El rol es `profile.role` abreviado, sin datos nuevos. */
     card: { role: string; cta: string };
   };
-  /** Asesor flotante: la foto de Domingo fija abajo a la derecha, con un mensaje que lleva al formulario. */
+  /** Asesor flotante: la foto de Domingo fija abajo a la derecha, con un mensaje que lleva al formulario.
+   *  El mensaje debe caber en dos líneas en el globo (Aaron, 20-11): corto, específico y directo a la acción. */
   advisor: { label: string; message: string; cta: string; close: string };
   intersection: {
     title: Tuple<string, 2>;
@@ -292,9 +293,9 @@ const es: Texts = {
     card: { role: "Dirección técnica · Abogado · IAAI-FIT", cta: "Conocer a Domingo" },
   },
   advisor: {
-    label: "Escribir a Domingo Soto Gamé: abrir el formulario",
-    message: "Hola, soy Domingo. ¿Necesita algo específico? Cuénteme su caso en el formulario y lo reviso personalmente.",
-    cta: "Abrir el formulario",
+    label: "Contar mi caso a Domingo Soto Gamé",
+    message: "¿Un siniestro o un informe que revisar? Lo analizo personalmente.",
+    cta: "Contar mi caso",
     close: "Cerrar mensaje",
   },
   // Intersección: un solo bloque (Aaron, 10-11). Las tres competencias van en palabras de Domingo (12-11).
@@ -515,9 +516,9 @@ const en: Texts = {
     card: { role: "Technical director · Attorney (Chile) · IAAI-FIT", cta: "Meet Domingo" },
   },
   advisor: {
-    label: "Write to Domingo Soto Gamé: open the form",
-    message: "Hello, I'm Domingo. Do you need something specific? Tell me about your case in the form and I will review it personally.",
-    cta: "Open the form",
+    label: "Tell Domingo Soto Gamé about your case",
+    message: "A fire loss or a report to review? I'll analyze it personally.",
+    cta: "Tell me about your case",
     close: "Close message",
   },
   intersection: {
@@ -739,9 +740,9 @@ const pt: Texts = {
     card: { role: "Direção técnica · Advogado (Chile) · IAAI-FIT", cta: "Conheça o Domingo" },
   },
   advisor: {
-    label: "Escrever para Domingo Soto Gamé: abrir o formulário",
-    message: "Olá, sou o Domingo. Precisa de algo específico? Conte-me o seu caso no formulário e eu o analiso pessoalmente.",
-    cta: "Abrir o formulário",
+    label: "Contar meu caso a Domingo Soto Gamé",
+    message: "Um sinistro ou um laudo para revisar? Eu analiso pessoalmente.",
+    cta: "Contar meu caso",
     close: "Fechar mensagem",
   },
   intersection: {
