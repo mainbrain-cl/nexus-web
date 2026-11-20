@@ -1,6 +1,6 @@
 // Genera public/correo/nexus-logo.png: el logo NEXUS (hueso con la X dorada) sobre fondo ceniza, para el
 // encabezado del correo de consultas. Gmail no muestra SVG, así que el correo lo carga como PNG desde
-// https://nexuschile.net/correo/nexus-logo.png (`LOGO_URL` en src/app/api/contacto/correo.ts).
+// https://nexuschile.net/correo/nexus-logo.png (`ASSET_BASE` en src/app/api/contacto/correo.ts).
 // Se dibuja con el componente y la fuente del propio sitio: se abre la página en Chrome y se fotografía el logo.
 // El fondo es opaco a propósito: si un cliente de correo en modo oscuro invierte el encabezado, el logo se sigue leyendo.
 //

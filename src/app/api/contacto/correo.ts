@@ -1,9 +1,10 @@
 // Arma el correo a Domingo a partir de una consulta ya validada. Siempre en español.
 //
-// Diseño: minimalista y de lectura fácil, en una sola columna. Franja oscura con el logo; título con el servicio,
-// fecha y, si la hay, la urgencia; el aviso fijo; y cuatro bloques: quién escribe, qué necesita, detalles del caso
-// (solo los que vienen con dato) y cómo responder, con botones grandes. Hecho para Gmail: tablas, estilos en línea,
-// 600 px de ancho máximo y fuentes del sistema; no depende de `<style>` ni de fuentes web.
+// Diseño: de lectura fácil y visual. Franja oscura con el logo; título con el servicio, fecha y, si la hay, la
+// urgencia en una banda; el aviso fijo; y cuatro tarjetas con ícono: quién escribe, qué necesita, detalles del caso
+// (solo los que vienen con dato) y cómo responder, con botones grandes. Los datos cortos van en dos columnas que
+// en el celular pasan a una. Hecho para Gmail: tablas, estilos en línea,
+// 600 px de ancho máximo y fuentes del sistema; no depende de fuentes web, y la única regla en `<style>` es una mejora.
 //
 // Defensas (si el diseño choca con una, gana la defensa):
 // - Todo valor del visitante se escapa antes de entrar al HTML; el asunto solo lleva textos de las listas blancas.
@@ -20,8 +21,11 @@ import { isEmail, type ContactPayload } from "@/lib/contacto";
 
 const es = getFormTexts("es");
 
-/** Logo para el correo: PNG servido por el sitio (Gmail no muestra SVG). Se genera con `scripts/correo-logo.mjs`. */
-export const LOGO_URL = "https://nexuschile.net/correo/nexus-logo.png";
+/**
+ * Base de las imágenes del correo (logo e íconos): PNG servidos por el sitio, porque Gmail no muestra SVG.
+ * Se generan con `scripts/correo-logo.mjs` y `scripts/correo-iconos.mjs` en `public/correo/`.
+ */
+export const ASSET_BASE = "https://nexuschile.net/correo";
 const LOGO = { width: 124, height: 40 };
 
 const escapeHtml = (s: string) =>
@@ -82,7 +86,6 @@ const indent = (v: string) => v.split("\n").map((l) => INDENT + l).join("\n");
 
 const label = <T extends { id: string; label: string }>(list: T[], id: string) => list.find((o) => o.id === id)?.label ?? id;
 
-type Row = [string, string];
 
 /** Fecha y hora de Chile, en 24 horas: larga para el cuerpo (`20 de noviembre de 2026, 14:32`) y corta para el asunto. */
 function chileDate(sentAt: Date) {
@@ -98,8 +101,9 @@ function chileDate(sentAt: Date) {
 }
 
 // ---------- Estilos en línea ----------
-// Una sola columna, letra grande y casi negro sobre claro. La jerarquía se marca con el tamaño y el peso, siempre igual:
-// título (25 px, 800) > título de sección (20 px, 700) > dato o párrafo (18 px, 400) > etiqueta (15 px, 600, un
+// Tarjetas blancas sobre un fondo cálido, cada una con su ícono y su título; los datos cortos van en una grilla de dos
+// columnas que en el celular pasa a una. La jerarquía se marca con el tamaño y el peso, siempre igual:
+// título (25 px, 800) > título de tarjeta (20 px, 700) > dato o párrafo (18 px, 400) > etiqueta (15 px, 600, un
 // tono más suave) > aviso (15 px) > pie (13 px). La negrita queda para los textos fijos del correo: lo que escribió
 // el visitante va siempre en peso normal.
 
@@ -108,19 +112,42 @@ const C = {
   oro: "#c9a26b",
   oroTinta: "#7c5c34", // oro oscuro del logo: fondo del botón principal
   hueso: "#f4eee6",
-  fondo: "#ece5da",
-  papel: "#fdfbf7",
-  aviso: "#f5ecdd",
+  fondo: "#f1ebe1",
+  tarjeta: "#ffffff",
+  aviso: "#f7ecd9",
   urgente: "#f3dfbd",
-  linea: "#ddd0bc",
+  borde: "#e2d6c3",
   tinta: "#14100d", // datos, párrafos y títulos
-  etiqueta: "#4d4238", // etiquetas: más suave que el dato, pero de alto contraste (9:1 sobre el papel)
+  etiqueta: "#4d4238", // etiquetas: más suave que el dato, pero de alto contraste (9:1 sobre blanco)
   pie: "#5c5148",
 };
 const FONT = "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;";
 /** Un texto largo sin espacios (una URL, por ejemplo) no ensancha el correo en el celular. */
 const WRAP = "word-break:break-word;overflow-wrap:anywhere;";
 const TABLE = 'role="presentation" cellpadding="0" cellspacing="0" border="0"';
+
+/**
+ * Íconos del correo: nombres fijos de archivos en `public/correo/iconos/` (los genera `scripts/correo-iconos.mjs`).
+ * Nunca dependen de lo que escribió el visitante. Son decorativos: llevan `alt=""` y el texto se entiende sin ellos.
+ */
+export const ICONS = [
+  "persona", "mensaje", "llama", "responder", "aviso", "urgencia", "cliente", "identificacion", "empresa", "idioma",
+  "situacion", "lugar", "fecha", "plazo", "correo", "telefono",
+] as const;
+type Icon = (typeof ICONS)[number];
+const icon = (name: Icon, size: number, style: string) =>
+  `<img src="${ASSET_BASE}/iconos/${name}.png" width="${size}" height="${size}" alt="" style="width:${size}px;height:${size}px;border:0;outline:none;${style}">`;
+
+/** Ancho de cada columna de la grilla: dos caben en la tarjeta a 600 px; en el celular queda una por fila. */
+const COL = 260;
+/**
+ * Única regla en `<style>`, como mejora: en el celular cada columna ocupa todo el ancho de la tarjeta. Si el
+ * cliente de correo la descarta, la columna queda de 260 px y el correo se lee igual.
+ */
+const STYLE = `@media (max-width:560px){.nx-col{max-width:100%!important}}`;
+
+/** Dato de una tarjeta: ícono fijo, etiqueta fija y valor. */
+type Field = [Icon, string, string];
 
 export function buildEmail(d: ContactPayload, sentAt: Date) {
   const s = es.steps;
@@ -158,24 +185,24 @@ export function buildEmail(d: ContactPayload, sentAt: Date) {
   // Arriba del aviso fijo va solo lo que arma el sistema con listas cerradas: el servicio en el título, la fecha y la
   // urgencia. Todo lo que escribió el visitante va después del aviso, cada dato bajo su etiqueta y en peso normal.
   // Solo se muestran los datos que vienen con algo: un campo opcional en blanco no ocupa lugar.
-  const filled = (rows: Row[]) => rows.filter(([, val]) => val);
+  const filled = (rows: Field[]) => rows.filter(([, , val]) => val);
   const quien = filled([
-    [t.labels.nombre, v.nombre],
-    [t.labels.cliente, cliente],
-    [t.labels.clienteOtro, d.cliente === "otro" ? v.clienteOtro : ""],
-    [t.labels.empresa, v.empresa],
-    [t.labels.idioma, d.idioma === "es" ? "" : t.idiomaValue(idioma)],
+    ["persona", t.labels.nombre, v.nombre],
+    ["cliente", t.labels.cliente, cliente],
+    ["identificacion", t.labels.clienteOtro, d.cliente === "otro" ? v.clienteOtro : ""],
+    ["empresa", t.labels.empresa, v.empresa],
+    ["idioma", t.labels.idioma, d.idioma === "es" ? "" : t.idiomaValue(idioma)],
   ]);
-  // La urgencia con plazo ya está arriba, en su línea: aquí queda solo el detalle.
+  // La urgencia con plazo ya está arriba, en su banda: aquí queda solo el detalle.
   const detalles = filled([
-    [t.labels.lugar, noIncident ? "" : v.lugar],
-    [t.labels.fecha, noIncident ? "" : v.fecha],
-    [t.labels.urgencia, conPlazo ? "" : urgencia],
-    [t.labels.plazoDetalle, v.plazoDetalle],
+    ["lugar", t.labels.lugar, noIncident ? "" : v.lugar],
+    ["fecha", t.labels.fecha, noIncident ? "" : v.fecha],
+    ["plazo", t.labels.urgencia, conPlazo ? "" : urgencia],
+    ["plazo", t.labels.plazoDetalle, v.plazoDetalle],
   ]);
 
   // ----- Texto plano -----
-  const line = ([k, val]: Row) => `${k}: ${val}`;
+  const line = ([, k, val]: Field) => `${k}: ${val}`;
   const text = [
     `${t.brand} · ${title}`,
     t.received(fecha.long),
@@ -193,9 +220,9 @@ export function buildEmail(d: ContactPayload, sentAt: Date) {
       ? [detallesTitle.toUpperCase(), ...estado.map((i) => `- ${i}`), ...detalles.map(line), ""]
       : []),
     t.sections.responder.toUpperCase(),
-    line([t.labels.correo, d.correo]),
-    ...(v.telefono ? [line([t.labels.telefono, v.telefono])] : []),
-    ...(phone?.whatsapp ? [line([t.labels.whatsapp, phone.whatsapp])] : []),
+    `${t.labels.correo}: ${d.correo}`,
+    ...(v.telefono ? [`${t.labels.telefono}: ${v.telefono}`] : []),
+    ...(phone?.whatsapp ? [`${t.labels.whatsapp}: ${phone.whatsapp}`] : []),
     t.replyHint,
     "",
     "--",
@@ -206,17 +233,43 @@ export function buildEmail(d: ContactPayload, sentAt: Date) {
   const e = escapeHtml;
   const multiline = (val: string) => e(val).replace(/\n/g, "<br>");
 
-  const sectionTitle = (text: string) =>
-    `<tr><td style="${FONT}padding:34px 0 0"><div style="border-top:1px solid ${C.linea};padding-top:22px;font-size:20px;line-height:26px;font-weight:700;color:${C.tinta}">${e(text)}</div></td></tr>`;
-  const labelHtml = (k: string) => `<div style="font-size:15px;line-height:21px;font-weight:600;color:${C.etiqueta}">${e(k)}:</div>`;
+  const labelHtml = (ic: Icon, k: string) =>
+    `<div style="font-size:15px;line-height:22px;font-weight:600;color:${C.etiqueta}">${icon(ic, 18, "vertical-align:-3px;margin-right:7px;")}${e(k)}:</div>`;
   const valueHtml = (html: string) => `<div style="${WRAP}font-size:18px;line-height:28px;font-weight:400;color:${C.tinta}">${html}</div>`;
-  const field = ([k, val]: Row) => `<tr><td style="${FONT}padding:14px 0 0">${labelHtml(k)}${valueHtml(e(val))}</td></tr>`;
-  const fields = (rows: Row[]) => rows.map(field).join("");
+  /** Una celda de la grilla. `html` reemplaza al valor cuando la celda lleva algo más (los botones). */
+  const cell = (ic: Icon, k: string, html: string) =>
+    `<div class="nx-col" style="display:inline-block;width:100%;max-width:${COL}px;vertical-align:top"><div style="${FONT}padding:16px 14px 0 0">${labelHtml(ic, k)}${html}</div></div>`;
+  /** Grilla fluida: celdas `inline-block` de ancho máximo fijo. `font-size:0` quita el espacio entre celdas. */
+  const grid = (cells: string[]) => (cells.length ? `<div style="font-size:0;line-height:0">${cells.join("")}</div>` : "");
+  const fieldCells = (rows: Field[]) => rows.map(([ic, k, val]) => cell(ic, k, valueHtml(e(val))));
 
-  // Botones a todo el ancho y de 52 px de alto. Letra clara sobre fondo oscuro: con letra oscura sobre dorado claro,
-  // un modo oscuro forzado aclara la letra y deja el fondo igual, y no se lee.
+  /** Tarjeta de sección: ícono y título en la cabecera, y el contenido debajo. */
+  const card = (ic: Icon, title: string, body: string) =>
+    `<tr><td style="padding:14px 0 0"><div style="${FONT}padding:20px 20px 22px;border:1px solid ${C.borde};border-radius:12px;background-color:${C.tarjeta}">` +
+    `<div style="font-size:20px;line-height:26px;font-weight:700;color:${C.tinta}">${icon(ic, 24, "vertical-align:-5px;margin-right:10px;")}${e(title)}</div>${body}</div></td></tr>`;
+  /** Banda de aviso: ícono a la izquierda y texto fijo. */
+  const band = (ic: Icon, bg: string, html: string, size: number, weight: number) =>
+    `<tr><td style="padding:14px 0 0"><table ${TABLE} width="100%" style="width:100%"><tr>` +
+    `<td width="40" valign="top" bgcolor="${bg}" style="width:40px;padding:14px 0 14px 16px;border-radius:12px 0 0 12px;background-color:${bg}">${icon(ic, 24, "display:block;")}</td>` +
+    `<td valign="top" bgcolor="${bg}" style="${FONT}padding:14px 16px 14px 12px;border-radius:0 12px 12px 0;background-color:${bg};font-size:${size}px;line-height:${size + 8}px;font-weight:${weight};color:${C.tinta}">${html}</td>` +
+    `</tr></table></td></tr>`;
+
+  // Botones a todo el ancho de su columna y de 52 px de alto. Letra clara sobre fondo oscuro: con letra oscura sobre
+  // dorado claro, un modo oscuro forzado aclara la letra y deja el fondo igual, y no se lee.
   const button = (href: string, text: string, primary = false) =>
-    `<tr><td style="padding:12px 0 0"><a href="${e(href)}" target="_blank" rel="noopener noreferrer" style="${FONT}display:block;padding:14px 16px;border:1px solid ${primary ? C.oroTinta : C.ceniza};border-radius:10px;background-color:${primary ? C.oroTinta : C.ceniza};font-size:18px;line-height:22px;font-weight:700;text-align:center;text-decoration:none;color:${C.hueso}"><span style="color:${C.hueso}">${e(text)}</span></a></td></tr>`;
+    `<a href="${e(href)}" target="_blank" rel="noopener noreferrer" style="${FONT}display:block;margin-top:12px;padding:14px 12px;border:1px solid ${primary ? C.oroTinta : C.ceniza};border-radius:10px;background-color:${primary ? C.oroTinta : C.ceniza};font-size:18px;line-height:22px;font-weight:700;text-align:center;text-decoration:none;color:${C.hueso}"><span style="color:${C.hueso}">${e(text)}</span></a>`;
+  const responder = grid([
+    cell("correo", t.labels.correo, valueHtml(e(d.correo)) + (mailto ? button(mailto, t.actions.correo, true) : "")),
+    ...(v.telefono
+      ? [
+          cell(
+            "telefono",
+            t.labels.telefono,
+            valueHtml(e(v.telefono)) + (phone?.whatsapp ? button(phone.whatsapp, t.actions.whatsapp) : "") + (phone ? button(phone.tel, t.actions.telefono) : ""),
+          ),
+        ]
+      : []),
+  ]);
 
   const html = `<!doctype html>
 <html lang="es">
@@ -226,43 +279,44 @@ export function buildEmail(d: ContactPayload, sentAt: Date) {
 <meta name="color-scheme" content="light only">
 <meta name="supported-color-schemes" content="light only">
 <title>${e(title)}</title>
+<style>${STYLE}</style>
 </head>
 <body style="margin:0;padding:0;background-color:${C.fondo};-webkit-text-size-adjust:100%">
 <table ${TABLE} width="100%" bgcolor="${C.fondo}" style="width:100%;background-color:${C.fondo}"><tr><td align="center" style="padding:0">
 <table ${TABLE} width="600" style="width:100%;max-width:600px">
-<tr><td bgcolor="${C.ceniza}" style="padding:20px 24px;background-color:${C.ceniza}">
-<img src="${LOGO_URL}" width="${LOGO.width}" height="${LOGO.height}" alt="${e(t.brand)}" style="${FONT}display:block;border:0;outline:none;text-decoration:none;font-size:26px;line-height:${LOGO.height}px;font-weight:700;letter-spacing:.06em;color:${C.hueso}">
+<tr><td bgcolor="${C.ceniza}" style="padding:20px 20px;background-color:${C.ceniza}">
+<img src="${ASSET_BASE}/nexus-logo.png" width="${LOGO.width}" height="${LOGO.height}" alt="${e(t.brand)}" style="${FONT}display:block;border:0;outline:none;text-decoration:none;font-size:26px;line-height:${LOGO.height}px;font-weight:700;letter-spacing:.06em;color:${C.hueso}">
 </td></tr>
 <tr><td bgcolor="${C.oro}" height="2" style="height:2px;font-size:0;line-height:0;background-color:${C.oro}">&nbsp;</td></tr>
-<tr><td bgcolor="${C.papel}" style="padding:28px 24px 34px;background-color:${C.papel}">
+<tr><td bgcolor="${C.fondo}" style="padding:26px 16px 22px;background-color:${C.fondo}">
 <table ${TABLE} width="100%" style="width:100%">
-<tr><td style="${FONT}">
+<tr><td style="${FONT}padding:0 4px">
 <h1 style="${FONT}margin:0;font-size:25px;line-height:32px;font-weight:800;color:${C.tinta}">${e(title)}</h1>
 <div style="margin-top:8px;font-size:15px;line-height:22px;font-weight:400;color:${C.etiqueta}">${e(t.received(fecha.long))}</div>
 </td></tr>
-${conPlazo ? `<tr><td style="padding:18px 0 0"><div style="${FONT}padding:12px 16px;border-radius:8px;background-color:${C.urgente};font-size:18px;line-height:26px;font-weight:700;color:${C.tinta}">${e(urgencia)}</div></td></tr>` : ""}
-<tr><td style="padding:18px 0 0"><div style="${FONT}padding:12px 16px;border-radius:8px;background-color:${C.aviso};font-size:15px;line-height:23px;font-weight:400;color:${C.tinta}"><span style="font-weight:600">${e(t.noticeTitle)}:</span> ${e(t.visitorNotice)}</div></td></tr>
-${sectionTitle(t.sections.quien)}
-${fields(quien)}
-${sectionTitle(t.sections.necesita)}
-<tr><td style="${FONT}padding:14px 0 0">${valueHtml(multiline(v.descripcion))}</td></tr>
+${conPlazo ? band("urgencia", C.urgente, e(urgencia), 18, 700) : ""}
+${band("aviso", C.aviso, `<span style="font-weight:600">${e(t.noticeTitle)}:</span> ${e(t.visitorNotice)}`, 15, 400)}
+${card("persona", t.sections.quien, grid(fieldCells(quien)))}
+${card("mensaje", t.sections.necesita, `<div style="padding:14px 0 0">${valueHtml(multiline(v.descripcion))}</div>`)}
 ${
   estado.length || detalles.length
-    ? sectionTitle(detallesTitle) +
-      (estado.length ? `<tr><td style="${FONT}padding:14px 0 0">${labelHtml(t.labels.estado)}${estado.map((i) => valueHtml(`&bull;&nbsp;${e(i)}`)).join("")}</td></tr>` : "") +
-      fields(detalles)
+    ? card(
+        "llama",
+        detallesTitle,
+        (estado.length
+          ? `<div style="padding:16px 0 0">${labelHtml("situacion", t.labels.estado)}${estado.map((i) => valueHtml(`&bull;&nbsp;${e(i)}`)).join("")}</div>`
+          : "") + grid(fieldCells(detalles)),
+      )
     : ""
 }
-${sectionTitle(t.sections.responder)}
-${field([t.labels.correo, d.correo])}
-${mailto ? button(mailto, t.actions.correo, true) : ""}
-${v.telefono ? `<tr><td style="font-size:0;line-height:0;height:10px">&nbsp;</td></tr>${field([t.labels.telefono, v.telefono])}` : ""}
-${phone?.whatsapp ? button(phone.whatsapp, t.actions.whatsapp) : ""}
-${phone ? button(phone.tel, t.actions.telefono) : ""}
-<tr><td style="${FONT}padding:18px 0 0;font-size:15px;line-height:23px;font-weight:400;color:${C.etiqueta}">${e(t.replyHint)}</td></tr>
+${card(
+  "responder",
+  t.sections.responder,
+  `${responder}<div style="padding:18px 0 0;font-size:15px;line-height:23px;font-weight:400;color:${C.etiqueta}">${e(t.replyHint)}</div>`,
+)}
+<tr><td style="${FONT}padding:18px 4px 0;font-size:13px;line-height:20px;font-weight:400;color:${C.pie}">${e(t.footer(idioma))}</td></tr>
 </table>
 </td></tr>
-<tr><td bgcolor="${C.fondo}" style="${FONT}padding:16px 24px 26px;background-color:${C.fondo};font-size:13px;line-height:20px;font-weight:400;color:${C.pie}">${e(t.footer(idioma))}</td></tr>
 </table>
 </td></tr></table>
 </body>
