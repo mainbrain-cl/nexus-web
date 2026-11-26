@@ -8,8 +8,10 @@ export function Logo({ className = "" }: { className?: string }) {
   const a = `nexus-x-a-${uid}`;
   const b = `nexus-x-b-${uid}`;
   return (
-    <span className={`inline-flex items-center font-semibold tracking-[0.06em] text-hueso ${className}`} aria-label="NEXUS">
+    <span role="img" aria-label="NEXUS" className={`inline-flex items-center font-semibold tracking-[0.06em] text-hueso ${className}`}>
       <span aria-hidden="true">NE</span>
+      {/* La X va dibujada en el SVG; esta copia invisible deja la marca completa ("NEXUS") en el texto del HTML. */}
+      <span className="sr-only">X</span>
       <svg aria-hidden="true" viewBox="0 0 100 112" className="mx-[0.02em] h-[1.18em] w-[1.05em] -translate-y-[0.02em]">
         <defs>
           <linearGradient id={a} x1="0" y1="0" x2="1" y2="1">

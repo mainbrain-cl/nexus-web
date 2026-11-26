@@ -65,6 +65,13 @@
   background-clip: text;
 }
 
+/* Títulos letra por letra (hero y cierre): la letra se dibuja desde `data-c` y no existe como texto en el
+   HTML. El texto real del título va una sola vez, en un `sr-only`, para lectores de pantalla y buscadores. */
+.title-char[data-c]::before,
+.title-hot[data-c]::before {
+  content: attr(data-c);
+}
+
 .title-hot {
   color: #ffe2b0;
   /* Dos sombras cortas: se rasterizan una vez por letra y luego solo se anima la opacidad en GPU. */

@@ -129,6 +129,9 @@ function useTextLayer(
  * completa midiendo la posición de cada letra, para que se vea continua y no reinicie letra por letra.
  * Cada letra carbonizada lleva relleno con margen negativo: la cursiva sobresale de su caja y el fondo
  * recortado al texto solo se pinta dentro de la caja; sin ese margen, las astas quedaban cortadas.
+ * Las letras no van como texto: cada capa las dibuja con CSS desde `data-c` (ver `[data-c]::before` en
+ * globals.css). Así el único texto del título en el HTML es el `sr-only` del h1, y los buscadores no leen
+ * cada letra dos veces ("AAuuddii…").
  */
 function TitleLine({ text, start }: { text: string; start: number }) {
   const ref = useRef<HTMLSpanElement>(null);
@@ -160,12 +163,8 @@ function TitleLine({ text, start }: { text: string; start: number }) {
           " "
         ) : (
           <span key={i} className="relative inline-block">
-            <span data-char className="title-char char-in -mx-[0.2em] -my-[0.16em] block px-[0.2em] py-[0.16em]" style={{ "--d": `${start + i * CHAR_STEP + 0.2}s` } as Vars}>
-              {c}
-            </span>
-            <span className="title-hot absolute inset-0 block" style={{ "--d": `${start + i * CHAR_STEP}s` } as Vars}>
-              {c}
-            </span>
+            <span data-char data-c={c} className="title-char char-in -mx-[0.2em] -my-[0.16em] block px-[0.2em] py-[0.16em]" style={{ "--d": `${start + i * CHAR_STEP + 0.2}s` } as Vars} />
+            <span data-c={c} className="title-hot absolute inset-0 block" style={{ "--d": `${start + i * CHAR_STEP}s` } as Vars} />
           </span>
         ),
       )}

@@ -265,8 +265,9 @@ export type Texts = {
 const es: Texts = {
   site: {
     title: "NEXUS | Evaluación pericial independiente en incendios",
+    // Hasta 155 caracteres: Google corta la descripción más allá de eso.
     description:
-      "Evaluación independiente que integra investigación de incendios, análisis técnico-científico y comprensión jurídica de la prueba pericial, para evaluar un informe o fortalecer el suyo. Domingo Soto Gamé, abogado e investigador de incendios, IAAI-FIT. Atención en todo Chile y en el extranjero.",
+      "Investigación de incendios y evaluación independiente de informes periciales. Domingo Soto Gamé, abogado e investigador IAAI-FIT. Chile y el extranjero.",
     tagline: "Método científico. Utilidad jurídica.",
   },
   whatsappText: "Hola Domingo, quiero solicitar una asesoría con NEXUS.",
@@ -490,7 +491,7 @@ const en: Texts = {
     // trabajo de un perito.
     title: "NEXUS | Independent expert review in fire cases",
     description:
-      "Independent evaluation that brings together fire investigation, scientific and technical analysis, and a legal understanding of expert evidence, to assess a report or strengthen your own. Domingo Soto Gamé, attorney (Chile) and fire investigator, IAAI-FIT. Serving clients throughout Chile and abroad.",
+      "Fire investigation and independent evaluation of expert reports. Domingo Soto Gamé, attorney (Chile) and fire investigator, IAAI-FIT. Chile and abroad.",
     tagline: "Scientific method. Legal value.",
   },
   whatsappText: "Hello Domingo, I would like to request a consultation with NEXUS.",
@@ -714,7 +715,7 @@ const pt: Texts = {
   site: {
     title: "NEXUS | Avaliação pericial independente em incêndios",
     description:
-      "Avaliação independente que integra investigação de incêndios, análise técnico-científica e compreensão jurídica da prova pericial, para avaliar um laudo ou fortalecer o seu. Domingo Soto Gamé, advogado (Chile) e investigador de incêndios, IAAI-FIT. Atendimento em todo o Chile e no exterior.",
+      "Investigação de incêndios e avaliação independente de laudos periciais. Domingo Soto Gamé, advogado (Chile) e investigador IAAI-FIT. Chile e exterior.",
     tagline: "Método científico. Utilidade jurídica.",
   },
   whatsappText: "Olá, Domingo. Gostaria de solicitar uma assessoria da NEXUS.",
