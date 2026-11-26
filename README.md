@@ -39,6 +39,7 @@ npm run test:portada  # tras el build: mide que nada se monte en la portada de c
 - **Títulos letra por letra (hero y cierre):** las letras se dibujan con CSS desde el atributo `data-c` y no existen como texto en el HTML; el texto real va una sola vez en un `sr-only`. Antes cada letra salía dos veces y los buscadores leían "AAuuddii…".
 - **Descripción:** hasta 155 caracteres por idioma (`site.description` en `nexus.ts`); Google corta lo que pase de eso.
 - **Search Console:** la etiqueta de verificación va en `RootDocument.tsx`. `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` la reemplaza y `NEXT_PUBLIC_BING_SITE_VERIFICATION` agrega la de Bing.
+- **Google Analytics:** `src/components/Analytics.tsx` carga la etiqueta de Google (contenedor `GTM-WVZK9LCV`, que ya trae la propiedad de Analytics 4 y la medición mejorada) en las tres versiones de idioma, solo en producción. `NEXT_PUBLIC_GOOGLE_TAG_ID` la reemplaza.
 - **Dominios `*.vercel.app`:** responden con `X-Robots-Tag: noindex` (`next.config.ts`), para que la copia del sitio en Vercel no aparezca en buscadores.
 
 ## Despliegue

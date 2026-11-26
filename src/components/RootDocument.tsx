@@ -4,6 +4,7 @@ import { Archivo, Barlow_Condensed, Schibsted_Grotesk } from "next/font/google";
 import { content } from "@/data/nexus";
 import { localeInfo, locales, type Locale } from "@/data/idiomas";
 import { MotionProvider } from "@/components/MotionProvider";
+import { Analytics } from "@/components/Analytics";
 import "@/app/globals.css";
 
 // Documento raíz compartido por los dos layouts raíz: `app/(es)` sirve `/` y `app/[lang]` sirve `/en/` y `/pt/`.
@@ -93,6 +94,7 @@ export function RootDocument({ locale, children }: { locale: Locale; children: R
           {content[locale].a11y.skipLink}
         </a>
         <MotionProvider>{children}</MotionProvider>
+        <Analytics />
       </body>
     </html>
   );
