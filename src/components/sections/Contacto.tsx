@@ -54,18 +54,14 @@ function ClosingLine({ text, start, lit }: { text: string; start: number; lit: b
           " "
         ) : (
           <span key={i} className="relative inline-block">
+            {/* Las letras se dibujan con CSS desde data-c, igual que en la hero: no se repiten como texto en el HTML. */}
             <span
               data-char
+              data-c={c}
               className={`title-char -mx-[0.2em] -my-[0.16em] block px-[0.2em] py-[0.16em]`}
               style={{ "--d": `${start + i * CHAR_STEP + 0.2}s` } as Vars}
-            >
-              {c}
-            </span>
-            {lit && (
-              <span className="title-hot absolute inset-0 block" style={{ "--d": `${start + i * CHAR_STEP}s` } as Vars}>
-                {c}
-              </span>
-            )}
+            />
+            {lit && <span data-c={c} className="title-hot absolute inset-0 block" style={{ "--d": `${start + i * CHAR_STEP}s` } as Vars} />}
           </span>
         ),
       )}

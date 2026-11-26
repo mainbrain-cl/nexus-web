@@ -28,6 +28,13 @@ const nextConfig: NextConfig = {
           },
         ],
       },
+      // Los dominios de Vercel (`*.vercel.app`) sirven una copia completa del sitio. No deben aparecer en
+      // buscadores: el único dominio que se indexa es el propio.
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: ".*\\.vercel\\.app" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
     ];
   },
   turbopack: {

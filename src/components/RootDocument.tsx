@@ -33,6 +33,9 @@ const name = Archivo({
 /** Variables de las tres fuentes, para `<html>`. También las usa la página 404 (`app/global-not-found.tsx`). */
 export const fontVariables = `${display.variable} ${sans.variable} ${name.variable}`;
 
+/** Código de verificación de Google Search Console para nexuschile.net. */
+const GOOGLE_SITE_VERIFICATION = "FG0Y4qe5p0boU-OOT8d6rNcE--kvCPnxqJzjoyxBOWw";
+
 export const viewport: Viewport = {
   themeColor: "#120f0d",
 };
@@ -69,6 +72,12 @@ export function buildMetadata(locale: Locale): Metadata {
       title: site.title,
       description: site.description,
       images: [image],
+    },
+    // Verificación de Google Search Console (etiqueta de la propiedad, entregada el 26-11; es un valor público).
+    // La variable de entorno permite cambiarla sin tocar el código. Bing solo se emite si se define su variable.
+    verification: {
+      google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION ?? GOOGLE_SITE_VERIFICATION,
+      other: process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION ? { "msvalidate.01": process.env.NEXT_PUBLIC_BING_SITE_VERIFICATION } : undefined,
     },
   };
 }

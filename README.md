@@ -32,6 +32,15 @@ npm run test:portada  # tras el build: mide que nada se monte en la portada de c
 - **Imagen al compartir (Open Graph y X/Twitter):** una por idioma en `public/og/<idioma>-3.jpg` (1200×630), con el logo, el título, el nombre y las dos frases del idioma, sin foto, igual que la portada. Se dibujan con las fuentes y la textura del sitio: `npm run build && node scripts/og.mjs` (o `node scripts/og.mjs http://localhost:3000` con `next dev` abierto). Hay que regenerarlas si cambian el título, el nombre o las frases de la hero; si cambia el diseño, se sube el número del archivo (en `og.image` de `src/data/nexus.ts`) para renovar la caché de WhatsApp y las redes, y se borran las anteriores.
 - **404:** `src/app/global-not-found.tsx` (con `experimental.globalNotFound` en `next.config.ts`, porque hay dos layouts raíz). Toma el idioma de la ruta pedida (`/en/xyz` sale en inglés).
 
+## Buscadores (SEO)
+
+- **`/robots.txt` y `/sitemap.xml`:** se generan desde `src/app/robots.ts` y `src/app/sitemap.ts`. El sitemap lleva una entrada por idioma con sus hreflang; al crear una página nueva hay que sumarla a `pages` en `sitemap.ts`.
+- **Datos estructurados (JSON-LD):** `src/data/schema.ts` arma, desde los textos de `nexus.ts`, la firma (`ProfessionalService`), a Domingo (`Person`, con la credencial IAAI-FIT y sus membresías), el sitio y los siete servicios. Lo inserta `src/components/StructuredData.tsx` en la portada de cada idioma. No lleva datos que no estén publicados en el sitio, salvo la ciudad base (Valdivia). Se valida en [validator.schema.org](https://validator.schema.org) y en la [prueba de resultados enriquecidos](https://search.google.com/test/rich-results) de Google.
+- **Títulos letra por letra (hero y cierre):** las letras se dibujan con CSS desde el atributo `data-c` y no existen como texto en el HTML; el texto real va una sola vez en un `sr-only`. Antes cada letra salía dos veces y los buscadores leían "AAuuddii…".
+- **Descripción:** hasta 155 caracteres por idioma (`site.description` en `nexus.ts`); Google corta lo que pase de eso.
+- **Search Console:** la etiqueta de verificación va en `RootDocument.tsx`. `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` la reemplaza y `NEXT_PUBLIC_BING_SITE_VERIFICATION` agrega la de Bing.
+- **Dominios `*.vercel.app`:** responden con `X-Robots-Tag: noindex` (`next.config.ts`), para que la copia del sitio en Vercel no aparezca en buscadores.
+
 ## Despliegue
 
 Vercel detecta Next.js sin configuración extra. Si el dominio no es `nexuschile.net`, define la variable `NEXT_PUBLIC_SITE_URL`.
